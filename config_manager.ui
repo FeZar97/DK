@@ -1,0 +1,2216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>config_manager</class>
+ <widget class="QDialog" name="config_manager">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>302</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>302</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>324</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Настройки</string>
+  </property>
+  <widget class="QWidget" name="InterfaceWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>292</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>400</width>
+     <height>1</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>400</width>
+     <height>322</height>
+    </size>
+   </property>
+   <widget class="QTabWidget" name="ConfigTab">
+    <property name="geometry">
+     <rect>
+      <x>4</x>
+      <y>24</y>
+      <width>392</width>
+      <height>262</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>392</width>
+      <height>200</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>392</width>
+      <height>290</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
+    <property name="currentIndex">
+     <number>2</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="elideMode">
+     <enum>Qt::ElideMiddle</enum>
+    </property>
+    <property name="usesScrollButtons">
+     <bool>false</bool>
+    </property>
+    <property name="documentMode">
+     <bool>true</bool>
+    </property>
+    <property name="tabsClosable">
+     <bool>false</bool>
+    </property>
+    <property name="movable">
+     <bool>true</bool>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="RPUTab">
+     <attribute name="title">
+      <string>РПУ</string>
+     </attribute>
+     <widget class="QComboBox" name="LPTPortCB">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>12</y>
+        <width>88</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <item>
+       <property name="text">
+        <string>0x378</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0xDD00</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0xE010</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0xDC00</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0xD880</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="LPTPortL">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>12</y>
+        <width>46</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Порт:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="ConfigLabel">
+      <property name="geometry">
+       <rect>
+        <x>174</x>
+        <y>12</y>
+        <width>55</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Режим:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="TractConfigCB">
+      <property name="geometry">
+       <rect>
+        <x>231</x>
+        <y>12</y>
+        <width>130</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <item>
+       <property name="text">
+        <string>4 синхронных</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3 + 1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2 + 2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2 + 1 + 1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1 + 1 + 1 + 1</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QTabWidget" name="RPUTabs">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>45</y>
+        <width>372</width>
+        <height>190</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>372</width>
+        <height>190</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>372</width>
+        <height>190</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Triangular</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="Tract1Tab">
+       <attribute name="title">
+        <string>Тракт 1</string>
+       </attribute>
+       <widget class="QComboBox" name="Tract1_AttInBox">
+        <property name="geometry">
+         <rect>
+          <x>153</x>
+          <y>42</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выкл.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10 дБ</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="Tract1_AttHFLabel">
+        <property name="geometry">
+         <rect>
+          <x>27</x>
+          <y>78</y>
+          <width>124</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Аттенюатор ВЧ:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="Tract1_AttIFBox">
+        <property name="geometry">
+         <rect>
+          <x>153</x>
+          <y>114</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выкл.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>4 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>6 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>8 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>12 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>14 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>16 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>18 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>20 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>22 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>24 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>26 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>28 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30 дБ</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QComboBox" name="Tract1_AttHFBox">
+        <property name="geometry">
+         <rect>
+          <x>153</x>
+          <y>78</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выкл.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>6 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>12 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>18 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>24 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>36 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>42 дБ</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="Tract1_kHzLabel">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>6</y>
+          <width>43</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>кГц</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="Tract1_BandIFBox">
+        <property name="geometry">
+         <rect>
+          <x>153</x>
+          <y>147</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>3 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>8 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>20 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>150 кГц</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="Tract1_AttIFLabel">
+        <property name="geometry">
+         <rect>
+          <x>24</x>
+          <y>111</y>
+          <width>124</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Аттенюатор ПЧ:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="Tract1_AttInLabel">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>40</y>
+          <width>139</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Аттенюатор вход:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="Tract1_BandIFLabel">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>144</y>
+          <width>88</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Полоса ПЧ:</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="Tract1_CentralFreqSB">
+        <property name="geometry">
+         <rect>
+          <x>156</x>
+          <y>9</y>
+          <width>109</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>150</number>
+        </property>
+        <property name="maximum">
+         <number>32000</number>
+        </property>
+        <property name="singleStep">
+         <number>25</number>
+        </property>
+        <property name="value">
+         <number>16000</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="Tract1_CentralFreqLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>7</y>
+          <width>145</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Частота настройки:</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="Tract2Tab">
+       <attribute name="title">
+        <string>Тракт 2</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="Tract3Tab">
+       <attribute name="title">
+        <string>Тракт 3</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="Tract4Tab">
+       <attribute name="title">
+        <string>Тракт 4</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="KalibratorTab">
+       <attribute name="title">
+        <string>Калибратор</string>
+       </attribute>
+       <widget class="QLabel" name="KalibKHZLabel">
+        <property name="geometry">
+         <rect>
+          <x>336</x>
+          <y>40</y>
+          <width>28</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>кГц</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="KalibExitTypeBox">
+        <property name="geometry">
+         <rect>
+          <x>59</x>
+          <y>41</y>
+          <width>124</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <item>
+         <property name="text">
+          <string>Внутренний</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Внешний</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QSpinBox" name="KalibModulationFrequencyBox">
+        <property name="geometry">
+         <rect>
+          <x>237</x>
+          <y>41</y>
+          <width>97</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="KalibExitTypeLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>40</y>
+          <width>55</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Выход:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="KalibAttenLabel">
+        <property name="geometry">
+         <rect>
+          <x>189</x>
+          <y>10</y>
+          <width>100</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Аттенюатор:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="KalibSignalTypeLabel">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>73</y>
+          <width>97</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Тип сигнала:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="KalibAttenTypeBox">
+        <property name="geometry">
+         <rect>
+          <x>291</x>
+          <y>10</y>
+          <width>70</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выкл.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>4 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>6 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>8 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>12 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>14 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>16 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>18 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>20 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>22 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>24 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>26 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>28 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>32 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>34 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>36 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>38 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>40 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>42 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>44 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>46 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>48 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>50 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>52 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>54 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>56 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>58 дБ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60 дБ</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="KalibModulationFrequencyLabel">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>40</y>
+          <width>43</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Fмод:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="KalibStatusLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>7</y>
+          <width>58</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Статус:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="KalibStatusBox">
+        <property name="geometry">
+         <rect>
+          <x>62</x>
+          <y>9</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <item>
+         <property name="text">
+          <string>Выкл</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Вкл</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QComboBox" name="KalibSignalTypeBox">
+        <property name="geometry">
+         <rect>
+          <x>105</x>
+          <y>73</y>
+          <width>136</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <item>
+         <property name="text">
+          <string>синусоида</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>радиоимпульс</string>
+         </property>
+        </item>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="Line" name="RPUMainTopLine">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>30</y>
+        <width>382</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SDRTab">
+     <attribute name="title">
+      <string>SDR</string>
+     </attribute>
+     <widget class="QPushButton" name="RefreshButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>15</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Обновление информаци о подключенных SDR приемниках.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>19</width>
+        <height>19</height>
+       </size>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="CurrentDevNumLabel">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>16</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>№</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="CurrentDevSpinBox">
+      <property name="geometry">
+       <rect>
+        <x>63</x>
+        <y>16</y>
+        <width>35</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="wrapping">
+       <bool>false</bool>
+      </property>
+      <property name="frame">
+       <bool>false</bool>
+      </property>
+      <property name="maximum">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ConfirmButton">
+      <property name="geometry">
+       <rect>
+        <x>102</x>
+        <y>15</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>19</width>
+        <height>19</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SampleRateLabel">
+      <property name="geometry">
+       <rect>
+        <x>132</x>
+        <y>16</y>
+        <width>29</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Fд:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="SampleRateSB">
+      <property name="geometry">
+       <rect>
+        <x>159</x>
+        <y>17</y>
+        <width>99</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="frame">
+       <bool>false</bool>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <number>230000</number>
+      </property>
+      <property name="maximum">
+       <number>2400000</number>
+      </property>
+      <property name="singleStep">
+       <number>5000</number>
+      </property>
+      <property name="value">
+       <number>240000</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="GainLabel">
+      <property name="geometry">
+       <rect>
+        <x>271</x>
+        <y>16</y>
+        <width>27</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>КУ:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="GainValBox">
+      <property name="geometry">
+       <rect>
+        <x>304</x>
+        <y>18</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="maxCount">
+       <number>29</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>авто</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>0.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>7.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>14.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>15.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>19.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>20.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>22.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>25.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>28</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>29.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>32.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>33.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>38.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>40.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>42.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>43.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>43.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>44.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>49.6</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QComboBox" name="DirectSamplingCB">
+      <property name="geometry">
+       <rect>
+        <x>157</x>
+        <y>84</y>
+        <width>141</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="maxCount">
+       <number>29</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>обе квадратуры</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>I часть</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Q часть</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="DirectSamplingLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>82</y>
+        <width>151</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Режим оцифровки:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="CentralFreqSB">
+      <property name="geometry">
+       <rect>
+        <x>159</x>
+        <y>50</y>
+        <width>145</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="frame">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>999999999</number>
+      </property>
+      <property name="singleStep">
+       <number>10000</number>
+      </property>
+      <property name="value">
+       <number>104200000</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="CentralFreqLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>49</y>
+        <width>145</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Частота настройки:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="HzLabel_2">
+      <property name="geometry">
+       <rect>
+        <x>309</x>
+        <y>49</y>
+        <width>29</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Гц</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="DSPTab">
+     <attribute name="title">
+      <string>ЦОС</string>
+     </attribute>
+     <widget class="QTabWidget" name="DSPWidget">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>14</y>
+        <width>376</width>
+        <height>205</height>
+       </rect>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Triangular</enum>
+      </property>
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="RecordTab">
+       <attribute name="title">
+        <string>Запись</string>
+       </attribute>
+       <widget class="QPushButton" name="CurrentPathButton">
+        <property name="geometry">
+         <rect>
+          <x>242</x>
+          <y>8</y>
+          <width>121</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Директория...</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="FltSignalCB">
+        <property name="geometry">
+         <rect>
+          <x>159</x>
+          <y>81</y>
+          <width>16</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="RecordTimeLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>9</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Время записи:</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="RealSignalCB">
+        <property name="geometry">
+         <rect>
+          <x>159</x>
+          <y>114</y>
+          <width>16</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="ADCSignalLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>42</y>
+          <width>111</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Сигнал с АЦП</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="RecordTimeCB">
+        <property name="geometry">
+         <rect>
+          <x>123</x>
+          <y>10</y>
+          <width>111</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>10 с.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30 с.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60 с.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>90 с.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>120 с.</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>360 с.</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="RealSignalLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>108</y>
+          <width>131</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Низкочастотный</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="FltSignalLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>75</y>
+          <width>151</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Отфильтрованный</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ADCSignalCB">
+        <property name="geometry">
+         <rect>
+          <x>159</x>
+          <y>46</y>
+          <width>16</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="RecordButton">
+        <property name="geometry">
+         <rect>
+          <x>242</x>
+          <y>42</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Запись</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="FiltrationTab">
+       <attribute name="title">
+        <string>Фильтрация</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="FftTab">
+       <attribute name="title">
+        <string>БПФ</string>
+       </attribute>
+       <widget class="QCheckBox" name="InversionCB">
+        <property name="geometry">
+         <rect>
+          <x>351</x>
+          <y>49</y>
+          <width>16</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="FftModeLabel">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>11</y>
+          <width>57</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Спектр:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="InfoLabel">
+        <property name="geometry">
+         <rect>
+          <x>243</x>
+          <y>11</y>
+          <width>109</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Информация:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="WindowCB">
+        <property name="geometry">
+         <rect>
+          <x>54</x>
+          <y>77</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>нет</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Кайзера</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Хэмминга</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Блэкмана</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QSpinBox" name="AverageNumSB">
+        <property name="geometry">
+         <rect>
+          <x>132</x>
+          <y>44</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="FftModeCB">
+        <property name="geometry">
+         <rect>
+          <x>69</x>
+          <y>11</y>
+          <width>167</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="maxCount">
+         <number>29</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>с АЦП (i / q)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>после фильтрации (i / q)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>низкочастотный (real)</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="AveragesNumLabel">
+        <property name="geometry">
+         <rect>
+          <x>94</x>
+          <y>44</y>
+          <width>36</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Avg:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="FftInversionLabel">
+        <property name="geometry">
+         <rect>
+          <x>267</x>
+          <y>44</y>
+          <width>81</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Инверсия:</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="InfoCB">
+        <property name="geometry">
+         <rect>
+          <x>351</x>
+          <y>16</y>
+          <width>16</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="ReadOutPerSecSB">
+        <property name="geometry">
+         <rect>
+          <x>39</x>
+          <y>44</y>
+          <width>47</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>4</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="MaxAverageNumber">
+        <property name="geometry">
+         <rect>
+          <x>196</x>
+          <y>44</y>
+          <width>49</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="WindowLabel">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>77</y>
+          <width>49</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Окно:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="ReadOutPerSecLabel">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>44</y>
+          <width>35</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>FPS:</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="ShiftFreqSB">
+        <property name="geometry">
+         <rect>
+          <x>141</x>
+          <y>110</y>
+          <width>163</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>6</number>
+        </property>
+        <property name="maximum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1367.187500000000000</double>
+        </property>
+       </widget>
+       <widget class="QLabel" name="HzLabel">
+        <property name="geometry">
+         <rect>
+          <x>315</x>
+          <y>110</y>
+          <width>29</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Гц</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="ShiftFreqLabel">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>110</y>
+          <width>132</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Частотный сдвиг:</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="ASKRTab">
+     <attribute name="title">
+      <string>АСКР</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="WindowTitleLabel">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="text">
+    <string>Конфигуратор</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="CloseButton">
+   <property name="geometry">
+    <rect>
+     <x>374</x>
+     <y>2</y>
+     <width>23</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>RecordTimeCB</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
