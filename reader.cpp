@@ -57,8 +57,9 @@ void READER::start_reading()
         //    emit get_filtration_step(read_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
 
         // двигаем частоту
-        if(dsp_params->fft_params->fft_mode == SHIFT_FFT)
+        if(dsp_params->fft_params->fft_mode == SHIFT_FFT){
             emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
+        }
 
         // запишем музыку
         if(dsp_params->wav_params->use_first_file)

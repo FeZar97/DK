@@ -267,7 +267,6 @@ void DSP::prepair_mr_filter()
 }
 void DSP::prepair_fft_shifter()
 {
-    /*
     int i;
     dsp_params->shift_params->shift_rb_cell_idx = 0;
 
@@ -276,7 +275,6 @@ void DSP::prepair_fft_shifter()
         dsp_params->shift_params->shift_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
 
     dsp_params->shift_params->complex_sin = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
-    */
 }
 void DSP::prepair_wav_recorder()
 {
@@ -304,7 +302,7 @@ void DSP::prepair_wav_recorder()
 void DSP::start_threads()
 {
     //wav_thread->start();
-    //fft_shift_thread->start();
+    fft_shift_thread->start();
     fft_thread->start();
     //filtration_thread->start();
     reader_thread->start();
