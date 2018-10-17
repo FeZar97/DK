@@ -16,5 +16,6 @@
         <file>buttons/STOP_GRAYRED.png</file>
         <file>buttons/STOP_RED.png</file>
         <file>buttons/SQUID.png</file>
+        <file>buttons/SquidLow.png</file>
     </qresource>
 </RCC>

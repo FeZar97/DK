@@ -127,12 +127,14 @@ enum FFT_MODE{
     FLT_FFT,    // спектр отфильтрованного сигнала
     SHIFT_FFT};   // спектр сдвинутого сигнала
 
-// доступные окна
+// оконные функции
 enum WINDOW{
     NONE,
-    KAISER,
+    BARLETT,
     BLACKMANN,
-    HAMMING};
+    HAMMING,
+    HANN,
+    KAISER};
 
 /// -----------------------------------объявления-----------------------------------------
 
@@ -200,9 +202,10 @@ enum WINDOW{
 #define     DSP_DEFAULT_DYNAMIC_RANGE               30
 #define     DSP_DEFAULT_NOISE_LEVEL                 -10
 #define     DSP_DEFAULT_RECORDING_TIME_IDX          2
-#define     DSP_READOUT_PER_SECONDS                 10
+#define     DSP_READOUT_PER_SECONDS                 20
 #define     DSP_DEFAULT_FFT_WINDOW                  NONE
 #define     DSP_DEFAULT_FFT_INFO                    true
+#define     DSP_DEFAULT_WIN_ALPHA                   0.5
 
 #define     DSP_DEFAULT_FILE_RECORD                 false
 
@@ -427,10 +430,13 @@ public:
     bool               fft_inversion;           // флаг инверсии спектра
     WINDOW             fft_current_window;      // используемое окно
     bool               fft_info;                // флаг вывода информации на экран
+    float              fft_win_alpha;           // параметр оконной функции
 
-    Ipp32f             fft_res[DSP_FFT_SIZE];  // энергетический спектр
+    Ipp32f             fft_res[DSP_FFT_SIZE];   // энергетический спектр
+
 
     FFT_params(){
+        fft_win_alpha = DSP_DEFAULT_WIN_ALPHA;
         fft_dynamic_range = DSP_DEFAULT_DYNAMIC_RANGE;
         fft_noise_level = DSP_DEFAULT_NOISE_LEVEL;
 

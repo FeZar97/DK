@@ -23,7 +23,14 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>Цифровой приемный тракт РПУ &quot;Кальмар&quot;</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/buttons/SquidLow.png</normaloff>:/buttons/SquidLow.png</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="widgetInterface" native="true">
    <property name="geometry">
@@ -305,6 +312,8 @@
    </slots>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

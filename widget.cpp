@@ -107,8 +107,12 @@ void Widget::on_RecButton_clicked()
         dsp->start_threads();
         global_update_interface();
     }
-    else
-        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать запись сигнала.");
+    else{
+        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать запись сигнала.\nЗаново подключите SDR приемник и перезапустите программу.");
+        sdr->sdr_params->is_open = false;
+        dsp->set_record_flags(false);
+        global_update_interface();
+    }
 }
 // ------------------------------------------------------------------------------------------------------------
 

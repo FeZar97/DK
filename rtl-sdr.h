@@ -1,4 +1,4 @@
-warning: LF will be replaced by CRLF /*
+/*
  * rtl-sdr, turns your Realtek RTL2832 based DVB dongle into a SDR receiver
  * Copyright (C) 2012-2013 by Steve Markgraf <steve@steve-m.de>
  * Copyright (C) 2012 by Dimitri Stolnikov <horiz0n@gmx.net>

@@ -59,3 +59,5 @@ include(../Qt IPP/LIBS/ipp.pri)
 
 RESOURCES += \
     images.qrc
+
+DISTFILES +=

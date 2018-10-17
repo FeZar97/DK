@@ -87,12 +87,10 @@ private slots:
     void on_InfoCB_clicked(bool new_fft_info); // вывод информации на спектр
     void on_InversionCB_clicked(bool new_fft_inversion); // смена флага инверсии спектра
     void on_WindowCB_currentIndexChanged(int new_win_idx); // выбор окна
-
-    // изменение частотного сдвига
-    void on_ShiftFreqSB_valueChanged(double new_freq_shift);
+    void on_WindowAlphaSB_valueChanged(double new_aplha); // изменение коэффициента alpha
+    void on_ShiftFreqSB_valueChanged(double new_freq_shift); // изменение частотного сдвига
 
     void on_CloseButton_clicked();
-
 
 signals:
     void global_update_interface();

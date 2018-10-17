@@ -35,18 +35,34 @@ void fft_calcer::get_fft_step(Ipp32fc *rb_cell)
        в конце результирующий массив усредняется по числу усреднений */
     for(i = 0; i < dsp_params->fft_params->fft_averages_number; i++){
 
-        // Толян к окошку
-        //if(dsp_params->fft_params->use_blackman_win)
-        //    ippsWinBlackman_32fc_I(dsp_params->fft_params->fft_dst, DSP_FFT_SIZE, alpha);
+        switch(dsp_params->fft_params->fft_current_window){
+            case BARLETT:
+                ippsWinBartlett_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE);
+                break;
+            case BLACKMANN:
+                ippsWinBlackman_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE, dsp_params->fft_params->fft_win_alpha);
+                break;
+            case HAMMING:
+                ippsWinHamming_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE);
+                break;
+            case HANN:
+                ippsWinHann_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE);
+                break;
+            case KAISER:
+                ippsWinKaiser_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE, dsp_params->fft_params->fft_win_alpha);
+                break;
+            case NONE:
+                ippsCopy_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, DSP_FFT_SIZE);
+                break;
+        }
 
-        // БПФ от нового кусочка сигнала
-        ippsFFTFwd_CToC_32fc(rb_cell + i * DSP_FFT_SIZE, fft_dst, pFftSpec, fft_buf);
+        // БПФ от нового куска сигнала
+        ippsFFTFwd_CToC_32fc_I(fft_dst, pFftSpec, fft_buf);
 
         // добавление к общему массиву значений
-        for(j = 0; j < DSP_FFT_SIZE; j++){
+        for(j = 0; j < DSP_FFT_SIZE; j++)
             dsp_params->fft_params->fft_res[j] += fft_dst[j].re * fft_dst[j].re
                                                 + fft_dst[j].im * fft_dst[j].im;
-        }
     }
 
     // усреднение после цикла

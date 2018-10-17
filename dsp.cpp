@@ -28,14 +28,20 @@ bool DSP::prepair_to_record(SDR *new_sdr)
 {
     sdr = new_sdr;
     sdr->set_params_to_device();
-    recalc_dsp_params();
+
+    bool result = true;
+
+    result &= recalc_dsp_params();
 
     set_record_flags(true);             // поготовка флагов
 
     create_objects();                   // создание потоков и объектов, распределение объектов по потокам
     prepair_memory();                   // выделение памяти в объектах
 
-    return true;
+    // крайняя проверка перед запуском - если возвратится -1, то приемник недоступен => нельзя запускать
+    result &= (rtlsdr_set_center_freq(sdr->sdr_params->sdr_ptr, sdr->sdr_params->central_freq) == -1 ? false : true);
+
+    return result;
 }
 
 // выставление флагов в соответствии с конфигурацией

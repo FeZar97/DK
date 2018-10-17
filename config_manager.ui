@@ -23,7 +23,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Настройки</string>
+   <string>Конфигуратор</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/buttons/SquidLow.png</normaloff>:/buttons/SquidLow.png</iconset>
   </property>
   <widget class="QWidget" name="InterfaceWidget" native="true">
    <property name="geometry">
@@ -1886,7 +1890,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Кайзера</string>
+          <string>Барлета</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Блэкмана</string>
          </property>
         </item>
         <item>
@@ -1896,7 +1905,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Блэкмана</string>
+          <string>Ханна</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Кайзера</string>
          </property>
         </item>
        </widget>
@@ -2036,10 +2050,10 @@
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>20</number>
         </property>
         <property name="value">
-         <number>4</number>
+         <number>10</number>
         </property>
        </widget>
        <widget class="QLabel" name="MaxAverageNumber">
@@ -2159,6 +2173,57 @@
          <string>Частотный сдвиг:</string>
         </property>
        </widget>
+       <widget class="QLabel" name="WindowAlphaLabel">
+        <property name="geometry">
+         <rect>
+          <x>165</x>
+          <y>77</y>
+          <width>64</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Коэф-т:</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="WindowAlphaSB">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>77</y>
+          <width>67</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>-1000.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.500000000000000</double>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -2211,6 +2276,8 @@
  <tabstops>
   <tabstop>RecordTimeCB</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

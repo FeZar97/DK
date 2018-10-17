@@ -163,6 +163,9 @@ void config_manager::update_sdr_tab()
 // обновление вкладки "ЦОС"
 void config_manager::update_dsp_tab()
 {
+    bool enabled_flag = !dsp->dsp_params->read_params->is_recording;
+
+    // значения
     ui->ShiftFreqSB->setMaximum(sdr->sdr_params->sample_rate / 2);
     ui->ShiftFreqSB->setMinimum((-1) * double(sdr->sdr_params->sample_rate / 2));
     ui->ShiftFreqSB->setValue(dsp->dsp_params->shift_params->shift_freq);
@@ -174,8 +177,10 @@ void config_manager::update_dsp_tab()
     ui->InfoCB->setChecked(dsp->dsp_params->fft_params->fft_info);
     ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
-    ui->DirectSamplingCB->setCurrentIndex(sdr->sdr_params->direct_sampling_idx);
-    ui->GainValBox->setCurrentIndex(sdr->sdr_params->gain_idx);
+
+    // доступность
+    ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
+    ui->ReadOutPerSecSB->setEnabled(enabled_flag);
 }
 
 // применение стиля
@@ -327,6 +332,11 @@ void config_manager::on_WindowCB_currentIndexChanged(int new_win_idx)
     emit global_update_interface();
 }
 
+// изменение коэффициента alpha
+void config_manager::on_WindowAlphaSB_valueChanged(double new_aplha)
+{
+    dsp->dsp_params->fft_params->fft_win_alpha = new_aplha;
+}
 
 // изменение числа усреднений
 void config_manager::on_AverageNumSB_valueChanged(int new_fft_averages_number)
