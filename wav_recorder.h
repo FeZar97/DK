@@ -14,8 +14,15 @@ public:
                           SDR_params *new_sdr_params = NULL);
     ~wav_recorder();
 
+    Ipp8u *out_buf;
+
     void make_wav_headers();
+
 public slots:
+    void write_to_file(Ipp32fc *rb_cell);
+
+signals:
+    void update_progr_bar(int new_val);
 
 };
 

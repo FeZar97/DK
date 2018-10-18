@@ -201,7 +201,7 @@ enum WINDOW{
 #define     DSP_DEFAULT_FFT_INVERSION               false
 #define     DSP_DEFAULT_DYNAMIC_RANGE               30
 #define     DSP_DEFAULT_NOISE_LEVEL                 -10
-#define     DSP_DEFAULT_RECORDING_TIME_IDX          2
+#define     DSP_DEFAULT_RECORDING_TIME_IDX          0
 #define     DSP_READOUT_PER_SECONDS                 20
 #define     DSP_DEFAULT_FFT_WINDOW                  NONE
 #define     DSP_DEFAULT_FFT_INFO                    true
@@ -486,6 +486,7 @@ public:
     quint64             first_file_total_size;
     bool                use_first_file;          // флаг записи в первый файл
     QString             first_file_name;         // имя первого файла
+    Ipp8u               *out_buf;
 
     QFile               second_file;
     WAVEHEADER          second_header;

@@ -22,9 +22,6 @@ fft_shifter::~fft_shifter()
 // сдвиг
 void fft_shifter::get_shift_step(Ipp32fc *rb_cell)
 {
-
-    qDebug() << "get shift" << endl;
-
     // комплексная синусоида
     ippsTone_32fc(dsp_params->shift_params->complex_sin,
                   dsp_params->read_params->read_rb_cell_size / 2,

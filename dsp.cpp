@@ -130,7 +130,8 @@ void DSP::create_wav_recorders()
     wav_thread = new QThread;
 
     wav_rec = new wav_recorder(dsp_params, sdr->sdr_params);
-    //connect(shifter, &fft_shifter::write_to_file, wav_rec,  &wav_recorder::write_to_file);
+    connect(reader, &READER::write_to_file, wav_rec, &wav_recorder::write_to_file);
+    connect(shifter, &fft_shifter::write_to_file, wav_rec, &wav_recorder::write_to_file);
     wav_rec->moveToThread(wav_thread);
 }
 
@@ -278,30 +279,26 @@ void DSP::prepair_fft_shifter()
 }
 void DSP::prepair_wav_recorder()
 {
-    // position
-    dsp_params->wav_params->first_file_pos = 0;
-    dsp_params->wav_params->second_file_pos = 0;
-    dsp_params->wav_params->third_file_pos = 0;
-
-    // total size
-    dsp_params->wav_params->first_file_total_size = times[dsp_params->read_params->rec_time_idx] * 2 * sdr->sdr_params->sample_rate * sizeof(char);
-    dsp_params->wav_params->second_file_total_size = times[dsp_params->read_params->rec_time_idx] * 2 * dsp_params->flt_params->out_sample_rate * sizeof(char);
-    dsp_params->wav_params->third_file_total_size = times[dsp_params->read_params->rec_time_idx] * 2 * sdr->sdr_params->sample_rate * sizeof(char);
-
-    // file_name
     rename_files();
-    dsp_params->wav_params->first_file.setFileName(dsp_params->wav_params->first_file_name);
-    dsp_params->wav_params->second_file.setFileName(dsp_params->wav_params->second_file_name);
-    dsp_params->wav_params->third_file.setFileName(dsp_params->wav_params->third_file_name);
 
-    // хидеры
+    if(dsp_params->wav_params->use_first_file){
+        dsp_params->wav_params->first_file_pos = 0;
+        dsp_params->wav_params->first_file_total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
+        qDebug() << "total = " << dsp_params->wav_params->first_file_total_size << endl;
+        dsp_params->wav_params->first_file.setFileName(dsp_params->wav_params->first_file_name);
+        dsp_params->wav_params->first_file.open(QIODevice::WriteOnly);
+    }
+
     wav_rec->make_wav_headers();
+
+    if(dsp_params->wav_params->use_first_file)
+        dsp_params->wav_params->first_file.write((char*)(&dsp_params->wav_params->first_header), sizeof(WAVEHEADER));
 }
 
 // старт потоков
 void DSP::start_threads()
 {
-    //wav_thread->start();
+    wav_thread->start();
     fft_shift_thread->start();
     fft_thread->start();
     //filtration_thread->start();

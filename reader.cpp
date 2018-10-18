@@ -38,10 +38,13 @@ void READER::start_reading()
                          dsp_params->read_params->read_rb_cell_size,
                          &n_read);
 
+        //ippsSubC_8u_ISfs(0, dsp_params->read_params->read_cell, dsp_params->read_params->read_rb_cell_size, 0);
+
         // конвертация 8u -> 32f
         ippsConvert_8u32f(dsp_params->read_params->read_cell,
                          (Ipp32f*)dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                           dsp_params->read_params->read_rb_cell_size);
+
 
         // Алиса в зазеркалье
         if(dsp_params->fft_params->fft_inversion)
