@@ -36,11 +36,11 @@ void fft_shifter::get_shift_step(Ipp32fc *rb_cell)
                  dsp_params->read_params->read_rb_cell_size / 2);
 
     // запись
-    if(dsp_params->wav_params->use_third_file)
+    if(dsp_params->read_params->use_third_file)
         emit write_to_file(dsp_params->shift_params->shift_rb[dsp_params->shift_params->shift_rb_cell_idx]);
 
     // бпф
-    if(dsp_params->fft_params->fft_mode == SHIFT_FFT)
+    if(dsp_params->fft_params->fft_mode == READER_FFT)
         emit get_fft_step(dsp_params->shift_params->shift_rb[dsp_params->shift_params->shift_rb_cell_idx]);
 
     // инкремент итератора

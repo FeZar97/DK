@@ -25,13 +25,20 @@ public:
     MRFiltering         *flt;
     fft_calcer          *fft;
     fft_shifter         *shifter;
-    wav_recorder        *wav_rec;
+    wav_recorder        *first_wav_rec;
+    wav_recorder        *second_wav_rec;
+    wav_recorder        *third_wav_rec;
 /// ---------------------------------------- потоки ---------------------------------------
     QThread             *reader_thread;
     QThread             *filtration_thread;
     QThread             *fft_thread;
     QThread             *fft_shift_thread;
-    QThread             *wav_thread;
+    QThread             *first_wav_thread;
+    QThread             *second_wav_thread;
+    QThread             *third_wav_thread;
+
+
+
 
     explicit DSP(SDR *new_sdr = NULL, simpleGraph *new_graph = NULL);
     ~DSP();
@@ -49,6 +56,7 @@ public:
     void                prepair_mr_filter();              // подготовка mr_filter к началу записи
     void                prepair_fft_shifter();            // подготовка fft_shifter к началу записи
     void                prepair_wav_recorder();           // подготовка wav_recorder к началу записи
+    void                make_wav_headers();
 
     void                create_objects();
     void                create_reader();                  // инициализация объектов

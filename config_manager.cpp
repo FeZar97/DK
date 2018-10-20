@@ -404,19 +404,19 @@ void config_manager::mouseMoveEvent(QMouseEvent *event)
 // флаг записи в первый файл
 void config_manager::on_ADCSignalCB_clicked(bool new_use_first_file)
 {
-    dsp->dsp_params->wav_params->use_first_file = new_use_first_file;
+    dsp->dsp_params->read_params->use_first_file = new_use_first_file;
 }
 
 // флаг записи во второй файл
 void config_manager::on_FltSignalCB_clicked(bool new_use_second_file)
 {
-    dsp->dsp_params->wav_params->use_second_file = new_use_second_file;
+    dsp->dsp_params->read_params->use_second_file = new_use_second_file;
 }
 
 // флаг записи в третий файл
 void config_manager::on_RealSignalCB_clicked(bool new_use_third_file)
 {
-    dsp->dsp_params->wav_params->use_third_file = new_use_third_file;
+    dsp->dsp_params->read_params->use_third_file = new_use_third_file;
 }
 
 // смена времени записи

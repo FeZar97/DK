@@ -123,28 +123,8 @@ void simpleGraph::paint_signature(QPainter &painter)
 
     switch(dsp_params->fft_params->fft_mode){
         case READER_FFT:
-            painter.drawText( 75, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 4/10));
-            painter.drawText(178, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 3/10));
-            painter.drawText(280, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 2/10));
-            painter.drawText(382, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 1/10));
-            painter.drawText(485, vRect.height() - 5, QString::number(sdr_params->central_freq));
-            painter.drawText(587, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 1/10));
-            painter.drawText(689, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 2/10));
-            painter.drawText(791, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 3/10));
-            painter.drawText(894, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 4/10));
-            break;
-        case FLT_FFT:
-            painter.drawText( 75, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 4/10));
-            painter.drawText(178, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 3/10));
-            painter.drawText(280, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 2/10));
-            painter.drawText(382, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 1/10));
-            painter.drawText(485, vRect.height() - 5, QString::number(sdr_params->central_freq));
-            painter.drawText(587, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 1/10));
-            painter.drawText(689, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 2/10));
-            painter.drawText(791, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 3/10));
-            painter.drawText(894, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 4/10));
-            break;
-        case SHIFT_FFT:
+        {
+
             int new_central_freq = sdr_params->central_freq + dsp_params->shift_params->shift_freq;
             painter.drawText( 75, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 4/10));
             painter.drawText(178, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 3/10));
@@ -155,6 +135,22 @@ void simpleGraph::paint_signature(QPainter &painter)
             painter.drawText(689, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 2/10));
             painter.drawText(791, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 3/10));
             painter.drawText(894, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 4/10));
+            break;
+        }
+        case FLT_FFT:
+        {
+            painter.drawText( 75, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 4/10));
+            painter.drawText(178, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 3/10));
+            painter.drawText(280, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 2/10));
+            painter.drawText(382, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 1/10));
+            painter.drawText(485, vRect.height() - 5, QString::number(sdr_params->central_freq));
+            painter.drawText(587, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 1/10));
+            painter.drawText(689, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 2/10));
+            painter.drawText(791, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 3/10));
+            painter.drawText(894, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 4/10));
+            break;
+        }
+        default:
             break;
     }
 

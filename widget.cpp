@@ -104,7 +104,6 @@ void Widget::on_RecButton_clicked()
         connect(dsp->reader,  &READER::update_ReadProgressBar, this, &Widget::update_ReadProgressBar);
         connect(dsp->reader,  &READER::end_of_recording,       this, &Widget::end_of_recording);
         connect(dsp->fft,     &fft_calcer::paint_fft,          this, &Widget::paint_fft);
-        connect(dsp->wav_rec, &wav_recorder::update_progr_bar, this, &Widget::update_ReadProgressBar);
         dsp->start_threads();
         global_update_interface();
     }
@@ -141,14 +140,14 @@ void Widget::end_of_recording(bool status)
 
     dsp->dsp_params->read_params->is_recording = false;
 
-    if(dsp->dsp_params->wav_params->first_file.isOpen())
-        dsp->dsp_params->wav_params->first_file.close();
+    if(dsp->first_wav_rec->params.file.isOpen())
+        dsp->first_wav_rec->params.file.close();
 
-    if(dsp->dsp_params->wav_params->second_file.isOpen())
-        dsp->dsp_params->wav_params->second_file.close();
+    if(dsp->second_wav_rec->params.file.isOpen())
+        dsp->second_wav_rec->params.file.close();
 
-    if(dsp->dsp_params->wav_params->third_file.isOpen())
-        dsp->dsp_params->wav_params->third_file.close();
+    if(dsp->third_wav_rec->params.file.isOpen())
+        dsp->third_wav_rec->params.file.close();
 
     global_update_interface();
 }

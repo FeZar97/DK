@@ -38,6 +38,7 @@ void READER::start_reading()
                          dsp_params->read_params->read_rb_cell_size,
                          &n_read);
 
+        // подавление постоянной составляющей
         //ippsSubC_8u_ISfs(0, dsp_params->read_params->read_cell, dsp_params->read_params->read_rb_cell_size, 0);
 
         // конвертация 8u -> 32f
@@ -46,37 +47,28 @@ void READER::start_reading()
                           dsp_params->read_params->read_rb_cell_size);
 
 
-        // Алиса в зазеркалье
+        // сопряжение
         if(dsp_params->fft_params->fft_inversion)
             ippsConj_32fc_I(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                             dsp_params->read_params->read_rb_cell_size / 2);
 
-        // на бпф
-        if(dsp_params->fft_params->fft_mode == READER_FFT)
-            emit get_fft_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
-
-        // АКВАФОР убирает вредное, сохраняя полезное
+        // АКВАФОР
+        // убирает вредное, сохраняя полезное
         //if(dsp_params->flt_params->use_filter)
         //    emit get_filtration_step(read_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
 
-        // двигаем частоту
-        if(dsp_params->fft_params->fft_mode == SHIFT_FFT){
-            emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
-        }
+        // частотный сдвиг
+        emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
 
-        // запишем музыку
-        if(dsp_params->wav_params->use_first_file)
+        // в файл
+        if(dsp_params->read_params->use_first_file)
             emit write_to_file(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
 
-        // в копилочку и показать сколько осталось
-        // emit update_ReadProgressBar(int(100 * float(++i) / float(iterations)));
+        // инкремент итератора
         dsp_params->read_params->read_rb_cell_idx = (dsp_params->read_params->read_rb_cell_idx + 1) % DSP_READ_RB_SIZE;
     }
 
     // если завершилось штатно, то флаг emergency_end_recording == 0
     // если завершилось экстренно, то emergency_end_recording == 1
-    if(dsp_params->read_params->emergency_end_recording)
-        emit end_of_recording(false);
-    else
-        emit end_of_recording(true);
+    emit end_of_recording(!dsp_params->read_params->emergency_end_recording);
 }

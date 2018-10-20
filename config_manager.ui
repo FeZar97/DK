@@ -1974,11 +1974,6 @@
           <string>после фильтрации (i / q)</string>
          </property>
         </item>
-        <item>
-         <property name="text">
-          <string>низкочастотный (real)</string>
-         </property>
-        </item>
        </widget>
        <widget class="QLabel" name="AveragesNumLabel">
         <property name="geometry">

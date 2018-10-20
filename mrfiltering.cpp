@@ -63,7 +63,7 @@ void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
         }
 
         // запись в файл
-        if(dsp_params->wav_params->use_second_file)
+        if(dsp_params->read_params->use_second_file)
             emit write_to_file(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
 
         // БПФ

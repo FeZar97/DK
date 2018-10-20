@@ -124,8 +124,7 @@ enum NUMERALS{ZERO,
 // отображаемый спектр
 enum FFT_MODE{
     READER_FFT, // спектр сигнала с АЦП
-    FLT_FFT,    // спектр отфильтрованного сигнала
-    SHIFT_FFT};   // спектр сдвинутого сигнала
+    FLT_FFT};   // спектр отфильтрованного сигнала
 
 // оконные функции
 enum WINDOW{
@@ -335,6 +334,11 @@ public:
     unsigned int        rec_time;                // длительность записи в секундах
     unsigned int        readout_per_seconds;     // ФПС
 
+    // флаги записи в файлы
+    bool                use_first_file;
+    bool                use_second_file;
+    bool                use_third_file;
+
     // локальные
     Ipp8u               *read_cell;              // временный буфер
 
@@ -350,6 +354,10 @@ public:
 
         rec_time_idx            = DSP_DEFAULT_RECORDING_TIME_IDX;
         readout_per_seconds     = DSP_READOUT_PER_SECONDS;
+
+        use_first_file          = false;
+        use_second_file         = false;
+        use_third_file          = false;
     }
 };
 
@@ -480,40 +488,21 @@ public:
 // параметры wav файлов
 class WAV_params{
 public:
-    QFile               first_file;
-    WAVEHEADER          first_header;
-    quint64             first_file_pos;
-    quint64             first_file_total_size;
-    bool                use_first_file;          // флаг записи в первый файл
-    QString             first_file_name;         // имя первого файла
-    Ipp8u               *out_buf;
 
-    QFile               second_file;
-    WAVEHEADER          second_header;
-    quint64             second_file_pos;
-    quint64             second_file_total_size;
-    bool                use_second_file;         // флаг записи во второй файл
-    QString             second_file_name;        // имя второго файла
+    QFile          file;
+    WAVEHEADER     header;
+    quint64        pos;
+    quint64        total_size;
+    QString        file_name;         // имя первого файла
 
-    QFile               third_file;
-    WAVEHEADER          third_header;
-    quint64             third_file_pos;
-    quint64             third_file_total_size;
-    bool                use_third_file;          // флаг записи в третий файл
-    QString             third_file_name;         // имя второго файла
-
+    int            input_cell_size;
+    Ipp8u          *out_buf;
     WAV_params(){
-        first_file_name = "";
-        first_file_pos = 0;
-        use_first_file = false;
-
-        second_file_name = "";
-        second_file_pos = 0;
-        use_second_file = false;
-
-        third_file_name = "";
-        third_file_pos = 0;
-        use_third_file = false;
+        pos = 0;
+        total_size = 0;
+        file_name = "";
+        input_cell_size = 0;
+        out_buf = NULL;
     }
 };
 
@@ -524,14 +513,12 @@ public:
     FFT_params          *fft_params;
     FLT_params          *flt_params;
     SHIFT_params        *shift_params;
-    WAV_params          *wav_params;
 
     DSP_params(){
         read_params  = new READ_params();
         fft_params   = new FFT_params();
         flt_params   = new FLT_params();
         shift_params = new SHIFT_params();
-        wav_params   = new WAV_params();
     }
 };
 
