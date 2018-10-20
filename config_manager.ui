@@ -83,7 +83,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1448,9 +1448,9 @@
       <property name="geometry">
        <rect>
         <x>157</x>
-        <y>84</y>
-        <width>141</width>
-        <height>22</height>
+        <y>83</y>
+        <width>154</width>
+        <height>23</height>
        </rect>
       </property>
       <property name="font">
@@ -1466,17 +1466,17 @@
       </property>
       <item>
        <property name="text">
-        <string>обе квадратуры</string>
+        <string> обе квадратуры</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>I часть</string>
+        <string> I часть</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Q часть</string>
+        <string> Q часть</string>
        </property>
       </item>
      </widget>
@@ -1582,7 +1582,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="RecordTab">
        <attribute name="title">
@@ -1786,8 +1786,8 @@
        <widget class="QPushButton" name="RecordButton">
         <property name="geometry">
          <rect>
-          <x>242</x>
-          <y>42</y>
+          <x>138</x>
+          <y>147</y>
           <width>75</width>
           <height>25</height>
          </rect>
@@ -1799,6 +1799,54 @@
         </property>
         <property name="text">
          <string>Запись</string>
+        </property>
+       </widget>
+       <widget class="QProgressBar" name="ADCBar">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>45</y>
+          <width>181</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QProgressBar" name="FltBar">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>79</y>
+          <width>181</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QProgressBar" name="RealBar">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>112</y>
+          <width>181</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -2226,6 +2274,24 @@
      <attribute name="title">
       <string>АСКР</string>
      </attribute>
+     <widget class="QPushButton" name="FirstValidatePB">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>21</y>
+        <width>103</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Проверка 1</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

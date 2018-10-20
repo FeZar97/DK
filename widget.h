@@ -58,13 +58,17 @@ public slots:
     // слот окончания записи
     // принимает сигнал и при экстренном завершении записи (нажатие кнопки стоп)
     //                  и при штатном завершении записи
-    void end_of_recording(bool status);
+    void end_of_recording();
 
     // обновление окон
     void global_update_interface();
 
     // изменение интерфейса
     void set_ui_style();
+
+    void end_of_first_file_rec();
+    void end_of_second_file_rec();
+    void end_of_third_file_rec();
 
 private slots:
     // открытие/закрытие настройщика

@@ -334,7 +334,8 @@ public:
     unsigned int        rec_time;                // длительность записи в секундах
     unsigned int        readout_per_seconds;     // ФПС
 
-    // флаги записи в файлы
+    // флаги записи в файл
+    bool                use_files; // главный флаг, разрешающий разблокировку кнопки записи
     bool                use_first_file;
     bool                use_second_file;
     bool                use_third_file;
@@ -355,9 +356,10 @@ public:
         rec_time_idx            = DSP_DEFAULT_RECORDING_TIME_IDX;
         readout_per_seconds     = DSP_READOUT_PER_SECONDS;
 
-        use_first_file          = false;
-        use_second_file         = false;
-        use_third_file          = false;
+        use_files = false;
+        use_first_file = false;
+        use_second_file = false;
+        use_third_file = false;
     }
 };
 
@@ -497,6 +499,7 @@ public:
 
     int            input_cell_size;
     Ipp8u          *out_buf;
+
     WAV_params(){
         pos = 0;
         total_size = 0;
@@ -513,12 +516,14 @@ public:
     FFT_params          *fft_params;
     FLT_params          *flt_params;
     SHIFT_params        *shift_params;
+    WAV_params          *wav_params;
 
     DSP_params(){
         read_params  = new READ_params();
         fft_params   = new FFT_params();
         flt_params   = new FLT_params();
         shift_params = new SHIFT_params();
+        wav_params   = new WAV_params();
     }
 };
 

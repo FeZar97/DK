@@ -60,47 +60,53 @@ QString StyleHelper::getWindowStyleSheet()
             "}"
 
 /// QPushButton
-            "QPushButton { "
-                 "color: rgb(220, 220, 220);"
-                 "border: 1px solid rgb(95, 95, 95);"
-                 "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
-            "}"
+            "QPushButton {                                 "
+            "   background: #949494;                       "
+            "}                                             "
+
+            "QPushButton::hover {                          "
+            "   background: #e7ad6d;                       "
+            "}                                             "
+
+            "QPushButton::pressed {                        "
+            "   background: #de8e37;                       "
+            "}                                             "
 
 /// QCheckBox
-            "QCheckBox { "
-                 "color: #de8e37;"
-                 "border: 0px;"
-                 "background: #454545;"
-            "}"
+            "QCheckBox {                                   "
+            "   color: #de8e37;                            "
+            "   border: 0px;                               "
+            "   background: #454545;                       "
+            "}                                             "
 
 /// QTabWidget
             /* The tab widget frame */
-            "QTabWidget::pane {                           "
-            "    border: 0px;                             "
-            "}                                            "
+            "QTabWidget::pane {                            "
+            "    border: 0px;                              "
+            "}                                             "
 
-            "QTabWidget::tab-bar {                        "
-            "    border: 0px;                             "
-            "}                                            "
+            "QTabWidget::tab-bar {                         "
+            "    border: 0px;                              "
+            "}                                             "
 
-            "QTabBar::tab {                               "
-            "    background: #949494;                     "
-            "    border: none;                            "
-            "    border-top-left-radius: 8px;             "
-            "    border-top-right-radius: 8px;            "
-            "    min-width: 70px;                         "
-            "    min-height: 20px;                        "
-            "}                                            "
+            "QTabBar::tab {                                "
+            "    background: #949494;                      "
+            "    border: none;                             "
+            "    border-top-left-radius: 8px;              "
+            "    border-top-right-radius: 8px;             "
+            "    min-width: 70px;                          "
+            "    min-height: 20px;                         "
+            "}                                             "
 
-            "QTabBar::tab:selected, QTabBar::tab:hover {  "
-            "    background: #e1e1e1;                     "
-            "}                                            "
+            "QTabBar::tab:selected, QTabBar::tab:hover {   "
+            "    background: #e1e1e1;                      "
+            "}                                             "
 
-            "QTabBar::tab:selected {                      "
+            "QTabBar::tab:selected {                       "
             "    border: none;"
-            "    background: #de8e37;                     "
-            "    color: #454545;                          "
-            "};                                           "
+            "    background: #de8e37;                      "
+            "    color: #454545;                           "
+            "};                                            "
             ;
 }
 

@@ -61,7 +61,7 @@ void READER::start_reading()
         emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
 
         // в файл
-        if(dsp_params->read_params->use_first_file)
+        if(dsp_params->read_params->use_first_file && dsp_params->read_params->use_files)
             emit write_to_file(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
 
         // инкремент итератора

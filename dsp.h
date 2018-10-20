@@ -33,12 +33,7 @@ public:
     QThread             *filtration_thread;
     QThread             *fft_thread;
     QThread             *fft_shift_thread;
-    QThread             *first_wav_thread;
-    QThread             *second_wav_thread;
-    QThread             *third_wav_thread;
-
-
-
+    QThread             *wav_thread;
 
     explicit DSP(SDR *new_sdr = NULL, simpleGraph *new_graph = NULL);
     ~DSP();

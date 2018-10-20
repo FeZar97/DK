@@ -19,10 +19,11 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     // Настройка UI
     set_ui_style();
 
-    connect(config_manager_form, &config_manager::global_update_interface, this,            &Widget::global_update_interface);
-    connect(ui->MinimizeButton,  &QToolButton::clicked,                    this,            &QWidget::showMinimized);
-    connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,             &DSP::recalc_dsp_params);
-    connect(sdr,                 &SDR::global_update_interface,            this,            &Widget::global_update_interface);
+    connect(config_manager_form, &config_manager::global_update_interface, this,                &Widget::global_update_interface);
+    connect(ui->MinimizeButton,  &QToolButton::clicked,                    this,                &QWidget::showMinimized);
+    connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,                 &DSP::recalc_dsp_params);
+    connect(sdr,                 &SDR::global_update_interface,            this,                &Widget::global_update_interface);
+    connect(config_manager_form, &config_manager::prepair_wav_recorder,    dsp,                 &DSP::prepair_wav_recorder);
 
     restore_settings();
 }
@@ -87,6 +88,24 @@ void Widget::set_ui_style()
     config_manager_form->set_ui_style();
 }
 
+void Widget::end_of_first_file_rec()
+{
+    dsp->dsp_params->read_params->use_first_file = false;
+    global_update_interface();
+}
+
+void Widget::end_of_second_file_rec()
+{
+    dsp->dsp_params->read_params->use_second_file = false;
+    global_update_interface();
+}
+
+void Widget::end_of_third_file_rec()
+{
+    dsp->dsp_params->read_params->use_third_file = false;
+    global_update_interface();
+}
+
 // отображение/скрытие окна конфигурации
 void Widget::on_ConfigButton_clicked()
 {
@@ -101,9 +120,15 @@ void Widget::on_RecButton_clicked()
 {
     // если подготовка к записи завершена успешно, то начинается прием
     if(dsp->prepair_to_record(sdr)){
-        connect(dsp->reader,  &READER::update_ReadProgressBar, this, &Widget::update_ReadProgressBar);
-        connect(dsp->reader,  &READER::end_of_recording,       this, &Widget::end_of_recording);
-        connect(dsp->fft,     &fft_calcer::paint_fft,          this, &Widget::paint_fft);
+        connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                &Widget::update_ReadProgressBar);
+        connect(dsp->reader,            &READER::end_of_recording,              this,                &Widget::end_of_recording);
+        connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                &Widget::paint_fft);
+        connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_first_file_rec);
+        connect(dsp->second_wav_rec,    &wav_recorder::end_of_recording,        this,                &Widget::end_of_second_file_rec);
+        connect(dsp->third_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_third_file_rec);
+        connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_adc_bar);
+        connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_flt_bar);
+        connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_real_bar);
         dsp->start_threads();
         global_update_interface();
     }
@@ -132,22 +157,18 @@ void Widget::paint_fft()
 // принимает сигнал при экстренном завершении записи (нажатие кнопки стоп)
 //                  и при штатном завершении записи
 // при нажатии на кнопку стоп все воркеры сами вышлют сигналы окончания своей работы. как только придет сигнал от последнего воркера, все удалится и закроется
-void Widget::end_of_recording(bool status)
+void Widget::end_of_recording()
 {
-    // если завершилось штатно, то можно ставить 100
-    if(status)
-        ui->ReadProgressBar->setValue(100);
-
     dsp->dsp_params->read_params->is_recording = false;
 
-    if(dsp->first_wav_rec->params.file.isOpen())
-        dsp->first_wav_rec->params.file.close();
+    if(dsp->first_wav_rec->params->file.isOpen())
+        dsp->first_wav_rec->params->file.close();
 
-    if(dsp->second_wav_rec->params.file.isOpen())
-        dsp->second_wav_rec->params.file.close();
+    if(dsp->second_wav_rec->params->file.isOpen())
+        dsp->second_wav_rec->params->file.close();
 
-    if(dsp->third_wav_rec->params.file.isOpen())
-        dsp->third_wav_rec->params.file.close();
+    if(dsp->third_wav_rec->params->file.isOpen())
+        dsp->third_wav_rec->params->file.close();
 
     global_update_interface();
 }
@@ -156,7 +177,7 @@ void Widget::end_of_recording(bool status)
 void Widget::on_StopButton_clicked()
 {
     dsp->dsp_params->read_params->emergency_end_recording = true;
-    end_of_recording(false);
+    end_of_recording();
 }
 
 // регулировка уровня шума
@@ -177,9 +198,10 @@ void Widget::on_DynamicRangeSlider_valueChanged(int new_dynamic_range)
 void Widget::on_CloseButton_clicked()
 {
     save_settings();
-    on_StopButton_clicked();
+    //on_StopButton_clicked();
     delete config_manager_form;
-    rtlsdr_close(sdr->sdr_params->sdr_ptr);
+    if(sdr->sdr_params->is_open)
+        rtlsdr_close(sdr->sdr_params->sdr_ptr);
     this->destroy();
     exit(0);
     qApp->quit();

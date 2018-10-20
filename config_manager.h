@@ -45,6 +45,10 @@ public slots:
     void update_dsp_tab(); // обновление вкладки "ЦОС"
     void set_ui_style(); // применение стиля
 
+    void update_adc_bar(int new_val);
+    void update_flt_bar(int new_val);
+    void update_real_bar(int new_val);
+
 private slots:
 /// -----------------------------------РПУ---------------------------------------------
     void on_LPTPortCB_currentIndexChanged(int new_lpt_port_idx); // смена адреса LPT порта
@@ -77,7 +81,6 @@ private slots:
     void on_ADCSignalCB_clicked(bool new_use_first_file); // выбор файлов на запись
     void on_FltSignalCB_clicked(bool new_use_second_file); // выбор файлов на запись
     void on_RealSignalCB_clicked(bool new_use_third_file); // выбор файлов на запись
-    void on_RecordButton_clicked(); // запись в файлы
 // фильтрация
 
 // БПФ
@@ -92,9 +95,16 @@ private slots:
 
     void on_CloseButton_clicked();
 
+/// АСКР
+
+    void on_RecordButton_clicked();
+
+    void on_FirstValidatePB_clicked();
+
 signals:
     void global_update_interface();
     void previousPositionChanged(QPoint previousPosition);
+    void prepair_wav_recorder();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

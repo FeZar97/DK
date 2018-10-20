@@ -178,9 +178,28 @@ void config_manager::update_dsp_tab()
     ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
 
-    // доступность
+    // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
     ui->ReadOutPerSecSB->setEnabled(enabled_flag);
+
+    // доступность чек-боксов записи
+    ui->ADCSignalCB->setChecked(dsp->dsp_params->read_params->use_first_file);
+    if(!dsp->dsp_params->read_params->use_first_file)
+        ui->ADCBar->setValue(0);
+    ui->FltSignalCB->setChecked(dsp->dsp_params->read_params->use_second_file);
+    if(!dsp->dsp_params->read_params->use_second_file)
+        ui->FltBar->setValue(0);
+    ui->RealSignalCB->setChecked(dsp->dsp_params->read_params->use_third_file);
+    if(!dsp->dsp_params->read_params->use_third_file)
+        ui->RealBar->setValue(0);
+
+    // флаг записи в файлы
+    // true, если хотя бы один файл выбран и открыт(запись в него все еще идет)
+    enabled_flag =  (dsp->dsp_params->read_params->use_first_file  && dsp->dsp_params->read_params->is_recording)
+                 || (dsp->dsp_params->read_params->use_second_file && dsp->dsp_params->read_params->is_recording)
+                 || (dsp->dsp_params->read_params->use_third_file  && dsp->dsp_params->read_params->is_recording);
+
+    ui->RecordButton->setEnabled(enabled_flag);
 }
 
 // применение стиля
@@ -194,6 +213,21 @@ void config_manager::set_ui_style()
     ui->CloseButton->setStyleSheet(StyleHelper::getCloseStyleSheet());
     ui->CloseButton->setStyleSheet(StyleHelper::getCloseStyleSheet());
     ui->RPUMainTopLine->setStyleSheet(StyleHelper::getLineStyleSheet());
+}
+
+void config_manager::update_adc_bar(int new_val)
+{
+    ui->ADCBar->setValue(new_val);
+}
+
+void config_manager::update_flt_bar(int new_val)
+{
+    ui->FltBar->setValue(new_val);
+}
+
+void config_manager::update_real_bar(int new_val)
+{
+    ui->RealBar->setValue(new_val);
 }
 
 /// --------------------------------РПУ----------------------------------------
@@ -405,18 +439,21 @@ void config_manager::mouseMoveEvent(QMouseEvent *event)
 void config_manager::on_ADCSignalCB_clicked(bool new_use_first_file)
 {
     dsp->dsp_params->read_params->use_first_file = new_use_first_file;
+    global_update_interface();
 }
 
 // флаг записи во второй файл
 void config_manager::on_FltSignalCB_clicked(bool new_use_second_file)
 {
     dsp->dsp_params->read_params->use_second_file = new_use_second_file;
+    global_update_interface();
 }
 
 // флаг записи в третий файл
 void config_manager::on_RealSignalCB_clicked(bool new_use_third_file)
 {
     dsp->dsp_params->read_params->use_third_file = new_use_third_file;
+    global_update_interface();
 }
 
 // смена времени записи
@@ -457,12 +494,36 @@ MouseType config_manager::checkResizableField(QMouseEvent *event)
         return None;
 }
 
-void config_manager::on_RecordButton_clicked()
-{
-
-}
-
 void config_manager::on_CloseButton_clicked()
 {
     this->setVisible(!this->isVisible());
+}
+void config_manager::on_RecordButton_clicked()
+{
+    dsp->dsp_params->read_params->use_files = true;
+
+    emit prepair_wav_recorder(); // подготовка wav_recorders к началу записи
+}
+
+
+/*
+ первый этап работы АСКР
+    производится перестройка на центральные частоты преселекторов и измеряется уровень калибровочного сигнала
+   200  - 1000  : 600 кГц
+   1000 - 1500  : 1250 кГц
+   1500 - 2200  : 1850 кГц
+   2200 - 3200  : 2700 кГц
+   3200 - 4700  : 3950 кГц
+   4700 - 6800  : 5750 кГц
+   6800 - 9900  : 8350 кГц
+   9900 - 14400 : 12150 кГц
+  14400 - 20700 : 17550 кГц
+  20700 - 32000 : 26350 кГц
+
+*/
+void config_manager::on_FirstValidatePB_clicked()
+{
+    for(int i = 0; i < 10; i++){
+
+    }
 }

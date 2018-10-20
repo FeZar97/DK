@@ -13,6 +13,14 @@ DSP::DSP(SDR *new_sdr, simpleGraph *new_graph)
         graph = new_graph;
     else
         graph = new simpleGraph();
+
+    reader = NULL;
+    flt = NULL;
+    fft = NULL;
+    shifter = NULL;
+    first_wav_rec = NULL;
+    second_wav_rec = NULL;
+    third_wav_rec = NULL;
 }
 
 DSP::~DSP()
@@ -77,9 +85,9 @@ void DSP::rename_files()
             break;
     }
 
-    first_wav_rec->params.file_name  = base_file_name + ".wav";
-    second_wav_rec->params.file_name = base_file_name + "_filtering.wav";
-    third_wav_rec->params.file_name  = base_file_name + "_real.wav";
+    first_wav_rec->params->file_name  = base_file_name + ".wav";
+    second_wav_rec->params->file_name = base_file_name + "_filtering.wav";
+    third_wav_rec->params->file_name  = base_file_name + "_real.wav";
 }
 
 // создание объектов
@@ -127,9 +135,7 @@ void DSP::create_fft_calcer()
 }
 void DSP::create_wav_recorders()
 {
-    first_wav_thread  = new QThread;
-    second_wav_thread = new QThread;
-    third_wav_thread  = new QThread;
+    wav_thread  = new QThread;
 
     first_wav_rec = new wav_recorder();
     connect(reader, &READER::write_to_file, first_wav_rec, &wav_recorder::write_to_file);
@@ -140,9 +146,9 @@ void DSP::create_wav_recorders()
     third_wav_rec = new wav_recorder();
     connect(shifter, &fft_shifter::write_to_file, third_wav_rec, &wav_recorder::write_to_file);
 
-    first_wav_rec->moveToThread(first_wav_thread);
-    second_wav_rec->moveToThread(second_wav_thread);
-    third_wav_rec->moveToThread(third_wav_thread);
+    first_wav_rec->moveToThread(wav_thread);
+    second_wav_rec->moveToThread(wav_thread);
+    third_wav_rec->moveToThread(wav_thread);
 }
 
 // пересчет параметров
@@ -185,7 +191,6 @@ void DSP::prepair_memory()
     prepair_reader(); // подготовка reader к началу записи
     prepair_mr_filter(); // подготовка mr_filter к началу записи
     prepair_fft_shifter(); // подготовка fft_shifter к началу записи
-    prepair_wav_recorder(); // подготовка wav_recorder к началу записи
 }
 // подготовка reader к началу записи
 void DSP::prepair_reader()
@@ -289,98 +294,96 @@ void DSP::prepair_wav_recorder()
     rename_files();
 
     if(dsp_params->read_params->use_first_file){
-        first_wav_rec->params.pos = 0;
-        first_wav_rec->params.total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
-        first_wav_rec->params.file.setFileName(first_wav_rec->params.file_name);
-        first_wav_rec->params.file.open(QIODevice::WriteOnly);
-        first_wav_rec->params.input_cell_size = dsp_params->read_params->read_rb_cell_size;
-        first_wav_rec->params.out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
+        first_wav_rec->params->pos = 0;
+        first_wav_rec->params->total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
+        first_wav_rec->params->file.setFileName(first_wav_rec->params->file_name);
+        first_wav_rec->params->file.open(QIODevice::WriteOnly);
+        first_wav_rec->params->input_cell_size = dsp_params->read_params->read_rb_cell_size;
+        first_wav_rec->params->out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
     }
 
     if(dsp_params->read_params->use_second_file){
-        second_wav_rec->params.pos = 0;
-        second_wav_rec->params.total_size = times[dsp_params->read_params->rec_time_idx] * dsp_params->flt_params->out_sample_rate * 2;
-        second_wav_rec->params.file.setFileName(second_wav_rec->params.file_name);
-        second_wav_rec->params.file.open(QIODevice::WriteOnly);
-        second_wav_rec->params.input_cell_size = dsp_params->flt_params->filtration_rb_cell_size;
-        second_wav_rec->params.out_buf = new Ipp8u[dsp_params->flt_params->filtration_rb_cell_size];
+        second_wav_rec->params->pos = 0;
+        second_wav_rec->params->total_size = times[dsp_params->read_params->rec_time_idx] * dsp_params->flt_params->out_sample_rate * 2;
+        second_wav_rec->params->file.setFileName(second_wav_rec->params->file_name);
+        second_wav_rec->params->file.open(QIODevice::WriteOnly);
+        second_wav_rec->params->input_cell_size = dsp_params->flt_params->filtration_rb_cell_size;
+        second_wav_rec->params->out_buf = new Ipp8u[dsp_params->flt_params->filtration_rb_cell_size];
     }
 
     if(dsp_params->read_params->use_third_file){
-        third_wav_rec->params.pos = 0;
-        third_wav_rec->params.total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
-        third_wav_rec->params.file.setFileName(third_wav_rec->params.file_name);
-        third_wav_rec->params.file.open(QIODevice::WriteOnly);
-        third_wav_rec->params.input_cell_size = dsp_params->read_params->read_rb_cell_size;
-        third_wav_rec->params.out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
+        third_wav_rec->params->pos = 0;
+        third_wav_rec->params->total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
+        third_wav_rec->params->file.setFileName(third_wav_rec->params->file_name);
+        third_wav_rec->params->file.open(QIODevice::WriteOnly);
+        third_wav_rec->params->input_cell_size = dsp_params->read_params->read_rb_cell_size;
+        third_wav_rec->params->out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
     }
 
     make_wav_headers();
 
     if(dsp_params->read_params->use_first_file)
-        first_wav_rec->params.file.write((char*)(&first_wav_rec->params.header), sizeof(WAVEHEADER));
+        first_wav_rec->params->file.write((char*)(&first_wav_rec->params->header), sizeof(WAVEHEADER));
     if(dsp_params->read_params->use_second_file)
-        second_wav_rec->params.file.write((char*)(&second_wav_rec->params.header), sizeof(WAVEHEADER));
+        second_wav_rec->params->file.write((char*)(&second_wav_rec->params->header), sizeof(WAVEHEADER));
     if(dsp_params->read_params->use_third_file)
-        third_wav_rec->params.file.write((char*)(&third_wav_rec->params.header), sizeof(WAVEHEADER));
+        third_wav_rec->params->file.write((char*)(&third_wav_rec->params->header), sizeof(WAVEHEADER));
 }
 
 void DSP::make_wav_headers()
 {
     // первый файл
-    memcpy(first_wav_rec->params.header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
-    first_wav_rec->params.header.chunkSize = first_wav_rec->params.total_size - 8; // data_size + 36
-    memcpy(first_wav_rec->params.header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
-    memcpy(first_wav_rec->params.header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
-    first_wav_rec->params.header.subchunk1Size = 16; // 16 для формата PCM
-    first_wav_rec->params.header.audioFormat = 1;
-    first_wav_rec->params.header.numChannels = 2;
-    first_wav_rec->params.header.sampleRate = sdr->sdr_params->sample_rate;
-    first_wav_rec->params.header.charRate = first_wav_rec->params.header.sampleRate * first_wav_rec->params.header.numChannels * sizeof(char);
-    first_wav_rec->params.header.blockAlign = first_wav_rec->params.header.numChannels * sizeof(char);
-    first_wav_rec->params.header.bitsPerSample = 8;
-    memcpy(first_wav_rec->params.header.subchunk2Id, "data", 4);
-    first_wav_rec->params.header.subchunk2Size = first_wav_rec->params.total_size;
+    memcpy(first_wav_rec->params->header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
+    first_wav_rec->params->header.chunkSize = first_wav_rec->params->total_size - 8; // data_size + 36
+    memcpy(first_wav_rec->params->header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
+    memcpy(first_wav_rec->params->header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
+    first_wav_rec->params->header.subchunk1Size = 16; // 16 для формата PCM
+    first_wav_rec->params->header.audioFormat = 1;
+    first_wav_rec->params->header.numChannels = 2;
+    first_wav_rec->params->header.sampleRate = sdr->sdr_params->sample_rate;
+    first_wav_rec->params->header.charRate = first_wav_rec->params->header.sampleRate * first_wav_rec->params->header.numChannels * sizeof(char);
+    first_wav_rec->params->header.blockAlign = first_wav_rec->params->header.numChannels * sizeof(char);
+    first_wav_rec->params->header.bitsPerSample = 8;
+    memcpy(first_wav_rec->params->header.subchunk2Id, "data", 4);
+    first_wav_rec->params->header.subchunk2Size = first_wav_rec->params->total_size;
 
 
     // второй файл
-    memcpy(second_wav_rec->params.header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
-    second_wav_rec->params.header.chunkSize = second_wav_rec->params.total_size - 8; // data_size + 36
-    memcpy(second_wav_rec->params.header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
-    memcpy(second_wav_rec->params.header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
-    second_wav_rec->params.header.subchunk1Size = 16; // 16 для формата PCM
-    second_wav_rec->params.header.audioFormat = 1;
-    second_wav_rec->params.header.numChannels = 2;
-    second_wav_rec->params.header.sampleRate = dsp_params->flt_params->out_sample_rate;
-    second_wav_rec->params.header.charRate = second_wav_rec->params.header.sampleRate * second_wav_rec->params.header.numChannels * sizeof(char);
-    second_wav_rec->params.header.blockAlign = second_wav_rec->params.header.numChannels * sizeof(char);
-    second_wav_rec->params.header.bitsPerSample = 8;
-    memcpy(second_wav_rec->params.header.subchunk2Id, "data", 4);
-    second_wav_rec->params.header.subchunk2Size = second_wav_rec->params.total_size;
+    memcpy(second_wav_rec->params->header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
+    second_wav_rec->params->header.chunkSize = second_wav_rec->params->total_size - 8; // data_size + 36
+    memcpy(second_wav_rec->params->header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
+    memcpy(second_wav_rec->params->header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
+    second_wav_rec->params->header.subchunk1Size = 16; // 16 для формата PCM
+    second_wav_rec->params->header.audioFormat = 1;
+    second_wav_rec->params->header.numChannels = 2;
+    second_wav_rec->params->header.sampleRate = dsp_params->flt_params->out_sample_rate;
+    second_wav_rec->params->header.charRate = second_wav_rec->params->header.sampleRate * second_wav_rec->params->header.numChannels * sizeof(char);
+    second_wav_rec->params->header.blockAlign = second_wav_rec->params->header.numChannels * sizeof(char);
+    second_wav_rec->params->header.bitsPerSample = 8;
+    memcpy(second_wav_rec->params->header.subchunk2Id, "data", 4);
+    second_wav_rec->params->header.subchunk2Size = second_wav_rec->params->total_size;
 
 
     // третий файл
-    memcpy(third_wav_rec->params.header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
-    third_wav_rec->params.header.chunkSize = third_wav_rec->params.total_size - 8; // data_size + 36
-    memcpy(third_wav_rec->params.header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
-    memcpy(third_wav_rec->params.header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
-    third_wav_rec->params.header.subchunk1Size = 16; // 16 для формата PCM
-    third_wav_rec->params.header.audioFormat = 1;
-    third_wav_rec->params.header.numChannels = 2;
-    third_wav_rec->params.header.sampleRate = sdr->sdr_params->sample_rate;
-    third_wav_rec->params.header.charRate = third_wav_rec->params.header.sampleRate * third_wav_rec->params.header.numChannels * sizeof(char);
-    third_wav_rec->params.header.blockAlign = third_wav_rec->params.header.numChannels * sizeof(char);
-    third_wav_rec->params.header.bitsPerSample = 8;
-    memcpy(third_wav_rec->params.header.subchunk2Id, "data", 4);
-    third_wav_rec->params.header.subchunk2Size = third_wav_rec->params.total_size;
+    memcpy(third_wav_rec->params->header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
+    third_wav_rec->params->header.chunkSize = third_wav_rec->params->total_size - 8; // data_size + 36
+    memcpy(third_wav_rec->params->header.format, "WAVE", 4); // (0x57415645 в big-endian представлении)
+    memcpy(third_wav_rec->params->header.subchunk1Id, "fmt ", 4); // (0x666d7420 в big-endian представлении)
+    third_wav_rec->params->header.subchunk1Size = 16; // 16 для формата PCM
+    third_wav_rec->params->header.audioFormat = 1;
+    third_wav_rec->params->header.numChannels = 2;
+    third_wav_rec->params->header.sampleRate = sdr->sdr_params->sample_rate;
+    third_wav_rec->params->header.charRate = third_wav_rec->params->header.sampleRate * third_wav_rec->params->header.numChannels * sizeof(char);
+    third_wav_rec->params->header.blockAlign = third_wav_rec->params->header.numChannels * sizeof(char);
+    third_wav_rec->params->header.bitsPerSample = 8;
+    memcpy(third_wav_rec->params->header.subchunk2Id, "data", 4);
+    third_wav_rec->params->header.subchunk2Size = third_wav_rec->params->total_size;
 }
 
 // старт потоков
 void DSP::start_threads()
 {
-    third_wav_thread->start();
-    second_wav_thread->start();
-    first_wav_thread->start();
+    wav_thread->start();
     fft_shift_thread->start();
     fft_thread->start();
     //filtration_thread->start();
