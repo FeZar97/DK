@@ -23,9 +23,6 @@ public:
     lpOutc         gfpOut_char;
     void           send_code(unsigned short addr, unsigned char code);
 
-    // дебаг
-    //void (*print_message)(DEBUG_DEGREE debug_deg, QString text);
-
 /// ИНТЕРФЕЙС
     // изменение типа калибровочного сигнала
     void set_signal_type(MOD_SIGNAL new_signal_type);

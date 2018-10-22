@@ -155,7 +155,7 @@ void RPU::set_config_to_RPU()
     //QMessageBox::information(NULL, "rpu", "set_config_to_RPU");
 
     // байтовый код, который будет отправлен в порт
-    char OperationMode = 0x00;
+    byte OperationMode = 0x00;
 
     // в зависимости от выбранного режима определяется код режима работы
     switch(config)
@@ -192,7 +192,7 @@ void RPU::set_config_to_RPU()
     send_code(lpt + LPT_DATA_REG, OperationMode);
 
     // СТРОБ ( 5 --- 4)
-    send_code(lpt + LPT_CONTROL_REG, 0x4);
-    send_code(lpt + LPT_CONTROL_REG, 0x5);
-    send_code(lpt + LPT_CONTROL_REG, 0x4);
+    send_code(lpt + LPT_CONTROL_REG, 0x4); // 0 1 0 0
+    send_code(lpt + LPT_CONTROL_REG, 0x5); // 0 1 0 1
+    send_code(lpt + LPT_CONTROL_REG, 0x4); // 0 1 0 0
 }

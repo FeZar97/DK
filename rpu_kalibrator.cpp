@@ -262,8 +262,6 @@ void RPU_kalibrator::set_work_status_to_RPU()
 // установка типа калибровочного сигнала в РПУ
 void RPU_kalibrator::set_signal_type_to_RPU(NUMERALS SupportTract)
 {
-    // QMessageBox::information(NULL, "kalib", "set_signal_type_to_RPU");
-
     char D5 = 0x00;
 
     if(get_signal_type() == RADIOIMP)
@@ -292,7 +290,7 @@ void RPU_kalibrator::set_signal_type_to_RPU(NUMERALS SupportTract)
     }
 
     send_code(lpt + LPT_CONTROL_REG, 0x8);
-    char ManageKod  = 0x00;
+    char ManageKod = 0x00;
 
     for(int i = 0; i < 4; i++){
         ManageKod = char(((D5 >> (3 - i)) & 0x1) | 0x10);
