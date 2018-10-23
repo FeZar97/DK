@@ -3,8 +3,9 @@
 
 #include "definitions.h"
 
-class RPU_tract
+class RPU_tract : public QObject
 {
+    Q_OBJECT
 private:
     LPT_ADDRESS         lpt;                   // адрес LPT порта
 
@@ -92,6 +93,9 @@ public:
 /// КОДОГРАММЫ
     // отправка в РПУ кодограмм с настройками
     void              send_tract_settings_to_RPU();
+
+signals:
+    void              global_update_interface();
 };
 
 #endif // RPU_TRACT_H

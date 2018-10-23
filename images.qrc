@@ -12,10 +12,10 @@
         <file>buttons/REFRESH_ORANGE.png</file>
         <file>buttons/REFRESH_ORANGEGRAY.png</file>
         <file>buttons/settings.png</file>
+        <file>buttons/SQUID.png</file>
+        <file>buttons/SquidLow.png</file>
         <file>buttons/STOP_GRAY.png</file>
         <file>buttons/STOP_GRAYRED.png</file>
         <file>buttons/STOP_RED.png</file>
-        <file>buttons/SQUID.png</file>
-        <file>buttons/SquidLow.png</file>
     </qresource>
 </RCC>

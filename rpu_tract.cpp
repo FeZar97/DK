@@ -128,6 +128,8 @@ void RPU_tract::set_central_freq(unsigned int new_central_freq)
             send_tract_settings_to_RPU();
         }
     }
+
+    emit global_update_interface();
 }
 
 // возвращает текущее значение частоты настройки тракта

@@ -4,8 +4,10 @@
 #include <rpu_tract.h>
 #include <rpu_kalibrator.h>
 
-class RPU
+class RPU : public QObject
 {
+    Q_OBJECT
+
     LPT_ADDRESS         lpt;                     // адрес используемого LPT порта
 
     RPU_CONFIG          config;                  // конфигурация трактов

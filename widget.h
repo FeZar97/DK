@@ -33,6 +33,7 @@ private:
     QSettings           settings;
 
     MouseType           m_leftMouseButtonPressed;
+    MouseType           m_rightMouseButtonPressed;
     QPoint              m_previousPosition;
     MouseType           checkResizableField(QMouseEvent *event); // определение области нажатия
 

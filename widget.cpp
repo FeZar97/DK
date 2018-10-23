@@ -24,6 +24,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,                 &DSP::recalc_dsp_params);
     connect(sdr,                 &SDR::global_update_interface,            this,                &Widget::global_update_interface);
     connect(config_manager_form, &config_manager::prepair_wav_recorder,    dsp,                 &DSP::prepair_wav_recorder);
+    connect(rpu->first_tract,   &RPU_tract::global_update_interface,       config_manager_form, &config_manager::update_interface);
 
     restore_settings();
 }
@@ -129,6 +130,7 @@ void Widget::on_RecButton_clicked()
         connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_adc_bar);
         connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_flt_bar);
         connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_real_bar);
+
         dsp->start_threads();
         global_update_interface();
     }
@@ -325,26 +327,28 @@ void Widget::setPreviousPosition(QPoint previousPosition)
 
 void Widget::mousePressEvent(QMouseEvent *event)
 {
-    // При клике левой кнопкой мыши
-    if (event->button() == Qt::LeftButton ) {
-        // Определяем, в какой области произошёл клик
+    if(event->button() == Qt::LeftButton){
         m_leftMouseButtonPressed = checkResizableField(event);
-        setPreviousPosition(event->pos()); // и устанавливаем позицию клика
+        setPreviousPosition(event->pos());
+    }
+    if(event->button() == Qt::RightButton){
+        m_rightMouseButtonPressed = checkResizableField(event);
+        setPreviousPosition(event->pos());
     }
     return QWidget::mousePressEvent(event);
 }
 
 void Widget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    if(event->button() == Qt::LeftButton)
         m_leftMouseButtonPressed = None;
-    }
+
     return QWidget::mouseReleaseEvent(event);
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event)
 {
-    switch (m_leftMouseButtonPressed) {
+    switch(m_leftMouseButtonPressed){
         case Move:{
             int dx = event->x() - m_previousPosition.x();
             int dy = event->y() - m_previousPosition.y();
@@ -361,6 +365,22 @@ void Widget::mouseMoveEvent(QMouseEvent *event)
             checkResizableField(event);
             break;
     }
+
+    switch(m_rightMouseButtonPressed){
+        case Move:{
+            break;
+        }
+        case Spectr:{
+            int dx = event->x() - m_previousPosition.x();
+            rpu->first_tract.set_central_freq(rpu->first_tract.get_central_freq() + (-1) * dx * (sdr->sdr_params->sample_rate / 1024.));
+            setPreviousPosition(event->pos());
+            break;
+        }
+        default:
+            checkResizableField(event);
+            break;
+    }
+
     return QWidget::mouseMoveEvent(event);
 }
 
