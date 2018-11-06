@@ -20,7 +20,8 @@ void wav_recorder::write_to_file(Ipp32fc *rb_cell)
 
         emit update_progr_bar(params->pos  * 100 / float(params->total_size) + 1);
 
-        if(params->pos == params->header.subchunk2Size){
+        if(params->pos >= params->header.subchunk2Size){
+
             params->file.close();
             emit end_of_recording();
         }

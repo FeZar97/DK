@@ -25,7 +25,7 @@ void READER::start_reading()
     rtlsdr_reset_buffer(sdr_params->sdr_ptr);
 
     // количество обращения к приемнику
-    int iterations = times[dsp_params->read_params->rec_time_idx] * dsp_params->read_params->readout_per_seconds, i = 0, n_read;
+    int n_read;//, iterations = times[dsp_params->read_params->rec_time_idx] * dsp_params->read_params->readout_per_seconds, i;
 
     // считывание просиходит до тех пор, пока либо не кончится время, либо не произойдет принудительная остановка
     while(/*i < iterations && */!dsp_params->read_params->emergency_end_recording){
@@ -39,7 +39,11 @@ void READER::start_reading()
                          &n_read);
 
         // подавление постоянной составляющей
-        //ippsSubC_8u_ISfs(0, dsp_params->read_params->read_cell, dsp_params->read_params->read_rb_cell_size, 0);
+        if(!dsp_params->fft_params->dc_correct)
+            ippsSubC_8u_ISfs(dsp_params->read_params->dc_offset,
+                             dsp_params->read_params->read_cell,
+                             dsp_params->read_params->read_rb_cell_size,
+                             0);
 
         // конвертация 8u -> 32f
         ippsConvert_8u32f(dsp_params->read_params->read_cell,
@@ -58,7 +62,8 @@ void READER::start_reading()
         //    emit get_filtration_step(read_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
 
         // частотный сдвиг
-        emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
+        emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+                            dsp_params->read_params->read_rb_cell_size);
 
         // в файл
         if(dsp_params->read_params->use_first_file && dsp_params->read_params->use_files)

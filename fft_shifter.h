@@ -15,11 +15,11 @@ public:
 
 public slots:
     // прием сигнала с поста чтения
-    void get_shift_step(Ipp32fc *rb_cell = NULL);
+    void get_shift_step(Ipp32fc *rb_cell = NULL, unsigned int cell_size = 0);
 
 signals:
     // сигнал для расчета спектра пересчитанного сигнала
-    void get_fft_step(Ipp32fc *shift_cell);
+    void get_fft_step(Ipp32fc *shift_cell, unsigned int cell_size);
 
     // сигнал на запись в трейти файл сдвинутого сигнала
     void write_to_file(Ipp32fc *shift_rb_cell);

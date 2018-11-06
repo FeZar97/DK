@@ -110,7 +110,6 @@ void RPU_tract::set_central_freq(unsigned int new_central_freq)
     // изменения происодят только если новая частота удовлетворяет ДРЧ
     if(new_central_freq >= RPU_MIN_TRACT_FREQ && new_central_freq <= RPU_MAX_TRACT_FREQ){
         central_freq = new_central_freq;
-        send_tract_settings_to_RPU();
     }else{
         if(get_central_freq() == RPU_MIN_TRACT_FREQ || get_central_freq() == RPU_MAX_TRACT_FREQ){
             if(new_central_freq < RPU_MIN_TRACT_FREQ){
@@ -125,9 +124,11 @@ void RPU_tract::set_central_freq(unsigned int new_central_freq)
             if(new_central_freq > RPU_MAX_TRACT_FREQ){
                 central_freq = RPU_MAX_TRACT_FREQ;
             }
-            send_tract_settings_to_RPU();
         }
     }
+
+    set_central_freq_to_RPU();
+    set_tract_params_to_RPU();
 
     emit global_update_interface();
 }
@@ -225,10 +226,8 @@ bool RPU_tract::get_tract_active()
 // отправка в РПУ кодограмм с настройками
 void RPU_tract::send_tract_settings_to_RPU()
 {
-    // QMessageBox::information(NULL, "tract", "send_tract_settings_to_RPU");
-
     set_tract_params_to_RPU();
-    set_central_freq_to_RPU();
+    //set_central_freq_to_RPU();
 }
 
 /*---------------------------------КОД УПРАВЛЕНИЯ РЕЖИМАМИ РАБОТЫ---------------------------------
@@ -277,11 +276,9 @@ N1, N2 – код управляемого канала (для автономн
 */
 void RPU_tract::set_config_to_RPU()
 {
-    // QMessageBox::information(NULL, "tract", "set_config_to_RPU");
-
     int code = 0, geterodinNumber = 0;
 
-    if( config < MIN_CONFIG || config > MAX_CONFIG )
+    if(config < MIN_CONFIG || config > MAX_CONFIG)
         code = 0xFF;
 
     switch(config)
@@ -357,8 +354,7 @@ void RPU_tract::set_config_to_RPU()
             break;
     }
 
-    if(code != 0xFF)
-    {
+    if(code != 0xFF){
         // комбинации из предыдущей функции ( R3 - R1 определяют режим трактов, N2 и N1 - код управляемго канала )
         // для 4 синхронных каналов код: Х Х Х R3 R2 R1 N2 N1
         //                               Х Х Х  0  1  1  1  1
@@ -366,7 +362,7 @@ void RPU_tract::set_config_to_RPU()
         //                                                                 2(N1) + 4 + 8 + 16 + 0 = 30
 
         // код
-        send_code(lpt + LPT_DATA_REG, (char)code);
+        send_code(lpt + LPT_DATA_REG, (byte)code);
 
         // строб по адресу 010 ( с учетом инверсии сигналов DB25)
         send_code(lpt + LPT_CONTROL_REG, 0x4);
@@ -417,23 +413,10 @@ void RPU_tract::set_config_to_RPU()
 */
 void RPU_tract::set_central_freq_to_RPU()
 {
-    // QMessageBox::information(NULL, "tract", "set_central_freq_to_RPU");
-
-    // Определяется частота первого гетеродина:
-    // F = Fн + Fпч1,
-    // где частота настройки Fн и первая промежуточная частота Fпч1 взяты в кГц
     int F_geterod = get_central_freq() / 1000 + 65500;
-
-    // A = int{ ( F - 1000 * int{ (F / 1000) } ) / 500 };
     int A  = int( ( F_geterod - 1000 * ( int(F_geterod / 1000) ) ) / 500);
-
-    // N1 = F - 1000 * int{F/1000} + 3000 - A * 1000;
     int N1 = F_geterod - 1000 * ( int(F_geterod / 1000) ) + 3000 - A * 1000;
-
-    // N2 = int{F / 1000} - 3 + A;
     int N2 = int(F_geterod / 1000) - 3 + A;
-
-    // N3 = int{F / 100} + int{ ( (N1 - 2500) - 100 * int{ (N1 - 2500) / 100 } ) / 50 };
     int N3 = int(F_geterod / 100) + int( ( (N1 - 2500) - 100 * int( (N1 - 2500) / 100) ) / 50);
 
     DWORD  D1 = 0;
@@ -464,15 +447,15 @@ void RPU_tract::set_central_freq_to_RPU()
     vrem3 = 0x64 << 19;
     D3 = vrem3 | vrem2 | (vrem1 << 6);
 
-    char ManageGeterKod = 0;
+    byte ManageGeterKod = 0;
 
     // предварительный сброс последней единички (1010)
-    //send_code(lpt + LPT_CONTROL_REG, 0xA);
+    send_code(lpt + LPT_CONTROL_REG, 0xA);
 
     for(int i = 0; i < 32; i++)
     {
         ManageGeterKod = 0x8;
-        ManageGeterKod |=  char(((D1 >> 31) << 2) | ((D2 >> 31) << 1) | (D3 >> 31));
+        ManageGeterKod |=  byte(((D1 >> 31) << 2) | ((D2 >> 31) << 1) | (D3 >> 31));
 
         send_code(lpt + LPT_DATA_REG, ManageGeterKod);
 
@@ -587,8 +570,6 @@ D4 - 14-ти разрядный последовательный код упра
 */
 void RPU_tract::set_tract_params_to_RPU()
 {
-    // QMessageBox::information(NULL, "tract", "set_tract_params_to_RPU");
-
     short  band_mask, preselektor_mask, InputAttenuator_mask;
     short  HFAttenuator_mask, IFAttenuator_mask, D4;
     int    carrier;
@@ -685,10 +666,10 @@ void RPU_tract::set_tract_params_to_RPU()
        InputAttenuator_mask = 0x0000;
 
     // определяем маску АттВЧ
-    HFAttenuator_mask = get_hf_att_idx();// * HF_ATT_STEP;
+    HFAttenuator_mask = get_hf_att_idx();
 
     // определяем маску АттПЧ
-    IFAttenuator_mask = get_if_att_idx() * RPU_IF_ATT_STEP;
+    IFAttenuator_mask = get_if_att_idx();
 
     //--- используя все данные формируем в D4 последовательный 14-ти разрядный код ---//
     // D4 - 2 байта, из которых 14 бит информационные

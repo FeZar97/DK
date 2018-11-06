@@ -81,6 +81,9 @@ private slots:
     void on_ADCSignalCB_clicked(bool new_use_first_file); // выбор файлов на запись
     void on_FltSignalCB_clicked(bool new_use_second_file); // выбор файлов на запись
     void on_RealSignalCB_clicked(bool new_use_third_file); // выбор файлов на запись
+    void on_RecordButton_clicked(); // начало записи в файл
+    void on_CurrentPathButton_clicked(); // выбор папки
+
 // фильтрация
 
 // БПФ
@@ -92,19 +95,22 @@ private slots:
     void on_WindowCB_currentIndexChanged(int new_win_idx); // выбор окна
     void on_WindowAlphaSB_valueChanged(double new_aplha); // изменение коэффициента alpha
     void on_ShiftFreqSB_valueChanged(double new_freq_shift); // изменение частотного сдвига
+    void on_DCOffsetSB_valueChanged(int new_dc_offset);
+    void on_FftShiftStepCB_clicked(bool new_state); // кратность шага изменения частоты сноса
 
     void on_CloseButton_clicked();
 
 /// АСКР
+    void on_FirstValidatePB_clicked(); // АСКР проверка №1
+    void on_comboBox_currentIndexChanged(int new_pres_idx); // выбор преселектора
 
-    void on_RecordButton_clicked();
-
-    void on_FirstValidatePB_clicked();
 
 signals:
     void global_update_interface();
     void previousPositionChanged(QPoint previousPosition);
     void prepair_wav_recorder();
+    void bind_slots_signals();
+    void stop();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

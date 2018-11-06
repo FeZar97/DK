@@ -75,7 +75,12 @@ unsigned int RPU::get_lpt_idx()
         case LPT_5:
             return 4;
     }
-    return -1;
+    return 0;
+}
+
+unsigned int RPU::get_lpt_addres()
+{
+    return lpt;
 }
 
 // изменение конфигурации РПУ и определение активности трактов

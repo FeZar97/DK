@@ -12,6 +12,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     dsp = new DSP();
 
     config_manager_form = new config_manager(NULL, rpu, sdr, dsp);
+    connect(config_manager_form, &config_manager::bind_slots_signals, this, &Widget::bind_slots_signals);
+    connect(config_manager_form, &config_manager::stop, this, &Widget::on_StopButton_clicked);
 
     ui->FftGraph->sdr_params = sdr->sdr_params;
     ui->FftGraph->dsp_params = dsp->dsp_params;
@@ -24,7 +26,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,                 &DSP::recalc_dsp_params);
     connect(sdr,                 &SDR::global_update_interface,            this,                &Widget::global_update_interface);
     connect(config_manager_form, &config_manager::prepair_wav_recorder,    dsp,                 &DSP::prepair_wav_recorder);
-    connect(rpu->first_tract,   &RPU_tract::global_update_interface,       config_manager_form, &config_manager::update_interface);
+    //connect(rpu->first_tract,   &RPU_tract::global_update_interface,       config_manager_form, &config_manager::update_interface);
 
     restore_settings();
 }
@@ -107,6 +109,19 @@ void Widget::end_of_third_file_rec()
     global_update_interface();
 }
 
+void Widget::bind_slots_signals()
+{
+    connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                     &Widget::update_ReadProgressBar);
+    connect(dsp->reader,            &READER::end_of_recording,              this,                     &Widget::end_of_recording);
+    connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                     &Widget::paint_fft);
+    connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                     &Widget::end_of_first_file_rec);
+    connect(dsp->second_wav_rec,    &wav_recorder::end_of_recording,        this,                     &Widget::end_of_second_file_rec);
+    connect(dsp->third_wav_rec,     &wav_recorder::end_of_recording,        this,                     &Widget::end_of_third_file_rec);
+    connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form,      &config_manager::update_adc_bar);
+    connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form,      &config_manager::update_flt_bar);
+    connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form,      &config_manager::update_real_bar);
+}
+
 // отображение/скрытие окна конфигурации
 void Widget::on_ConfigButton_clicked()
 {
@@ -121,15 +136,8 @@ void Widget::on_RecButton_clicked()
 {
     // если подготовка к записи завершена успешно, то начинается прием
     if(dsp->prepair_to_record(sdr)){
-        connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                &Widget::update_ReadProgressBar);
-        connect(dsp->reader,            &READER::end_of_recording,              this,                &Widget::end_of_recording);
-        connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                &Widget::paint_fft);
-        connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_first_file_rec);
-        connect(dsp->second_wav_rec,    &wav_recorder::end_of_recording,        this,                &Widget::end_of_second_file_rec);
-        connect(dsp->third_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_third_file_rec);
-        connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_adc_bar);
-        connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_flt_bar);
-        connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_real_bar);
+
+        bind_slots_signals();
 
         dsp->start_threads();
         global_update_interface();
@@ -249,6 +257,11 @@ void Widget::save_settings()
     settings.setValue("DSP_fft_info",               dsp->dsp_params->fft_params->fft_info);
     settings.setValue("DSP_fft_inversion",          dsp->dsp_params->fft_params->fft_inversion);
     settings.setValue("DSP_fft_mode",               dsp->dsp_params->fft_params->fft_mode);
+    settings.setValue("DSP_fft_dc_correct",         dsp->dsp_params->fft_params->dc_correct);
+    settings.setValue("DSP_fft_dc_offset",          dsp->dsp_params->read_params->dc_offset);
+    settings.setValue("DSP_fft_shift_val",          dsp->dsp_params->shift_params->shift_freq);
+    settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
+    settings.setValue("DSP_wav_directory",          dsp->dsp_params->wav_params->directory);
 
     settings.sync();
 }
@@ -304,11 +317,21 @@ void Widget::restore_settings()
     dsp->dsp_params->fft_params->fft_info = settings.value("DSP_fft_info").toBool();
     dsp->dsp_params->fft_params->fft_inversion = settings.value("DSP_fft_inversion").toInt();
     dsp->dsp_params->fft_params->fft_mode = FFT_MODE(settings.value("DSP_fft_mode").toInt());
+    dsp->dsp_params->fft_params->dc_correct = settings.value("DSP_fft_dc_correct").toBool();
+    dsp->dsp_params->read_params->dc_offset = settings.value("DSP_fft_dc_offset").toInt();
+    dsp->dsp_params->shift_params->shift_freq = settings.value("DSP_fft_shift_val").toDouble();
+    dsp->dsp_params->shift_params->step = settings.value("DSP_fft_shift_step").toBool();
+    dsp->dsp_params->wav_params->directory = settings.value("DSP_wav_directory").toString();
 
     global_update_interface();
 
     if(settings.value("DSP_is_recording").toBool())
         on_RecButton_clicked();
+}
+
+void Widget::test_kalibrator()
+{
+
 }
 
 QPoint Widget::previousPosition() const

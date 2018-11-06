@@ -21,11 +21,13 @@ fft_calcer::~fft_calcer()
     // еще один бесполезный деструктор
 }
 
-void fft_calcer::get_fft_step(Ipp32fc *rb_cell)
+void fft_calcer::get_fft_step(Ipp32fc *rb_cell, unsigned int cell_size)
 {
+    Q_UNUSED(cell_size);
+
     unsigned int i, j;
 
-    // генеральная уборка
+    // обнуление результирующего массива
     ippsZero_32f(dsp_params->fft_params->fft_res, DSP_FFT_SIZE);
 
     /*
@@ -75,7 +77,47 @@ void fft_calcer::get_fft_step(Ipp32fc *rb_cell)
     ippsMulC_32f_I(10, dsp_params->fft_params->fft_res, DSP_FFT_SIZE);
 
     // учет нулевого бина
-    //dsp_params->fft_params->fft_res[0] = dsp_params->fft_params->fft_res[1] = (dsp_params->fft_params->fft_res[2] > dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1] ? dsp_params->fft_params->fft_res[2] : dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1]);
+    if(dsp_params->fft_params->dc_correct)
+        dsp_params->fft_params->fft_res[0] = dsp_params->fft_params->fft_res[1] = (dsp_params->fft_params->fft_res[2] > dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1] ? dsp_params->fft_params->fft_res[2] : dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1]);
+
+
+// ШУМ
+    // поиск минимума и сохранение в массив
+    int min_idx = 0;
+    for(i = 1; i < DSP_FFT_SIZE/2 - DSP_FFT_SIZE/64; i++)
+        if(dsp_params->fft_params->fft_res[i] < dsp_params->fft_params->fft_res[min_idx])
+            min_idx = i;
+
+    for(i = DSP_FFT_SIZE/2 + DSP_FFT_SIZE/64; i < DSP_FFT_SIZE; i++)
+        if(dsp_params->fft_params->fft_res[i] < dsp_params->fft_params->fft_res[min_idx])
+            min_idx = i;
+
+    // убираем из аккумулятора самый старый уровень
+    dsp_params->fft_params->accum -= dsp_params->fft_params->noise_buf[dsp_params->fft_params->noise_idx];
+    // заменяем старый уровень на новый
+    dsp_params->fft_params->noise_buf[dsp_params->fft_params->noise_idx] = dsp_params->fft_params->fft_res[min_idx];
+    // добавляем к аккумулятору новый уровень
+    dsp_params->fft_params->accum += dsp_params->fft_params->noise_buf[dsp_params->fft_params->noise_idx];
+    // считаем среднее по аккумулятору с учетом веса аккумулятора
+    if(dsp_params->fft_params->accum_weight)
+        dsp_params->fft_params->noise_level = dsp_params->fft_params->accum / dsp_params->fft_params->accum_weight;
+    else
+        dsp_params->fft_params->noise_level = dsp_params->fft_params->accum;
+    dsp_params->fft_params->noise_level += 1.8;
+
+    // итератор по кольцевому
+    dsp_params->fft_params->noise_idx = (dsp_params->fft_params->noise_idx + 1) % DSP_NOISE_SIZE;
+    //накапливаем вес аккумулятора
+    if(dsp_params->fft_params->accum_weight < DSP_NOISE_SIZE)
+        dsp_params->fft_params->accum_weight++;
+//--------------------------------------------------------------------------------------------------------------
+
+// МАКСИМУМ
+    dsp_params->fft_params->max_level_idx = 0;
+    for(i = 1; i < DSP_FFT_SIZE; i++)
+        if(dsp_params->fft_params->fft_res[i] > dsp_params->fft_params->fft_res[dsp_params->fft_params->max_level_idx])
+            dsp_params->fft_params->max_level_idx = i;
+//--------------------------------------------------------------------------------------------------------------------
 
     // на телевизор
     emit paint_fft();

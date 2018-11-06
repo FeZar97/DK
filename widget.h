@@ -71,6 +71,8 @@ public slots:
     void end_of_second_file_rec();
     void end_of_third_file_rec();
 
+    void bind_slots_signals();
+
 private slots:
     // открытие/закрытие настройщика
     void on_ConfigButton_clicked();
@@ -95,6 +97,9 @@ private slots:
 
     // восстановление настроек
     void restore_settings();
+
+    // тестировка калибратора
+    void test_kalibrator();
 
 signals:
     void previousPositionChanged(QPoint previousPosition);

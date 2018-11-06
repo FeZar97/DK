@@ -19,7 +19,7 @@ public:
     Ipp32fc             fft_dst[DSP_FFT_SIZE];  // кусок сигнала
 public slots:
     // воркер
-    void get_fft_step(Ipp32fc *rb_cell = NULL);
+    void get_fft_step(Ipp32fc *rb_cell = NULL, unsigned int cell_size = 0);
 
 signals:
     // картинка для телевизора

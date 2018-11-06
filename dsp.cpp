@@ -69,7 +69,8 @@ void DSP::set_record_flags(bool flag)
 
 void DSP::rename_files()
 {
-    QString base_file_name = QDateTime::currentDateTime().toString("d.M.yyyy(hh;mm;ss)")
+    QString base_file_name = dsp_params->wav_params->directory
+                           + QDateTime::currentDateTime().toString("d.M.yyyy(hh;mm;ss)")
                            + "_Freq(" + QString::number(sdr->sdr_params->central_freq)
                            + ")_SampleRate(" + QString::number(sdr->sdr_params->sample_rate) + ")";
 
@@ -129,7 +130,6 @@ void DSP::create_shifter()
 void DSP::create_fft_calcer()
 {
     fft = new fft_calcer(dsp_params);
-    connect(reader, &READER::get_fft_step, fft, &fft_calcer::get_fft_step);
     connect(shifter, &fft_shifter::get_fft_step, fft, &fft_calcer::get_fft_step);
     fft->moveToThread(fft_thread);
 }

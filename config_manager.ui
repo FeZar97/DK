@@ -2158,7 +2158,7 @@
          <rect>
           <x>141</x>
           <y>110</y>
-          <width>163</width>
+          <width>136</width>
           <height>22</height>
          </rect>
         </property>
@@ -2171,10 +2171,10 @@
          <bool>false</bool>
         </property>
         <property name="decimals">
-         <number>6</number>
+         <number>4</number>
         </property>
         <property name="maximum">
-         <double>0.000000000000000</double>
+         <double>15.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>1367.187500000000000</double>
@@ -2183,9 +2183,9 @@
        <widget class="QLabel" name="HzLabel">
         <property name="geometry">
          <rect>
-          <x>315</x>
+          <x>285</x>
           <y>110</y>
-          <width>29</width>
+          <width>22</width>
           <height>22</height>
          </rect>
         </property>
@@ -2267,6 +2267,63 @@
          <double>0.500000000000000</double>
         </property>
        </widget>
+       <widget class="QLabel" name="DCOffsetLabel">
+        <property name="geometry">
+         <rect>
+          <x>6</x>
+          <y>144</y>
+          <width>106</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Коррекция iq:</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="FftShiftStepCB">
+        <property name="geometry">
+         <rect>
+          <x>309</x>
+          <y>111</y>
+          <width>52</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>шаг</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="DCOffsetSB">
+        <property name="geometry">
+         <rect>
+          <x>114</x>
+          <y>145</y>
+          <width>88</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>32768</number>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -2290,6 +2347,79 @@
       </property>
       <property name="text">
        <string>Проверка 1</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox">
+      <property name="geometry">
+       <rect>
+        <x>264</x>
+        <y>6</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>200-1000</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1000-1500</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1500-2200</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2200-3200</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3200-4700</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4700-6800</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6800-9900</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>9900-14400</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>14400-20700</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>20700-32000</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="BandLabel">
+      <property name="geometry">
+       <rect>
+        <x>174</x>
+        <y>9</y>
+        <width>79</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Преселектор</string>
       </property>
      </widget>
     </widget>

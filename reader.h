@@ -29,11 +29,8 @@ signals:
     // отправка сигнала на запись сырого ЦП
     void write_to_file(Ipp32fc *rb_cell);
 
-    // отрисовка спектра
-    void get_fft_step(Ipp32fc *rb_cell);
-
     // сдвиг спектра
-    void get_shift_step(Ipp32fc *rb_cell);
+    void get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size);
 
     // если завершилось штатно, то флаг emergency_end_recording == 0
     // если завершилось экстренно, то emergency_end_recording == 1

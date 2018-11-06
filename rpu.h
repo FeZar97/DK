@@ -8,13 +8,12 @@ class RPU : public QObject
 {
     Q_OBJECT
 
-    LPT_ADDRESS         lpt;                     // адрес используемого LPT порта
-
-    RPU_CONFIG          config;                  // конфигурация трактов
-
 public:
     RPU();
     ~RPU();
+
+    LPT_ADDRESS         lpt;                     // адрес используемого LPT порта
+    RPU_CONFIG          config;                  // конфигурация трактов
 
     RPU_tract           first_tract;             // первый тракт
     RPU_tract           second_tract;            // второй тракт
@@ -28,13 +27,12 @@ public:
 
     void                set_lpt_idx(int new_lpt_idx); // изменение адреса LPT порта
     unsigned int        get_lpt_idx(); // возвращает индекс LPT порта
+    unsigned int        get_lpt_addres(); // возвращает адрес LPT порта
 
     void                set_config(RPU_CONFIG new_config); // изменение конфигурации РПУ
     unsigned int        get_config_idx(); // возвращает индекс конфигурации РПУ
 
-private:
-    // кодограмма управления режимами работы
-    void                set_config_to_RPU();
+    void                set_config_to_RPU(); // кодограмма управления режимами работы
 };
 
 #endif // RPU_H

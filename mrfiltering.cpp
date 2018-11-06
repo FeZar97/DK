@@ -23,6 +23,7 @@ MRFiltering::~MRFiltering()
 // передается указатель на массив принятого комплексного ЦП с поста чтения
 void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
 {
+    Q_UNUSED(rb_cell);
     /*
     // если фильтрация используется, еще не конец фильтрации
     if(dsp_params->flt_params->is_using && !dsp_params->read_params->end_filtering){

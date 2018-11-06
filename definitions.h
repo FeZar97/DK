@@ -209,6 +209,7 @@ enum WINDOW{
 #define     DSP_DEFAULT_FILE_RECORD                 false
 
 #define     DSP_FFT_SIZE                            1024
+#define     DSP_NOISE_SIZE                          25
 
 // размеры кольцевых буферов
 #define     DSP_READ_RB_SIZE                        10
@@ -319,6 +320,8 @@ public:
 class READ_params
 {
 public:
+    int                 dc_offset;
+
     // глобальные
     bool                is_recording;            // флаг активной записи
     bool                end_reading;             // флаг штатного окончания чтения
@@ -344,6 +347,8 @@ public:
     Ipp8u               *read_cell;              // временный буфер
 
     READ_params(){
+        dc_offset               = 0;
+
         is_recording            = false;
         end_reading             = true;
         end_filtering           = true;
@@ -433,6 +438,7 @@ public:
     unsigned int       fft_dynamic_range;       // динамический диапазон
     int                fft_noise_level;         // уровень шума
 
+    bool               dc_correct;              // флаг коррекции дисбаланса i/q
     FFT_MODE           fft_mode;                // спектр какого сигнала выводить
     unsigned int       fft_input_cell_size;     // размер входного массива
     unsigned int       fft_averages_number;     // кол-во усреднений спектра
@@ -444,12 +450,20 @@ public:
 
     Ipp32f             fft_res[DSP_FFT_SIZE];   // энергетический спектр
 
+    Ipp32f             noise_level;
+    Ipp32f             noise_buf[DSP_NOISE_SIZE];
+    int                noise_idx;
+    Ipp32f             accum;
+    int                accum_weight;
+
+    int                max_level_idx;
 
     FFT_params(){
         fft_win_alpha = DSP_DEFAULT_WIN_ALPHA;
         fft_dynamic_range = DSP_DEFAULT_DYNAMIC_RANGE;
         fft_noise_level = DSP_DEFAULT_NOISE_LEVEL;
 
+        dc_correct = true;
         fft_mode = DSP_DEFAULT_FFT_MODE;
         fft_input_cell_size = 0;
         fft_averages_number = DSP_DEFAULT_AVERAGE_NUMBER;
@@ -458,7 +472,15 @@ public:
         fft_current_window = DSP_DEFAULT_FFT_WINDOW;
         fft_info = DSP_DEFAULT_FFT_INFO;
 
+        noise_level = 0;
+        noise_idx = 0;
+        accum = 0;
+        accum_weight = 0;
+
+        max_level_idx = 0;
+
         ippsZero_32f(fft_res, DSP_FFT_SIZE);
+        ippsZero_32f(noise_buf, DSP_NOISE_SIZE);
     }
 };
 
@@ -471,6 +493,7 @@ public:
     Ipp32fc             **shift_rb;          // КБ сдвига
     unsigned int        shift_rb_cell_size;  // размер ячейки КБ сдвига
     unsigned int        shift_rb_cell_idx;   // итератор по КБ сдвига
+    bool                step;                // флаг кратности шага изменения частоты сноса
 
     // локальные
     Ipp32fc             *complex_sin;       // комплексная синусоида для сдвига
@@ -481,6 +504,7 @@ public:
         shift_rb = NULL;
         shift_rb_cell_size = 0;
         shift_rb_cell_idx = 0;
+        step = true;
 
         complex_sin = 0;
         CurrentPhase = 0;
@@ -495,12 +519,14 @@ public:
     WAVEHEADER     header;
     quint64        pos;
     quint64        total_size;
-    QString        file_name;         // имя первого файла
+    QString        file_name;
+    QString        directory;
 
     int            input_cell_size;
     Ipp8u          *out_buf;
 
     WAV_params(){
+        directory = "C:/";
         pos = 0;
         total_size = 0;
         file_name = "";

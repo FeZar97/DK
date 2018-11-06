@@ -177,6 +177,7 @@ void config_manager::update_dsp_tab()
     ui->InfoCB->setChecked(dsp->dsp_params->fft_params->fft_info);
     ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
+    ui->DCOffsetSB->setValue(dsp->dsp_params->read_params->dc_offset);
 
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
@@ -200,6 +201,14 @@ void config_manager::update_dsp_tab()
                  || (dsp->dsp_params->read_params->use_third_file  && dsp->dsp_params->read_params->is_recording);
 
     ui->RecordButton->setEnabled(enabled_flag);
+
+    // если флаг кратности == true, то шаг = (частота дискретизации) / (DSP_FFT_SIZE)
+    // если флаг кратности == false, то шаг = 1
+    ui->FftShiftStepCB->setChecked(dsp->dsp_params->shift_params->step);
+    if(dsp->dsp_params->shift_params->step)
+        ui->ShiftFreqSB->setSingleStep(sdr->sdr_params->sample_rate / float(DSP_FFT_SIZE));
+    else
+        ui->ShiftFreqSB->setSingleStep(50.);
 }
 
 // применение стиля
@@ -393,10 +402,25 @@ void config_manager::on_InversionCB_clicked(bool new_fft_inversion)
     emit global_update_interface();
 }
 
-// смена частотного сдвига для fft_shifter
 void config_manager::on_ShiftFreqSB_valueChanged(double new_freq_shift)
 {
     dsp->dsp_params->shift_params->shift_freq = new_freq_shift;
+    emit global_update_interface();
+}
+
+// смена частотного сдвига для fft_shifter
+void config_manager::on_DCOffsetSB_valueChanged(int new_dc_offset)
+{
+    dsp->dsp_params->read_params->dc_offset = new_dc_offset;
+    dsp->dsp_params->fft_params->dc_correct = !bool(new_dc_offset);
+
+    emit global_update_interface();
+}
+
+// кратность шага изменения частоты сноса
+void config_manager::on_FftShiftStepCB_clicked(bool new_state)
+{
+    dsp->dsp_params->shift_params->step = new_state;
     emit global_update_interface();
 }
 
@@ -504,6 +528,11 @@ void config_manager::on_RecordButton_clicked()
 
     emit prepair_wav_recorder(); // подготовка wav_recorders к началу записи
 }
+// выбор выходной папки
+void config_manager::on_CurrentPathButton_clicked()
+{
+    dsp->dsp_params->wav_params->directory = QFileDialog::getExistingDirectory(this, "Выходная директория", dsp->dsp_params->wav_params->directory) + "/";
+}
 
 
 /*
@@ -529,11 +558,178 @@ void config_manager::on_RecordButton_clicked()
 */
 void config_manager::on_FirstValidatePB_clicked()
 {
-    int freqs[10] = {600000, 1250000, 1850000, 2700000, 3950000, 5750000, 8350000, 12150000, 17550000, 26350000};
+    if(dsp->dsp_params->read_params->is_recording)
+        emit stop();
 
-    for(int i = 0; i < 10; i++){
-        rpu->set_config(FOUR_CHANNEL);
-        rpu->first_tract.set_central_freq(freqs[i]);
+// настройки SDR
+    sdr->sdr_params->central_freq = 5500000;
+    sdr->sdr_params->direct_sampling_idx = 2;
+    sdr->sdr_params->gain_idx = 1;
+    sdr->sdr_params->sample_rate = 1400000;
+
+// настройки тракта РПУ
+    rpu->first_tract.set_central_freq(15000000);
+    rpu->first_tract.set_if_band_idx(3);
+    rpu->first_tract.set_in_att_idx(OFF);
+    rpu->first_tract.set_hf_att_idx(0);
+    rpu->first_tract.set_if_att_idx(0);
+
+// настройки калибратора
+    rpu->kalibrator.set_work_status(ON);
+    rpu->kalibrator.set_att_idx(0);
+    rpu->kalibrator.set_exit_type(INTERNAL);
+    rpu->kalibrator.set_signal_type(SINUS);
+
+    if(dsp->prepair_to_record(sdr)){
+        emit bind_slots_signals();
+
+        dsp->fft_shift_thread->start();
+        dsp->fft_thread->start();
+
+        dsp->reader_thread->start();
+    }
+    else{
+        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать калибровку. Ошибка 1.");
+        sdr->sdr_params->is_open = false;
+        dsp->set_record_flags(false);
+    }
+
+    // на данном моменте на спектре должна быть видна синусоида калибратора
+
+    int freqs[10] = {600000, 1250000, 1850000, 2700000, 3950000, 5750000, 8350000, 12150000, 17550000, 26350000}, i, j, n_read;
+
+    // 10 обращений в секунду
+    //dsp->dsp_params->read_params->readout_per_seconds = 10;
+    //dsp->recalc_dsp_params();
+
+    char *input_buffer = new char[dsp->dsp_params->read_params->read_rb_cell_size];
+
+    /*
+    // если подготовка к записи завершена успешно, то начинается прием
+    if(dsp->prepair_to_record(sdr)){
+        connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                &Widget::update_ReadProgressBar);
+        connect(dsp->reader,            &READER::end_of_recording,              this,                &Widget::end_of_recording);
+        connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                &Widget::paint_fft);
+        connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_first_file_rec);
+        connect(dsp->second_wav_rec,    &wav_recorder::end_of_recording,        this,                &Widget::end_of_second_file_rec);
+        connect(dsp->third_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_third_file_rec);
+        connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_adc_bar);
+        connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_flt_bar);
+        connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_real_bar);
+
+        dsp->wav_thread->start();
+        dsp->fft_shift_thread->start();
+        dsp->fft_thread->start();
+        global_update_interface();
+
+
+        for(i = 0; i < 10; i++){
+            rpu->set_config(FOUR_CHANNEL);
+            rpu->first_tract.set_central_freq(freqs[i]);
+
+            // в начале накопить инфу о шуме
+            // для статистики шума требуется DSP_NOISE_SIZE обращений к приемнику
+
+            j = 0;
+            // считывание просиходит до тех пор, пока либо не кончится время, либо не произойдет принудительная остановка
+            while(j < DSP_NOISE_SIZE){
+                rtlsdr_reset_buffer(sdr->sdr_params->sdr_ptr);
+
+                // общение с железкой
+                rtlsdr_read_sync(sdr->sdr_params->sdr_ptr,
+                                 dsp->dsp_params->read_params->read_cell,
+                                 dsp->dsp_params->read_params->read_rb_cell_size,
+                                 &n_read);
+
+                // конвертация 8u -> 32f
+                ippsConvert_8u32f(dsp->dsp_params->read_params->read_cell,
+                                 (Ipp32f*)dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
+                                  dsp->dsp_params->read_params->read_rb_cell_size);
+
+
+                // сопряжение
+                if(dsp->dsp_params->fft_params->fft_inversion)
+                    ippsConj_32fc_I(dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
+                                    dsp->dsp_params->read_params->read_rb_cell_size / 2);
+
+                // АКВАФОР
+                // убирает вредное, сохраняя полезное
+                //if(dsp_params->flt_params->use_filter)
+                //    emit get_filtration_step(read_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
+
+                // инкремент итератора
+                dsp->dsp_params->read_params->read_rb_cell_idx = (dsp_params->read_params->read_rb_cell_idx + 1) % DSP_READ_RB_SIZE;
+            }
+
+            // если завершилось штатно, то флаг emergency_end_recording == 0
+            // если завершилось экстренно, то emergency_end_recording == 1
+            emit end_of_recording(!dsp_params->read_params->emergency_end_recording);
+        }
 
     }
+    else{
+        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать запись сигнала.\nЗаново подключите SDR приемник и перезапустите программу.");
+        sdr->sdr_params->is_open = false;
+        dsp->set_record_flags(false);
+        global_update_interface();
+    }
+    */
+}
+
+void config_manager::on_comboBox_currentIndexChanged(int new_pres_idx)
+{
+    short  band_mask, preselektor_mask, InputAttenuator_mask;
+    short  HFAttenuator_mask, IFAttenuator_mask, D4;
+
+    rpu->set_config_to_RPU();
+
+    switch(rpu->first_tract.get_if_band_idx()){
+        case FOURTH_BAND: // 150 кГц
+            band_mask = 0x0003;
+            break;
+
+        case THIRD_BAND: // 20 кГц
+            band_mask = 0x0001;
+            break;
+
+        case SECOND_BAND: // 8 кГц
+            band_mask = 0x0002;
+            break;
+
+        case FIRST_BAND: // 3 кГц
+            band_mask = 0x0000;
+            break;
+    }
+
+    preselektor_mask = 0x0009 - new_pres_idx;
+
+    InputAttenuator_mask = 0;
+    if(rpu->first_tract.get_in_att_idx())
+       InputAttenuator_mask = 0x0001;
+    else
+       InputAttenuator_mask = 0x0000;
+
+    HFAttenuator_mask = rpu->first_tract.get_hf_att_idx();
+    IFAttenuator_mask = rpu->first_tract.get_if_att_idx();
+    D4 = (short)((band_mask << 12) | (preselektor_mask << 8) | (InputAttenuator_mask << 7) | (HFAttenuator_mask << 4) | IFAttenuator_mask);
+    D4 <<= 2;
+    rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xA);
+    char ManageRPUKod = 0;
+    for(int i = 0; i < 14; i++){
+        ManageRPUKod  = 0x80;
+        ManageRPUKod |= char( (D4 & 0x8000) >> 10 );
+        rpu->send_code(rpu->get_lpt_addres() + LPT_DATA_REG, ManageRPUKod);
+        rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xB);
+        rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xA);
+        ManageRPUKod ^= 0x40;
+        rpu->send_code(rpu->get_lpt_addres() + LPT_DATA_REG, ManageRPUKod);
+        rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xB);
+        rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xA);
+
+        D4 <<= 1;
+    }
+    ManageRPUKod = 0x00;
+    rpu->send_code(rpu->get_lpt_addres() + LPT_DATA_REG, ManageRPUKod);
+    rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xB);
+    rpu->send_code(rpu->get_lpt_addres() + LPT_CONTROL_REG, 0xA);
 }

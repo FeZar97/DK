@@ -35,6 +35,7 @@ void RPU_kalibrator::set_signal_type(MOD_SIGNAL new_signal_type)
 
     // отправка кодограммы
     set_signal_type_to_RPU(FIRST);
+    set_work_status_to_RPU();
 }
 
 MOD_SIGNAL RPU_kalibrator::get_signal_type()
@@ -86,7 +87,8 @@ void RPU_kalibrator::set_exit_type(KALIB_TYPE new_exit_type)
     exit_type = new_exit_type;
 
     // отправка кодограммы
-    //set_exit_type_to_RPU();
+    set_signal_type_to_RPU(FIRST);
+    set_work_status_to_RPU();
 }
 
 KALIB_TYPE RPU_kalibrator::get_exit_type()
@@ -133,19 +135,16 @@ RPU_kalibrator &RPU_kalibrator::operator=(RPU_kalibrator &RightKalib)
 // установка в РПУ частоты модуляции калибратора
 void RPU_kalibrator::set_modulation_freq_to_RPU()
 {
-    // QMessageBox::information(NULL, "kalib", "set_modulation_freq_to_RPU");
-
     int ModulationFreq = get_modulation_freq();
     int N5 = int(30000 / ModulationFreq);
-
     DWORD D5 = 0;
 
     D5 = ((D5 | 0x0A) << 19)  | ((D5 | N5) << 3) | 1;
 
     // учет особенности при P=1
-    char D5_0 = (char)D5;
+    byte D5_0 = (char)D5;
 
-    ((char*)(&D5))[0] = (char)(((D5_0>>2) & 0x0f) | (D5_0 & 0xc1));
+    ((byte*)(&D5))[0] = (byte)(((D5_0>>2) & 0x0f) | (D5_0 & 0xc1));
 
     send_code(lpt + LPT_CONTROL_REG, 0x8);// строб в CR0
 
@@ -153,7 +152,7 @@ void RPU_kalibrator::set_modulation_freq_to_RPU()
 
     for(int i = 0; i < 32; i++){
         ManageKod  = 0x02;
-        ManageKod |=  char( (D5 & 0x80000000) >> 31);
+        ManageKod |=  byte( (D5 & 0x80000000) >> 31);
 
         send_code(lpt + LPT_DATA_REG, ManageKod);
         // СТРОБ  ( 9 -- 8 )
@@ -191,29 +190,27 @@ void RPU_kalibrator::set_modulation_freq_to_RPU()
 // установка в РПУ уровня аттенюации калибратора
 void RPU_kalibrator::set_attenuation_to_RPU()
 {
-    // QMessageBox::information(NULL, "kalib", "set_attenuation_to_RPU");
-
     char D5 = 0x00;
 
     // тут нужен индекс аттенюации, а не само значение
-    int KalibAttenuation = get_att_idx();
+    int KalibAttenuation = get_att_idx() * 2;
 
     if(KalibAttenuation <= 30){
-       D5 = (char)(KalibAttenuation >> 1);
+       D5 = (byte)(KalibAttenuation >> 1);
     }else{
         KalibAttenuation -= 30;
-        D5 = (char)(KalibAttenuation >> 1);
+        D5 = (byte)(KalibAttenuation >> 1);
         D5 <<= 4;
         D5 |= 0xFF;
     }
 
-    send_code(LPT_CONTROL_REG, 0x8); // строб в CR0
+    send_code(lpt + LPT_CONTROL_REG, 0x8); // строб в CR0
 
-    char  ManageKod = 0x00;
+    byte ManageKod = 0x00;
 
     for(int i = 0; i < 8; i++){
         ManageKod  = 0x0A;
-        ManageKod |=  char(D5 & 0x01);
+        ManageKod |=  byte(D5 & 0x01);
         send_code(lpt + LPT_DATA_REG, ManageKod);
         // СТРОБ  ( 9 -- 8 )
         send_code(lpt + LPT_CONTROL_REG, 0x9);
@@ -238,20 +235,17 @@ void RPU_kalibrator::set_attenuation_to_RPU()
 // включение / отключение калибратора в РПУ
 void RPU_kalibrator::set_work_status_to_RPU()
 {
-    // QMessageBox::information(NULL, "kalib", "set_work_status_to_RPU");
-
     send_code(lpt + LPT_CONTROL_REG, 0xC);
 
-    char ManageKod;
+    byte ManageKod;
 
-    if(get_work_status() == ON){
+    if(get_work_status() == ON)
         if(get_exit_type() == EXTERNAL)
            ManageKod = 0x10;
         else
            ManageKod = 0x1F;
-    }else{
+    else
        ManageKod = 0x00;
-    }
 
     send_code(lpt + LPT_DATA_REG, ManageKod);
     // СТРОБ  ( D -- C )(110)
@@ -262,7 +256,7 @@ void RPU_kalibrator::set_work_status_to_RPU()
 // установка типа калибровочного сигнала в РПУ
 void RPU_kalibrator::set_signal_type_to_RPU(NUMERALS SupportTract)
 {
-    char D5 = 0x00;
+    byte D5 = 0x00;
 
     if(get_signal_type() == RADIOIMP)
        D5 |= 0x01;
