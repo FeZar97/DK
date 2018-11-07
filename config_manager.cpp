@@ -177,7 +177,8 @@ void config_manager::update_dsp_tab()
     ui->InfoCB->setChecked(dsp->dsp_params->fft_params->fft_info);
     ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
-    ui->DCOffsetSB->setValue(dsp->dsp_params->read_params->dc_offset);
+    ui->DCOffsetRe->setValue(dsp->dsp_params->fft_params->dc_offset.re);
+    ui->DCOffsetIm->setValue(dsp->dsp_params->fft_params->dc_offset.im);
 
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
@@ -408,12 +409,15 @@ void config_manager::on_ShiftFreqSB_valueChanged(double new_freq_shift)
     emit global_update_interface();
 }
 
-// смена частотного сдвига для fft_shifter
-void config_manager::on_DCOffsetSB_valueChanged(int new_dc_offset)
+void config_manager::on_DCOffsetRe_valueChanged(double new_offset_re)
 {
-    dsp->dsp_params->read_params->dc_offset = new_dc_offset;
-    dsp->dsp_params->fft_params->dc_correct = !bool(new_dc_offset);
+    dsp->dsp_params->fft_params->dc_offset.re = float(new_offset_re);
+    emit global_update_interface();
+}
 
+void config_manager::on_DCOffsetIm_valueChanged(double new_offset_im)
+{
+    dsp->dsp_params->fft_params->dc_offset.im = float(new_offset_im);
     emit global_update_interface();
 }
 
@@ -542,9 +546,9 @@ void config_manager::on_CurrentPathButton_clicked()
    1000 - 1500  : 1250 кГц
    1500 - 2200  : 1850 кГц
    2200 - 3200  : 2700 кГц
-   3200 - 4700  : 3950 кГц
-   4700 - 6800  : 5750 кГц
-   6800 - 9900  : 8350 кГц
+   3200 - 4700  : 3800 кГц  (должно быть 3950)
+   4700 - 6800  : 5250 кГц  (должно быть 5750)
+   6800 - 9900  : 7350 кГц  (должно быть 8750)
    9900 - 14400 : 12150 кГц
   14400 - 20700 : 17550 кГц
   20700 - 32000 : 26350 кГц
@@ -585,8 +589,8 @@ void config_manager::on_FirstValidatePB_clicked()
 
         dsp->fft_shift_thread->start();
         dsp->fft_thread->start();
-
         dsp->reader_thread->start();
+        global_update_interface();
     }
     else{
         QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать калибровку. Ошибка 1.");
@@ -596,7 +600,7 @@ void config_manager::on_FirstValidatePB_clicked()
 
     // на данном моменте на спектре должна быть видна синусоида калибратора
 
-    int freqs[10] = {600000, 1250000, 1850000, 2700000, 3950000, 5750000, 8350000, 12150000, 17550000, 26350000}, i, j, n_read;
+    int freqs[10] = {600000, 1250000, 1850000, 2700000, 3800000, 5250000, 7350000, 12150000, 17550000, 26350000}, i, j, n_read;
 
     // 10 обращений в секунду
     //dsp->dsp_params->read_params->readout_per_seconds = 10;

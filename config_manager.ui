@@ -83,7 +83,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1582,7 +1582,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="RecordTab">
        <attribute name="title">
@@ -2303,12 +2303,12 @@
          <string>шаг</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="DCOffsetSB">
+       <widget class="QDoubleSpinBox" name="DCOffsetRe">
         <property name="geometry">
          <rect>
-          <x>114</x>
+          <x>116</x>
           <y>145</y>
-          <width>88</width>
+          <width>95</width>
           <height>22</height>
          </rect>
         </property>
@@ -2320,8 +2320,47 @@
         <property name="frame">
          <bool>false</bool>
         </property>
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>-256.000000000000000</double>
+        </property>
         <property name="maximum">
-         <number>32768</number>
+         <double>256.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.001000000000000</double>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="DCOffsetIm">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>145</y>
+          <width>95</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>-256.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>256.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.001000000000000</double>
         </property>
        </widget>
       </widget>
@@ -2471,4 +2510,21 @@
   <include location="images.qrc"/>
  </resources>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>2</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>2</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>

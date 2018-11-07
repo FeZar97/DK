@@ -257,8 +257,8 @@ void Widget::save_settings()
     settings.setValue("DSP_fft_info",               dsp->dsp_params->fft_params->fft_info);
     settings.setValue("DSP_fft_inversion",          dsp->dsp_params->fft_params->fft_inversion);
     settings.setValue("DSP_fft_mode",               dsp->dsp_params->fft_params->fft_mode);
-    settings.setValue("DSP_fft_dc_correct",         dsp->dsp_params->fft_params->dc_correct);
-    settings.setValue("DSP_fft_dc_offset",          dsp->dsp_params->read_params->dc_offset);
+    settings.setValue("DSP_fft_dc_offset_re",       dsp->dsp_params->fft_params->dc_offset.re);
+    settings.setValue("DSP_fft_dc_offset_im",       dsp->dsp_params->fft_params->dc_offset.im);
     settings.setValue("DSP_fft_shift_val",          dsp->dsp_params->shift_params->shift_freq);
     settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
     settings.setValue("DSP_wav_directory",          dsp->dsp_params->wav_params->directory);
@@ -317,8 +317,8 @@ void Widget::restore_settings()
     dsp->dsp_params->fft_params->fft_info = settings.value("DSP_fft_info").toBool();
     dsp->dsp_params->fft_params->fft_inversion = settings.value("DSP_fft_inversion").toInt();
     dsp->dsp_params->fft_params->fft_mode = FFT_MODE(settings.value("DSP_fft_mode").toInt());
-    dsp->dsp_params->fft_params->dc_correct = settings.value("DSP_fft_dc_correct").toBool();
-    dsp->dsp_params->read_params->dc_offset = settings.value("DSP_fft_dc_offset").toInt();
+    dsp->dsp_params->fft_params->dc_offset.re = settings.value("DSP_fft_dc_offset_re").toFloat();
+    dsp->dsp_params->fft_params->dc_offset.im = settings.value("DSP_fft_dc_offset_im").toFloat();
     dsp->dsp_params->shift_params->shift_freq = settings.value("DSP_fft_shift_val").toDouble();
     dsp->dsp_params->shift_params->step = settings.value("DSP_fft_shift_step").toBool();
     dsp->dsp_params->wav_params->directory = settings.value("DSP_wav_directory").toString();

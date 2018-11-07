@@ -25,7 +25,7 @@ void READER::start_reading()
     rtlsdr_reset_buffer(sdr_params->sdr_ptr);
 
     // количество обращения к приемнику
-    int n_read;//, iterations = times[dsp_params->read_params->rec_time_idx] * dsp_params->read_params->readout_per_seconds, i;
+    int n_read, i;//, iterations = times[dsp_params->read_params->rec_time_idx] * dsp_params->read_params->readout_per_seconds;
 
     // считывание просиходит до тех пор, пока либо не кончится время, либо не произойдет принудительная остановка
     while(/*i < iterations && */!dsp_params->read_params->emergency_end_recording){
@@ -38,18 +38,16 @@ void READER::start_reading()
                          dsp_params->read_params->read_rb_cell_size,
                          &n_read);
 
-        // подавление постоянной составляющей
-        if(!dsp_params->fft_params->dc_correct)
-            ippsSubC_8u_ISfs(dsp_params->read_params->dc_offset,
-                             dsp_params->read_params->read_cell,
-                             dsp_params->read_params->read_rb_cell_size,
-                             0);
-
         // конвертация 8u -> 32f
         ippsConvert_8u32f(dsp_params->read_params->read_cell,
                          (Ipp32f*)dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                           dsp_params->read_params->read_rb_cell_size);
 
+        // подавление постоянной составляющей
+        if(dsp_params->fft_params->dc_offset.re != 0 || dsp_params->fft_params->dc_offset.im != 0)
+            ippsSubC_32fc_I(dsp_params->fft_params->dc_offset,
+                            dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+                            dsp_params->read_params->read_rb_cell_size / 2);
 
         // сопряжение
         if(dsp_params->fft_params->fft_inversion)

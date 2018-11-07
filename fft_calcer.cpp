@@ -77,7 +77,7 @@ void fft_calcer::get_fft_step(Ipp32fc *rb_cell, unsigned int cell_size)
     ippsMulC_32f_I(10, dsp_params->fft_params->fft_res, DSP_FFT_SIZE);
 
     // учет нулевого бина
-    if(dsp_params->fft_params->dc_correct)
+    if(!dsp_params->fft_params->dc_offset.re && !dsp_params->fft_params->dc_offset.im)
         dsp_params->fft_params->fft_res[0] = dsp_params->fft_params->fft_res[1] = (dsp_params->fft_params->fft_res[2] > dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1] ? dsp_params->fft_params->fft_res[2] : dsp_params->fft_params->fft_res[DSP_FFT_SIZE - 1]);
 
 

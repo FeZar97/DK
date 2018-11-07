@@ -320,8 +320,6 @@ public:
 class READ_params
 {
 public:
-    int                 dc_offset;
-
     // глобальные
     bool                is_recording;            // флаг активной записи
     bool                end_reading;             // флаг штатного окончания чтения
@@ -347,8 +345,6 @@ public:
     Ipp8u               *read_cell;              // временный буфер
 
     READ_params(){
-        dc_offset               = 0;
-
         is_recording            = false;
         end_reading             = true;
         end_filtering           = true;
@@ -438,7 +434,8 @@ public:
     unsigned int       fft_dynamic_range;       // динамический диапазон
     int                fft_noise_level;         // уровень шума
 
-    bool               dc_correct;              // флаг коррекции дисбаланса i/q
+    Ipp32fc            dc_offset;            // величина коррекции
+
     FFT_MODE           fft_mode;                // спектр какого сигнала выводить
     unsigned int       fft_input_cell_size;     // размер входного массива
     unsigned int       fft_averages_number;     // кол-во усреднений спектра
@@ -463,7 +460,8 @@ public:
         fft_dynamic_range = DSP_DEFAULT_DYNAMIC_RANGE;
         fft_noise_level = DSP_DEFAULT_NOISE_LEVEL;
 
-        dc_correct = true;
+        dc_offset = {0., 0.};
+
         fft_mode = DSP_DEFAULT_FFT_MODE;
         fft_input_cell_size = 0;
         fft_averages_number = DSP_DEFAULT_AVERAGE_NUMBER;

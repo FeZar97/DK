@@ -95,7 +95,8 @@ private slots:
     void on_WindowCB_currentIndexChanged(int new_win_idx); // выбор окна
     void on_WindowAlphaSB_valueChanged(double new_aplha); // изменение коэффициента alpha
     void on_ShiftFreqSB_valueChanged(double new_freq_shift); // изменение частотного сдвига
-    void on_DCOffsetSB_valueChanged(int new_dc_offset);
+    void on_DCOffsetRe_valueChanged(double new_offset_re);
+    void on_DCOffsetIm_valueChanged(double new_offset_im);
     void on_FftShiftStepCB_clicked(bool new_state); // кратность шага изменения частоты сноса
 
     void on_CloseButton_clicked();
@@ -103,7 +104,6 @@ private slots:
 /// АСКР
     void on_FirstValidatePB_clicked(); // АСКР проверка №1
     void on_comboBox_currentIndexChanged(int new_pres_idx); // выбор преселектора
-
 
 signals:
     void global_update_interface();
