@@ -119,21 +119,8 @@ void simpleGraph::paint_signature(QPainter &painter)
 
     // подписи частот
     painter.setPen(QPen(Qt::red, 1));
-
     switch(dsp_params->fft_params->fft_mode){
-        case READER_FFT:{
-            int new_central_freq = sdr_params->central_freq + dsp_params->shift_params->shift_freq;
-            painter.drawText( 75, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 4/10));
-            painter.drawText(178, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 3/10));
-            painter.drawText(280, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 2/10));
-            painter.drawText(382, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 1/10));
-            painter.drawText(485, vRect.height() - 5, QString::number(new_central_freq));
-            painter.drawText(587, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 1/10));
-            painter.drawText(689, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 2/10));
-            painter.drawText(791, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 3/10));
-            painter.drawText(894, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 4/10));
-            break;
-        }
+        case READER_FFT:
         case FLT_FFT:{
             painter.drawText( 75, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 4/10));
             painter.drawText(178, vRect.height() - 5, QString::number(sdr_params->central_freq - sdr_params->sample_rate * 3/10));
@@ -144,6 +131,19 @@ void simpleGraph::paint_signature(QPainter &painter)
             painter.drawText(689, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 2/10));
             painter.drawText(791, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 3/10));
             painter.drawText(894, vRect.height() - 5, QString::number(sdr_params->central_freq + sdr_params->sample_rate * 4/10));
+            break;
+        }
+        case SHIFT_FFT:{
+        int new_central_freq = sdr_params->central_freq + dsp_params->shift_params->shift_freq;
+            painter.drawText( 75, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 4/10));
+            painter.drawText(178, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 3/10));
+            painter.drawText(280, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 2/10));
+            painter.drawText(382, vRect.height() - 5, QString::number(new_central_freq - sdr_params->sample_rate * 1/10));
+            painter.drawText(485, vRect.height() - 5, QString::number(new_central_freq));
+            painter.drawText(587, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 1/10));
+            painter.drawText(689, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 2/10));
+            painter.drawText(791, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 3/10));
+            painter.drawText(894, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 4/10));
             break;
         }
         default:
@@ -171,10 +171,10 @@ void simpleGraph::paint_signature(QPainter &painter)
         painter.setPen(QPen(Qt::green, 1) );
         painter.drawText(930, 12, "FPS: "    + QString::number(dsp_params->read_params->readout_per_seconds));
         painter.drawText(929, 24, "Avg: "    + QString::number(dsp_params->fft_params->fft_averages_number));
-        painter.drawText(929, 36, "Shft: "   + QString::number(dsp_params->fft_params->fft_noise_level) + " дБ");
+        painter.drawText(929, 36, "Noise: "   + QString::number(dsp_params->fft_params->fft_noise_level) + " дБ");
         painter.drawText(930, 48, "DR: "     + QString::number(dsp_params->fft_params->fft_dynamic_range) + " дБ");
         painter.drawText(930, 60, "Fд: "     + QString::number(int(sdr_params->sample_rate / 1000.)) + " кГц");
-        painter.drawText(930, 72, "DSidx: "  + QString::number(sdr_params->direct_sampling_idx));
+        painter.drawText(930, 72, "ACD: "  + QString::number(sdr_params->direct_sampling_idx));
         painter.drawText(930, 84, "КУ: "     + (sdr_params->gain_idx ? QString::number(gains[sdr_params->gain_idx - 1]/10.) + " дБ" : "авто"));
         painter.drawText(930, 96, "dfreq: "  + QString::number(dsp_params->shift_params->shift_freq));
         painter.drawText(930, 108, "max: "   + QString::number(dsp_params->fft_params->fft_res[dsp_params->fft_params->max_level_idx]
@@ -187,10 +187,34 @@ void simpleGraph::paint_signature(QPainter &painter)
     }
 
 
+    // уровень шума
     painter.setPen(QPen(Qt::yellow, 1));
     int height = vRect.height() * (1. - (dsp_params->fft_params->noise_level - dsp_params->fft_params->fft_noise_level) / dsp_params->fft_params->fft_dynamic_range);
     painter.drawLine(0, height, (dsp_params->fft_params->fft_info ? 1023 : 15), height);
     painter.drawText(5, height - 3, QString::number(dsp_params->fft_params->noise_level - dsp_params->fft_params->fft_dynamic_range - 1, 'f', 1));
+
+
+    // нулевой бин
+    painter.setPen(QPen(Qt::cyan));
+    if(dsp_params->fft_params->null_bin_circle){
+        switch(dsp_params->fft_params->fft_mode){
+            case READER_FFT:
+            case FLT_FFT:
+                painter.drawEllipse(DSP_FFT_SIZE/2 - 5,
+                                vRect.height() * (1. - (dsp_params->fft_params->fft_res[0] - dsp_params->fft_params->fft_noise_level) / dsp_params->fft_params->fft_dynamic_range) - 5,
+                                10,
+                                10);
+                break;
+            case SHIFT_FFT:
+                painter.drawEllipse(DSP_FFT_SIZE/2 - 5 + (DSP_FFT_SIZE * dsp_params->shift_params->shift_freq / sdr_params->sample_rate),
+                            vRect.height() * (1. - (dsp_params->fft_params->fft_res[int(DSP_FFT_SIZE * dsp_params->shift_params->shift_freq / sdr_params->sample_rate)] - dsp_params->fft_params->fft_noise_level) / dsp_params->fft_params->fft_dynamic_range) - 5,
+                            10,
+                            10);
+                break;
+        }
+
+
+    }
 }
 
 // отрисовка всего графа
@@ -215,5 +239,6 @@ void simpleGraph::repaintGraph()
     // отрисовка сетки
     paint_grid(painter);
 
-    repaint();
+    update();
+    //repaint();
 }

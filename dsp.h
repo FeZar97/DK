@@ -11,6 +11,7 @@
 #include <fft_calcer.h>
 #include <fft_shifter.h>
 #include <wav_recorder.h>
+#include <sound_maker.h>
 
 class DSP : public QObject
 {
@@ -28,12 +29,15 @@ public:
     wav_recorder        *first_wav_rec;
     wav_recorder        *second_wav_rec;
     wav_recorder        *third_wav_rec;
+    sound_maker         *sounder;
+
 /// ---------------------------------------- потоки ---------------------------------------
     QThread             *reader_thread;
     QThread             *filtration_thread;
     QThread             *fft_thread;
     QThread             *fft_shift_thread;
     QThread             *wav_thread;
+    QThread             *sound_thread;
 
     explicit DSP(SDR *new_sdr = NULL, simpleGraph *new_graph = NULL);
     ~DSP();
@@ -51,6 +55,7 @@ public:
     void                prepair_mr_filter();              // подготовка mr_filter к началу записи
     void                prepair_fft_shifter();            // подготовка fft_shifter к началу записи
     void                prepair_wav_recorder();           // подготовка wav_recorder к началу записи
+    void                prepair_sound_maker();                // подготовка sounder к началу записи
     void                make_wav_headers();
 
     void                create_objects();
@@ -59,6 +64,7 @@ public:
     void                create_shifter();                 // инициализация объектов
     void                create_fft_calcer();              // инициализация объектов
     void                create_wav_recorders();           // инициализация объектов
+    void                create_sounder();                 // инициализация объектов
 
     void                start_threads();                  // старт потоков
 };

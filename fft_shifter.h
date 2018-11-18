@@ -21,8 +21,11 @@ signals:
     // сигнал для расчета спектра пересчитанного сигнала
     void get_fft_step(Ipp32fc *shift_cell, unsigned int cell_size);
 
-    // сигнал на запись в трейти файл сдвинутого сигнала
+    // сигнал на запись в третий файл сдвинутого сигнала
     void write_to_file(Ipp32fc *shift_rb_cell);
+
+    // сигнал для вывода
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
 };
 
 #endif // FFT_SHIFTER_H

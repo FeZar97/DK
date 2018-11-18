@@ -101,6 +101,7 @@ void DSP::create_objects()
     create_shifter();
     create_fft_calcer();
     create_wav_recorders();
+    create_sounder();
 }
 void DSP::create_threads()
 {
@@ -125,17 +126,20 @@ void DSP::create_shifter()
 {
     shifter = new fft_shifter(dsp_params, sdr->sdr_params);
     connect(reader, &READER::get_shift_step, shifter, &fft_shifter::get_shift_step);
+    connect(flt, &MRFiltering::get_shift_step, shifter, &fft_shifter::get_shift_step);
     shifter->moveToThread(fft_shift_thread);
 }
 void DSP::create_fft_calcer()
 {
     fft = new fft_calcer(dsp_params);
+    connect(reader, &READER::get_fft_step, fft, &fft_calcer::get_fft_step);
+    connect(flt, &MRFiltering::get_fft_step, fft, &fft_calcer::get_fft_step);
     connect(shifter, &fft_shifter::get_fft_step, fft, &fft_calcer::get_fft_step);
     fft->moveToThread(fft_thread);
 }
 void DSP::create_wav_recorders()
 {
-    wav_thread  = new QThread;
+    wav_thread = new QThread;
 
     first_wav_rec = new wav_recorder();
     connect(reader, &READER::write_to_file, first_wav_rec, &wav_recorder::write_to_file);
@@ -151,6 +155,14 @@ void DSP::create_wav_recorders()
     third_wav_rec->moveToThread(wav_thread);
 }
 
+void DSP::create_sounder()
+{
+    sounder = new sound_maker(dsp_params, sdr->sdr_params);
+    connect(flt, &MRFiltering::get_sound_step, sounder, &sound_maker::get_sound_step);
+    connect(shifter, &fft_shifter::get_sound_step, sounder, &sound_maker::get_sound_step);
+    sounder->moveToThread(sound_thread);
+}
+
 // пересчет параметров
 bool DSP::recalc_dsp_params()
 {
@@ -162,10 +174,7 @@ bool DSP::recalc_dsp_params()
         success_flag = false;
 
     if(dsp_params->flt_params->is_using){
-        dsp_params->flt_params->out_sample_rate = sdr->sdr_params->sample_rate * dsp_params->flt_params->up_factor / dsp_params->flt_params->down_factor;
-        dsp_params->flt_params->filtration_rb_cell_size = 2 * dsp_params->flt_params->out_sample_rate / dsp_params->read_params->readout_per_seconds;
-        if(dsp_params->flt_params->out_sample_rate < 1 || dsp_params->flt_params->filtration_rb_cell_size < 1)
-            success_flag = false;
+        dsp_params->flt_params->filtration_rb_cell_size = dsp_params->read_params->read_rb_cell_size;
     }
 
     switch(dsp_params->fft_params->fft_mode){
@@ -173,7 +182,10 @@ bool DSP::recalc_dsp_params()
             dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
             break;
         case FLT_FFT:
-            dsp_params->fft_params->fft_input_cell_size = dsp_params->flt_params->filtration_rb_cell_size;
+            dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
+            break;
+        case SHIFT_FFT:
+            dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
             break;
     }
 
@@ -191,6 +203,7 @@ void DSP::prepair_memory()
     prepair_reader(); // подготовка reader к началу записи
     prepair_mr_filter(); // подготовка mr_filter к началу записи
     prepair_fft_shifter(); // подготовка fft_shifter к началу записи
+    prepair_sound_maker(); // подготовка sounder к началу записи
 }
 // подготовка reader к началу записи
 void DSP::prepair_reader()
@@ -206,77 +219,17 @@ void DSP::prepair_reader()
 }
 void DSP::prepair_mr_filter()
 {
-    /*
     // если используется этап фильтрации
     if(dsp_params->flt_params->is_using){
         int i;
 
         dsp_params->flt_params->filtration_rb = new Ipp32fc*[DSP_FLT_RB_SIZE];
         for(i = 0; i < DSP_FLT_RB_SIZE; i++)
-            dsp_params->flt_params->filtration_rb[i] = new Ipp32fc[dsp_params->flt_params->filtration_rb_cell_size / 2];
-
-        switch(dsp_params->flt_params->out_sample_rate){
-
-            case 9600:
-                dsp_params->flt_params->filter_length = FLT_9600_LENGTH;
-                dsp_params->flt_params->filter_taps = new Ipp32f[dsp_params->flt_params->filter_length];
-                for(int i = 0; i < dsp_params->flt_params->filter_length; i++)
-                    dsp_params->flt_params->filter_taps[i] = filter_9600[i];
-                break;
-
-            case 20000:
-                dsp_params->flt_params->filter_length = FLT_20000_LENGTH;
-                dsp_params->flt_params->filter_taps = new Ipp32f[dsp_params->flt_params->filter_length];
-                for(int i = 0; i < dsp_params->flt_params->filter_length; i++)
-                    dsp_params->flt_params->filter_taps[i] = filter_20000[i];
-                break;
-            case 120000:
-                dsp_params->flt_params->filter_length = FLT_120000_LENGTH;
-                dsp_params->flt_params->filter_taps = new Ipp32f[dsp_params->flt_params->filter_length];
-                for(int i = 0; i < dsp_params->flt_params->filter_length; i++){
-                    dsp_params->flt_params->filter_taps[i] = filter_120000[i];
-                }
-            case 160000:
-                dsp_params->flt_params->filter_length = FLT_160000_LENGTH;
-                dsp_params->flt_params->filter_taps = new Ipp32f[dsp_params->flt_params->filter_length];
-                for(int i = 0; i < dsp_params->flt_params->filter_length; i++){
-                    dsp_params->flt_params->filter_taps[i] = filter_160000[i];
-                }
-                break;
-        }
-
-        dsp_params->flt_params->temp_32fc = new Ipp32f[dsp_params->read_params->read_rb_cell_size];
+            dsp_params->flt_params->filtration_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
 
         dsp_params->flt_params->temp_32f_re = new Ipp32f[dsp_params->read_params->read_rb_cell_size / 2];
         dsp_params->flt_params->temp_32f_im = new Ipp32f[dsp_params->read_params->read_rb_cell_size / 2];
-
-        dsp_params->flt_params->flt_32f_re = new Ipp32f[dsp_params->flt_params->filtration_rb_cell_size / 2];
-        dsp_params->flt_params->flt_32f_im = new Ipp32f[dsp_params->flt_params->filtration_rb_cell_size / 2];
-
-        dsp_params->flt_params->delay_re = new Ipp32f[(dsp_params->flt_params->filter_length + dsp_params->flt_params->up_factor - 1 ) / dsp_params->flt_params->up_factor];
-        dsp_params->flt_params->delay_im = new Ipp32f[(dsp_params->flt_params->filter_length + dsp_params->flt_params->up_factor - 1 ) / dsp_params->flt_params->up_factor];
-
-        // инициализация фильтра
-        int specSize, bufSize;
-        ippsFIRMRGetSize(dsp_params->flt_params->filter_length,
-                         dsp_params->flt_params->up_factor,
-                         dsp_params->flt_params->down_factor,
-                         ipp32f,
-                         &specSize,
-                         &bufSize);
-
-        dsp_params->flt_params->pSpec = (IppsFIRSpec_32f*)ippsMalloc_8u(specSize);
-        dsp_params->flt_params->buf = ippsMalloc_8u(bufSize);
-
-        ippsFIRMRInit_32f(*(&dsp_params->flt_params->filter_taps),
-                          dsp_params->flt_params->filter_length,
-                          dsp_params->flt_params->up_factor,
-                          0,
-                          dsp_params->flt_params->down_factor,
-                          0,
-                          dsp_params->flt_params->pSpec);
     }
-*/
 }
 void DSP::prepair_fft_shifter()
 {
@@ -299,16 +252,16 @@ void DSP::prepair_wav_recorder()
         first_wav_rec->params->file.setFileName(first_wav_rec->params->file_name);
         first_wav_rec->params->file.open(QIODevice::WriteOnly);
         first_wav_rec->params->input_cell_size = dsp_params->read_params->read_rb_cell_size;
-        first_wav_rec->params->out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
+        first_wav_rec->params->out_buf = new Ipp8s[dsp_params->read_params->read_rb_cell_size];
     }
 
     if(dsp_params->read_params->use_second_file){
         second_wav_rec->params->pos = 0;
-        second_wav_rec->params->total_size = times[dsp_params->read_params->rec_time_idx] * dsp_params->flt_params->out_sample_rate * 2;
+        second_wav_rec->params->total_size = times[dsp_params->read_params->rec_time_idx] * sdr->sdr_params->sample_rate * 2;
         second_wav_rec->params->file.setFileName(second_wav_rec->params->file_name);
         second_wav_rec->params->file.open(QIODevice::WriteOnly);
-        second_wav_rec->params->input_cell_size = dsp_params->flt_params->filtration_rb_cell_size;
-        second_wav_rec->params->out_buf = new Ipp8u[dsp_params->flt_params->filtration_rb_cell_size];
+        second_wav_rec->params->input_cell_size = dsp_params->read_params->read_rb_cell_size;
+        second_wav_rec->params->out_buf = new Ipp8s[dsp_params->read_params->read_rb_cell_size];
     }
 
     if(dsp_params->read_params->use_third_file){
@@ -317,7 +270,7 @@ void DSP::prepair_wav_recorder()
         third_wav_rec->params->file.setFileName(third_wav_rec->params->file_name);
         third_wav_rec->params->file.open(QIODevice::WriteOnly);
         third_wav_rec->params->input_cell_size = dsp_params->read_params->read_rb_cell_size;
-        third_wav_rec->params->out_buf = new Ipp8u[dsp_params->read_params->read_rb_cell_size];
+        third_wav_rec->params->out_buf = new Ipp8s[dsp_params->read_params->read_rb_cell_size];
     }
 
     make_wav_headers();
@@ -328,6 +281,15 @@ void DSP::prepair_wav_recorder()
         second_wav_rec->params->file.write((char*)(&second_wav_rec->params->header), sizeof(WAVEHEADER));
     if(dsp_params->read_params->use_third_file)
         third_wav_rec->params->file.write((char*)(&third_wav_rec->params->header), sizeof(WAVEHEADER));
+}
+void DSP::prepair_sound_maker()
+{
+    int i;
+    dsp_params->sound_params->sound_rb_cell_idx = 0;
+
+    dsp_params->sound_params->sound_rb = new Ipp16s*[DSP_SOUND_RB_SIZE];
+    for(i = 0; i < DSP_SOUND_RB_SIZE; i++)
+        dsp_params->sound_params->sound_rb[i] = new Ipp16s[dsp_params->read_params->read_rb_cell_size / 2];
 }
 
 void DSP::make_wav_headers()
@@ -356,7 +318,7 @@ void DSP::make_wav_headers()
     second_wav_rec->params->header.subchunk1Size = 16; // 16 для формата PCM
     second_wav_rec->params->header.audioFormat = 1;
     second_wav_rec->params->header.numChannels = 2;
-    second_wav_rec->params->header.sampleRate = dsp_params->flt_params->out_sample_rate;
+    second_wav_rec->params->header.sampleRate = sdr->sdr_params->sample_rate;
     second_wav_rec->params->header.charRate = second_wav_rec->params->header.sampleRate * second_wav_rec->params->header.numChannels * sizeof(char);
     second_wav_rec->params->header.blockAlign = second_wav_rec->params->header.numChannels * sizeof(char);
     second_wav_rec->params->header.bitsPerSample = 8;
@@ -386,6 +348,6 @@ void DSP::start_threads()
     wav_thread->start();
     fft_shift_thread->start();
     fft_thread->start();
-    //filtration_thread->start();
+    filtration_thread->start();
     reader_thread->start();
 }

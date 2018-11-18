@@ -22,17 +22,17 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     set_ui_style();
 
     connect(config_manager_form, &config_manager::global_update_interface, this,                &Widget::global_update_interface);
-    connect(ui->MinimizeButton,  &QToolButton::clicked,                    this,                &QWidget::showMinimized);
     connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,                 &DSP::recalc_dsp_params);
     connect(sdr,                 &SDR::global_update_interface,            this,                &Widget::global_update_interface);
     connect(config_manager_form, &config_manager::prepair_wav_recorder,    dsp,                 &DSP::prepair_wav_recorder);
-    //connect(rpu->first_tract,   &RPU_tract::global_update_interface,       config_manager_form, &config_manager::update_interface);
+    connect(ui->MinimizeButton,  &QToolButton::clicked,                    this,                &Widget::showMinimized);
 
     restore_settings();
 }
 
 Widget::~Widget()
 {
+    delete config_manager_form;
     delete ui;
 }
 
@@ -125,10 +125,13 @@ void Widget::bind_slots_signals()
 // отображение/скрытие окна конфигурации
 void Widget::on_ConfigButton_clicked()
 {
-    if(!config_manager_form->isVisible())
+    if(!config_manager_form->isVisible()){
         config_manager_form->setVisible(true);
-    else
+        config_manager_form->is_visible = true;
+    }else{
         config_manager_form->setVisible(false);
+        config_manager_form->is_visible = false;
+    }
 }
 
 // -----------------------------------------начало записи-------------------------------------------------------
@@ -179,6 +182,12 @@ void Widget::end_of_recording()
 
     if(dsp->third_wav_rec->params->file.isOpen())
         dsp->third_wav_rec->params->file.close();
+
+    dsp->wav_thread->quit();
+    dsp->fft_shift_thread->quit();
+    dsp->fft_thread->quit();
+    dsp->filtration_thread->quit();
+    dsp->reader_thread->quit();
 
     global_update_interface();
 }
@@ -259,6 +268,7 @@ void Widget::save_settings()
     settings.setValue("DSP_fft_mode",               dsp->dsp_params->fft_params->fft_mode);
     settings.setValue("DSP_fft_dc_offset_re",       dsp->dsp_params->fft_params->dc_offset.re);
     settings.setValue("DSP_fft_dc_offset_im",       dsp->dsp_params->fft_params->dc_offset.im);
+    settings.setValue("DSP_fft_0_bin_circle",       dsp->dsp_params->fft_params->null_bin_circle);
     settings.setValue("DSP_fft_shift_val",          dsp->dsp_params->shift_params->shift_freq);
     settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
     settings.setValue("DSP_wav_directory",          dsp->dsp_params->wav_params->directory);
@@ -319,6 +329,7 @@ void Widget::restore_settings()
     dsp->dsp_params->fft_params->fft_mode = FFT_MODE(settings.value("DSP_fft_mode").toInt());
     dsp->dsp_params->fft_params->dc_offset.re = settings.value("DSP_fft_dc_offset_re").toFloat();
     dsp->dsp_params->fft_params->dc_offset.im = settings.value("DSP_fft_dc_offset_im").toFloat();
+    dsp->dsp_params->fft_params->null_bin_circle = settings.value("DSP_fft_0_bin_circle").toBool();
     dsp->dsp_params->shift_params->shift_freq = settings.value("DSP_fft_shift_val").toDouble();
     dsp->dsp_params->shift_params->step = settings.value("DSP_fft_shift_step").toBool();
     dsp->dsp_params->wav_params->directory = settings.value("DSP_wav_directory").toString();
@@ -332,6 +343,25 @@ void Widget::restore_settings()
 void Widget::test_kalibrator()
 {
 
+}
+
+void Widget::hideEvent(QHideEvent *event)
+{
+    Q_UNUSED(event);
+    if(config_manager_form->is_visible)
+        config_manager_form->on_CloseButton_clicked();
+}
+
+void Widget::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event);
+    if(config_manager_form->is_visible)
+        on_ConfigButton_clicked();
+    /*
+    show();
+    if(config_manager_form->is_visible)
+        config_manager_form->show();
+    */
 }
 
 QPoint Widget::previousPosition() const

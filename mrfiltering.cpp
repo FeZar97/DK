@@ -23,24 +23,34 @@ MRFiltering::~MRFiltering()
 // передается указатель на массив принятого комплексного ЦП с поста чтения
 void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
 {
-    Q_UNUSED(rb_cell);
-    /*
     // если фильтрация используется, еще не конец фильтрации
-    if(dsp_params->flt_params->is_using && !dsp_params->read_params->end_filtering){
+    if(dsp_params->flt_params->is_using){
         unsigned int i;
-
-        // конвертация входного вектора 8u->32f
-        ippsConvert_8u32f(rb_cell,
-                          dsp_params->flt_params->temp_32fc,
-                          dsp_params->read_params->read_rb_cell_size);
 
         // разбиение на re и im
         for(i = 0; i < dsp_params->read_params->read_rb_cell_size / 2; i++){
-            dsp_params->flt_params->temp_32f_re[i] = dsp_params->flt_params->temp_32fc[i * 2];
-            dsp_params->flt_params->temp_32f_im[i] = dsp_params->flt_params-> temp_32fc[i * 2 + 1];
+            dsp_params->flt_params->temp_32f_re[i] = ((Ipp32f*)rb_cell)[2 * i];
+            dsp_params->flt_params->temp_32f_im[i] = ((Ipp32f*)rb_cell)[2 * i + 1];
         }
 
         // фильтрация
+        ippsFIRSR_32f(dsp_params->flt_params->temp_32f_re,
+                      dsp_params->flt_params->temp_32f_re,
+                      dsp_params->read_params->read_rb_cell_size / 2,
+                      dsp_params->flt_params->flt_spec,
+                      dsp_params->flt_params->delay_re,
+                      dsp_params->flt_params->delay_re,
+                      dsp_params->flt_params->buf);
+
+        ippsFIRSR_32f(dsp_params->flt_params->temp_32f_im,
+                      dsp_params->flt_params->temp_32f_im,
+                      dsp_params->read_params->read_rb_cell_size / 2,
+                      dsp_params->flt_params->flt_spec,
+                      dsp_params->flt_params->delay_im,
+                      dsp_params->flt_params->delay_im,
+                      dsp_params->flt_params->buf);
+
+        /*
         unsigned int numIters = sdr_params->sample_rate / (dsp_params->flt_params->down_factor * dsp_params->read_params->readout_per_seconds);
         ippsFIRMR_32f(dsp_params->flt_params->temp_32f_re,
                       dsp_params->flt_params->flt_32f_re,
@@ -57,10 +67,11 @@ void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
                       dsp_params->flt_params->delay_im,
                       dsp_params->flt_params->delay_im,
                       dsp_params->flt_params->buf);
+                      */
 
-        for(i = 0; i < dsp_params->flt_params->filtration_rb_cell_size / 2; i++){
-            dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx][2 * i]     = dsp_params->flt_params->flt_32f_re[i];
-            dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx][2 * i + 1] = dsp_params->flt_params->flt_32f_im[i];
+        for(i = 0; i < dsp_params->read_params->read_rb_cell_size / 2; i++){
+            dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx][i].re = dsp_params->flt_params->temp_32f_re[i];
+            dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx][i].im = dsp_params->flt_params->temp_32f_im[i];
         }
 
         // запись в файл
@@ -68,13 +79,16 @@ void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
             emit write_to_file(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
 
         // БПФ
-        if(dsp_params->fft_params->fft_mode == FLT_FFT){
-            emit get_fft_step(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
-        }
+        if(dsp_params->fft_params->fft_mode == FLT_FFT)
+            emit get_fft_step(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx],
+                              dsp_params->read_params->read_rb_cell_size);
+
+        // частотный сдвиг
+        emit get_shift_step(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx],
+                            dsp_params->read_params->read_rb_cell_size);
 
         // инкремент итератора по КБ
         dsp_params->flt_params->filtration_rb_cell_idx = (dsp_params->flt_params->filtration_rb_cell_idx + 1) % DSP_FLT_RB_SIZE;
     }
-    */
 }
 

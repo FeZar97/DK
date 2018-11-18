@@ -180,6 +180,9 @@ void config_manager::update_dsp_tab()
     ui->DCOffsetRe->setValue(dsp->dsp_params->fft_params->dc_offset.re);
     ui->DCOffsetIm->setValue(dsp->dsp_params->fft_params->dc_offset.im);
 
+    ui->PassbandValSB->setMaximum(dsp->dsp_params->flt_params->in_sample_rate / 2);
+    ui->BoombandValSB->setMaximum(dsp->dsp_params->flt_params->in_sample_rate / 2);
+
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
     ui->ReadOutPerSecSB->setEnabled(enabled_flag);
@@ -351,6 +354,8 @@ void config_manager::on_CentralFreqSB_editingFinished()
 void config_manager::on_SampleRateSB_valueChanged(int new_sample_rate)
 {
     sdr->set_sample_rate(new_sample_rate);
+    dsp->dsp_params->flt_params->in_sample_rate = new_sample_rate;
+    dsp->dsp_params->flt_params->recalc_flt_params();
     emit global_update_interface();
 }
 
@@ -426,6 +431,11 @@ void config_manager::on_FftShiftStepCB_clicked(bool new_state)
 {
     dsp->dsp_params->shift_params->step = new_state;
     emit global_update_interface();
+}
+
+void config_manager::on_NullBinCircleCB_clicked(bool new_state)
+{
+    dsp->dsp_params->fft_params->null_bin_circle = new_state;
 }
 
 void config_manager::mousePressEvent(QMouseEvent *event)
@@ -524,7 +534,7 @@ MouseType config_manager::checkResizableField(QMouseEvent *event)
 
 void config_manager::on_CloseButton_clicked()
 {
-    this->setVisible(!this->isVisible());
+    this->setVisible(false);
 }
 void config_manager::on_RecordButton_clicked()
 {
@@ -536,6 +546,50 @@ void config_manager::on_RecordButton_clicked()
 void config_manager::on_CurrentPathButton_clicked()
 {
     dsp->dsp_params->wav_params->directory = QFileDialog::getExistingDirectory(this, "Выходная директория", dsp->dsp_params->wav_params->directory) + "/";
+}
+
+void config_manager::on_FiltrationCB_clicked(bool new_state)
+{
+    dsp->dsp_params->flt_params->is_using = new_state;
+    dsp->dsp_params->flt_params->recalc_flt_params();
+    global_update_interface();
+}
+
+void config_manager::on_PassbandValSB_valueChanged(int new_passband_freq)
+{
+    dsp->dsp_params->flt_params->passband_freq = new_passband_freq;
+    dsp->dsp_params->flt_params->recalc_flt_params();
+    global_update_interface();
+}
+
+void config_manager::on_BoombandValSB_valueChanged(int new_boomband_freq)
+{
+    dsp->dsp_params->flt_params->boomband_freq = new_boomband_freq;
+    dsp->dsp_params->flt_params->recalc_flt_params();
+    global_update_interface();
+}
+
+void config_manager::on_OutSampleFreqCB_currentIndexChanged(int new_out_sample_rate_idx)
+{
+    switch(new_out_sample_rate_idx){
+        case 0:
+            dsp->dsp_params->flt_params->out_sample_rate = 8000;
+            break;
+        case 1:
+            dsp->dsp_params->flt_params->out_sample_rate = 16000;
+            break;
+        case 2:
+            dsp->dsp_params->flt_params->out_sample_rate = 44100;
+            break;
+        case 3:
+            dsp->dsp_params->flt_params->out_sample_rate = 48000;
+            break;
+        default:
+            dsp->dsp_params->flt_params->out_sample_rate = 48000;
+            break;
+    }
+    dsp->dsp_params->flt_params->recalc_flt_params();
+    global_update_interface();
 }
 
 
@@ -569,7 +623,7 @@ void config_manager::on_FirstValidatePB_clicked()
     sdr->sdr_params->central_freq = 5500000;
     sdr->sdr_params->direct_sampling_idx = 2;
     sdr->sdr_params->gain_idx = 1;
-    sdr->sdr_params->sample_rate = 1400000;
+    sdr->sdr_params->sample_rate = 230000;
 
 // настройки тракта РПУ
     rpu->first_tract.set_central_freq(15000000);
@@ -584,12 +638,40 @@ void config_manager::on_FirstValidatePB_clicked()
     rpu->kalibrator.set_exit_type(INTERNAL);
     rpu->kalibrator.set_signal_type(SINUS);
 
+// настройки ЦОС
+    // для частоты 5 500 000 это оптимальные настройки для подавления DC
+    dsp->dsp_params->fft_params->dc_offset.re = 127.005;
+    dsp->dsp_params->fft_params->dc_offset.im = 127.005;
+    dsp->dsp_params->read_params->readout_per_seconds = 10;
+
+// кол-во обращений к преимнику/сек = 10
+// объем считываемых данных = 2 * 230 000 / 10 = 46 000 байт
+
     if(dsp->prepair_to_record(sdr)){
         emit bind_slots_signals();
 
         dsp->fft_shift_thread->start();
         dsp->fft_thread->start();
-        dsp->reader_thread->start();
+        //dsp->reader_thread->start();
+
+        Sleep(50);
+
+        // на данном моменте на спектре должна быть видна синусоида калибратора
+        int freqs[10] = {600000, 1250000, 1850000, 2700000, 3800000, 5250000, 7350000, 12150000, 17550000, 26350000}, i, j, n_read;
+        char *input_buffer = new char[dsp->dsp_params->read_params->read_rb_cell_size];
+
+        // заполняется один кольцевой буфер
+        for(i = 0; i < DSP_READ_RB_SIZE; i++){
+            rtlsdr_read_sync(sdr->sdr_params->sdr_ptr,
+                             input_buffer,
+                             dsp->dsp_params->read_params->read_rb_cell_size,
+                             &n_read);
+
+            ippsConvert_8u32f(dsp->dsp_params->read_params->read_cell,
+                             (Ipp32f*)dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
+                              dsp->dsp_params->read_params->read_rb_cell_size);
+        }
+
         global_update_interface();
     }
     else{
@@ -597,87 +679,6 @@ void config_manager::on_FirstValidatePB_clicked()
         sdr->sdr_params->is_open = false;
         dsp->set_record_flags(false);
     }
-
-    // на данном моменте на спектре должна быть видна синусоида калибратора
-
-    int freqs[10] = {600000, 1250000, 1850000, 2700000, 3800000, 5250000, 7350000, 12150000, 17550000, 26350000}, i, j, n_read;
-
-    // 10 обращений в секунду
-    //dsp->dsp_params->read_params->readout_per_seconds = 10;
-    //dsp->recalc_dsp_params();
-
-    char *input_buffer = new char[dsp->dsp_params->read_params->read_rb_cell_size];
-
-    /*
-    // если подготовка к записи завершена успешно, то начинается прием
-    if(dsp->prepair_to_record(sdr)){
-        connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                &Widget::update_ReadProgressBar);
-        connect(dsp->reader,            &READER::end_of_recording,              this,                &Widget::end_of_recording);
-        connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                &Widget::paint_fft);
-        connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_first_file_rec);
-        connect(dsp->second_wav_rec,    &wav_recorder::end_of_recording,        this,                &Widget::end_of_second_file_rec);
-        connect(dsp->third_wav_rec,     &wav_recorder::end_of_recording,        this,                &Widget::end_of_third_file_rec);
-        connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_adc_bar);
-        connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_flt_bar);
-        connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,        config_manager_form, &config_manager::update_real_bar);
-
-        dsp->wav_thread->start();
-        dsp->fft_shift_thread->start();
-        dsp->fft_thread->start();
-        global_update_interface();
-
-
-        for(i = 0; i < 10; i++){
-            rpu->set_config(FOUR_CHANNEL);
-            rpu->first_tract.set_central_freq(freqs[i]);
-
-            // в начале накопить инфу о шуме
-            // для статистики шума требуется DSP_NOISE_SIZE обращений к приемнику
-
-            j = 0;
-            // считывание просиходит до тех пор, пока либо не кончится время, либо не произойдет принудительная остановка
-            while(j < DSP_NOISE_SIZE){
-                rtlsdr_reset_buffer(sdr->sdr_params->sdr_ptr);
-
-                // общение с железкой
-                rtlsdr_read_sync(sdr->sdr_params->sdr_ptr,
-                                 dsp->dsp_params->read_params->read_cell,
-                                 dsp->dsp_params->read_params->read_rb_cell_size,
-                                 &n_read);
-
-                // конвертация 8u -> 32f
-                ippsConvert_8u32f(dsp->dsp_params->read_params->read_cell,
-                                 (Ipp32f*)dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
-                                  dsp->dsp_params->read_params->read_rb_cell_size);
-
-
-                // сопряжение
-                if(dsp->dsp_params->fft_params->fft_inversion)
-                    ippsConj_32fc_I(dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
-                                    dsp->dsp_params->read_params->read_rb_cell_size / 2);
-
-                // АКВАФОР
-                // убирает вредное, сохраняя полезное
-                //if(dsp_params->flt_params->use_filter)
-                //    emit get_filtration_step(read_rb[dsp_params->flt_params->filtration_rb_cell_idx]);
-
-                // инкремент итератора
-                dsp->dsp_params->read_params->read_rb_cell_idx = (dsp_params->read_params->read_rb_cell_idx + 1) % DSP_READ_RB_SIZE;
-            }
-
-            // если завершилось штатно, то флаг emergency_end_recording == 0
-            // если завершилось экстренно, то emergency_end_recording == 1
-            emit end_of_recording(!dsp_params->read_params->emergency_end_recording);
-        }
-
-    }
-    else{
-        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать запись сигнала.\nЗаново подключите SDR приемник и перезапустите программу.");
-        sdr->sdr_params->is_open = false;
-        dsp->set_record_flags(false);
-        global_update_interface();
-    }
-    */
 }
 
 void config_manager::on_comboBox_currentIndexChanged(int new_pres_idx)

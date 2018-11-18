@@ -101,7 +101,11 @@ private slots:
     // тестировка калибратора
     void test_kalibrator();
 
+    void hideEvent(QHideEvent *event);
+    void showEvent(QShowEvent *event);
+
 signals:
+    void changeEvent(QEvent *e);
     void previousPositionChanged(QPoint previousPosition);
 
 protected:

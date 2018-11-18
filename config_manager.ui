@@ -1854,6 +1854,225 @@
        <attribute name="title">
         <string>Фильтрация</string>
        </attribute>
+       <widget class="QCheckBox" name="FiltrationCB">
+        <property name="geometry">
+         <rect>
+          <x>188</x>
+          <y>14</y>
+          <width>15</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="PassbandValSB">
+        <property name="geometry">
+         <rect>
+          <x>176</x>
+          <y>42</y>
+          <width>99</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="PassbandLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>42</y>
+          <width>171</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Полоса пропускания:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="UseFltLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>9</y>
+          <width>177</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Использовать фильтр:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="BoombandLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>74</y>
+          <width>171</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Полоса заграждения:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="HzLabel1">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>42</y>
+          <width>25</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Гц</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="BoombandValSB">
+        <property name="geometry">
+         <rect>
+          <x>176</x>
+          <y>76</y>
+          <width>99</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="HzLabel2">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>76</y>
+          <width>25</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Гц</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="OutSampleFreqLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>106</y>
+          <width>147</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Выходная частота:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="OutSampleFreqCB">
+        <property name="geometry">
+         <rect>
+          <x>156</x>
+          <y>108</y>
+          <width>69</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="currentIndex">
+         <number>3</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>8000</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>16000</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>44100</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>48000</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="HzLabel3">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>108</y>
+          <width>25</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Гц</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="FftTab">
        <attribute name="title">
@@ -1938,7 +2157,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Барлета</string>
+          <string>Барлетта</string>
          </property>
         </item>
         <item>
@@ -2014,12 +2233,17 @@
         </property>
         <item>
          <property name="text">
-          <string>с АЦП (i / q)</string>
+          <string>с АЦП</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>после фильтрации (i / q)</string>
+          <string>после фильтрации</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>перенесенный</string>
          </property>
         </item>
        </widget>
@@ -2272,7 +2496,7 @@
          <rect>
           <x>6</x>
           <y>144</y>
-          <width>106</width>
+          <width>83</width>
           <height>22</height>
          </rect>
         </property>
@@ -2282,7 +2506,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Коррекция iq:</string>
+         <string>Коррекция</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="FftShiftStepCB">
@@ -2306,11 +2530,17 @@
        <widget class="QDoubleSpinBox" name="DCOffsetRe">
         <property name="geometry">
          <rect>
-          <x>116</x>
-          <y>145</y>
-          <width>95</width>
+          <x>110</x>
+          <y>146</y>
+          <width>87</width>
           <height>22</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="font">
          <font>
@@ -2320,8 +2550,11 @@
         <property name="frame">
          <bool>false</bool>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
         <property name="decimals">
-         <number>4</number>
+         <number>3</number>
         </property>
         <property name="minimum">
          <double>-256.000000000000000</double>
@@ -2336,9 +2569,9 @@
        <widget class="QDoubleSpinBox" name="DCOffsetIm">
         <property name="geometry">
          <rect>
-          <x>230</x>
+          <x>224</x>
           <y>145</y>
-          <width>95</width>
+          <width>87</width>
           <height>22</height>
          </rect>
         </property>
@@ -2350,8 +2583,11 @@
         <property name="frame">
          <bool>false</bool>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
         <property name="decimals">
-         <number>4</number>
+         <number>3</number>
         </property>
         <property name="minimum">
          <double>-256.000000000000000</double>
@@ -2361,6 +2597,56 @@
         </property>
         <property name="singleStep">
          <double>0.001000000000000</double>
+        </property>
+       </widget>
+       <widget class="QLabel" name="DCOffsetLabel_2">
+        <property name="geometry">
+         <rect>
+          <x>98</x>
+          <y>145</y>
+          <width>10</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>i:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="DCOffsetLabel_3">
+        <property name="geometry">
+         <rect>
+          <x>206</x>
+          <y>144</y>
+          <width>17</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>q:</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="NullBinCircleCB">
+        <property name="geometry">
+         <rect>
+          <x>320</x>
+          <y>138</y>
+          <width>49</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0bin
+circle</string>
         </property>
        </widget>
       </widget>
@@ -2373,8 +2659,8 @@
      <widget class="QPushButton" name="FirstValidatePB">
       <property name="geometry">
        <rect>
-        <x>18</x>
-        <y>21</y>
+        <x>2</x>
+        <y>10</y>
         <width>103</width>
         <height>25</height>
        </rect>

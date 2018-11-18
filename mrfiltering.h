@@ -23,7 +23,11 @@ signals:
     // запись в файл
     void write_to_file(Ipp32fc *cell);
     // сигнал для расчета спектра
-    void get_fft_step(Ipp32fc *rb_cell);
+    void get_fft_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    // сигнал для частотного сдвига
+    void get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    // сигнал для вывода
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
 };
 
 #endif // MRFILTERING_H

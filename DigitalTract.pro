@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     sdr.cpp \
     simplegraph.cpp \
     stylehelper.cpp \
-    wav_recorder.cpp
+    wav_recorder.cpp \
+    sound_maker.cpp
 
 HEADERS  += widget.h \
     config_manager.h \
@@ -34,7 +35,6 @@ HEADERS  += widget.h \
     dsp.h \
     fft_calcer.h \
     fft_shifter.h \
-    filter.h \
     mrfiltering.h \
     reader.h \
     rpu.h \
@@ -45,7 +45,8 @@ HEADERS  += widget.h \
     sdr.h \
     simplegraph.h \
     stylehelper.h \
-    wav_recorder.h
+    wav_recorder.h \
+    sound_maker.h
 
 FORMS    += widget.ui \
     config_manager.ui

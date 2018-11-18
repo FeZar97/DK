@@ -29,9 +29,6 @@
    <iconset resource="images.qrc">
     <normaloff>:/buttons/SquidLow.png</normaloff>:/buttons/SquidLow.png</iconset>
   </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
-  </property>
   <widget class="QWidget" name="widgetInterface" native="true">
    <property name="geometry">
     <rect>
@@ -111,7 +108,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="text">
-     <string>Цифровой приемный тракт РПУ Кальмар</string>
+     <string>---</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>

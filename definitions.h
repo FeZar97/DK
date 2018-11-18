@@ -47,6 +47,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopWidget>
+#include <QEvent>
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -124,7 +125,8 @@ enum NUMERALS{ZERO,
 // отображаемый спектр
 enum FFT_MODE{
     READER_FFT, // спектр сигнала с АЦП
-    FLT_FFT};   // спектр отфильтрованного сигнала
+    FLT_FFT,    // спектр отфильтрованного сигнала
+    SHIFT_FFT}; // спектр сдвинутого сигнала
 
 // оконные функции
 enum WINDOW{
@@ -195,6 +197,7 @@ enum WINDOW{
 // ---------------------------------------DSP---------------------------------------------
 #define     DSP_DEFAULT_UP_FACTOR                   1
 #define     DSP_DEFAULT_DOWN_FACTOR                 2
+#define     DSP_FILTER_LENGTH                       350
 #define     DSP_DEFAULT_FFT_MODE                    READER_FFT
 #define     DSP_DEFAULT_AVERAGE_NUMBER              8
 #define     DSP_DEFAULT_FFT_INVERSION               false
@@ -215,6 +218,7 @@ enum WINDOW{
 #define     DSP_READ_RB_SIZE                        10
 #define     DSP_FLT_RB_SIZE                         10
 #define     DSP_SHIFT_RB_SIZE                       10
+#define     DSP_SOUND_RB_SIZE                       10
 
 #define     LINE                                "\n-----------------------------------------------------------------------------"
 
@@ -369,60 +373,67 @@ class FLT_params{
 public:
 // глобальные
     bool                is_using;                // флаг использования фильтрации
-    unsigned int        up_factor;               // коэф-т интерполяции
-    unsigned int        down_factor;             // коэф-т децимации
-    unsigned int        out_sample_rate;         // частота сигнала после передискретизации
+    unsigned int        in_sample_rate;          // входная частота дискретизации
+    unsigned int        out_sample_rate;         // выходная частота дискретизации
+    unsigned int        passband_freq;           // выходная частота дискретизации
+    unsigned int        boomband_freq;           // выходная частота дискретизации
 
     Ipp32fc             **filtration_rb;         // КБ фильтрации
     unsigned int        filtration_rb_cell_size; // размер ячейки КБ фильтрации
     unsigned int        filtration_rb_cell_idx;  // итератор по КБ фильтрации
 
 // локальные
-    Ipp32f              *filter_taps;            // указатель на массив отсчетов ИХ фильтра
-    int                 filter_length;           // длина ИХ фильтра
+    Ipp32f              flt_taps32[DSP_FILTER_LENGTH]; // массив отсчетов ИХ фильтра
+    Ipp32f              delay_re[DSP_FILTER_LENGTH - 1]; // линии задержки
+    Ipp32f              delay_im[DSP_FILTER_LENGTH - 1];
 
     // спецификации для IPP
-    IppsFIRSpec_32f     *pSpec;
+    IppsFIRSpec_32f     *flt_spec;
     Ipp8u               *buf;
-
-    Ipp32f              *temp_32fc;              // буфер для преобразования 8u -> 32f
 
     // входные вектора для фильтрации
     Ipp32f              *temp_32f_re;
     Ipp32f              *temp_32f_im;
 
-    // результат фильтрации
-    Ipp32f              *flt_32f_re;
-    Ipp32f              *flt_32f_im;
-
-    // линии задержки
-    Ipp32f              *delay_re;
-    Ipp32f              *delay_im;
-
     FLT_params(){
-        up_factor = DSP_DEFAULT_UP_FACTOR;
-        down_factor = DSP_DEFAULT_DOWN_FACTOR;
-
-        filter_taps = NULL;
-        filter_length = 0;
-
-        pSpec = NULL;
-        buf = NULL;
-
-        temp_32fc = NULL;
-
-        temp_32f_re = NULL;
-        temp_32f_im = NULL;
-
-        flt_32f_re = NULL;
-        flt_32f_im = NULL;
-
-        delay_re = NULL;
-        delay_im = NULL;
+        is_using = false;
+        in_sample_rate = SDR_DEFAULT_SAMPLE_RATE;
+        out_sample_rate = 48000;
+        passband_freq = 250;
+        boomband_freq = 20000;
 
         filtration_rb = NULL;
         filtration_rb_cell_size = 0;
         filtration_rb_cell_idx = 0;
+
+        flt_spec = NULL;
+        buf = NULL;
+
+        temp_32f_re = NULL;
+        temp_32f_im = NULL;
+    }
+
+    void recalc_flt_params(){
+        int buf_size, spec_size;
+        flt_spec = NULL;
+        buf = NULL;
+
+        Ipp64f flt_taps64[DSP_FILTER_LENGTH];
+        ippsFIRGenGetBufferSize(DSP_FILTER_LENGTH, &buf_size);
+        buf = new Ipp8u[buf_size];
+        ippsFIRGenBandpass_64f(passband_freq/float(in_sample_rate), boomband_freq/float(in_sample_rate), flt_taps64, DSP_FILTER_LENGTH, ippWinBlackman, ippTrue, buf);
+        ippsConvert_64f32f(flt_taps64, flt_taps32, DSP_FILTER_LENGTH);
+
+        delete[] buf;
+        buf = NULL;
+
+        ippsFIRSRGetSize(DSP_FILTER_LENGTH, ipp32f, &spec_size, &buf_size);
+        flt_spec = (IppsFIRSpec_32f*)new Ipp8u[spec_size];
+        buf = new Ipp8u[buf_size];
+
+        ippsFIRSRInit_32f(flt_taps32, DSP_FILTER_LENGTH, ippAlgAuto, flt_spec);
+        ippsSet_32f(0, delay_re, DSP_FILTER_LENGTH - 1);
+        ippsSet_32f(0, delay_im, DSP_FILTER_LENGTH - 1);
     }
 };
 
@@ -455,12 +466,15 @@ public:
 
     int                max_level_idx;
 
+    bool               null_bin_circle;
+
     FFT_params(){
         fft_win_alpha = DSP_DEFAULT_WIN_ALPHA;
         fft_dynamic_range = DSP_DEFAULT_DYNAMIC_RANGE;
         fft_noise_level = DSP_DEFAULT_NOISE_LEVEL;
 
-        dc_offset = {0., 0.};
+        dc_offset.re = 0;
+        dc_offset.im = 0;
 
         fft_mode = DSP_DEFAULT_FFT_MODE;
         fft_input_cell_size = 0;
@@ -476,6 +490,8 @@ public:
         accum_weight = 0;
 
         max_level_idx = 0;
+
+        null_bin_circle = false;
 
         ippsZero_32f(fft_res, DSP_FFT_SIZE);
         ippsZero_32f(noise_buf, DSP_NOISE_SIZE);
@@ -521,7 +537,7 @@ public:
     QString        directory;
 
     int            input_cell_size;
-    Ipp8u          *out_buf;
+    Ipp8s          *out_buf;
 
     WAV_params(){
         directory = "C:/";
@@ -533,6 +549,26 @@ public:
     }
 };
 
+// параметры выходного аудиопотока
+class SOUND_params{
+public:
+    static const int sound_freq = 48000;
+    static const int channel_count = 2;
+    static const int sample_size = 16;
+
+
+
+    Ipp16s       **sound_rb;
+    unsigned int sound_rb_cell_size;
+    unsigned int sound_rb_cell_idx;
+
+    SOUND_params(){
+        sound_rb = NULL;
+        sound_rb_cell_size = 0;
+        sound_rb_cell_idx = 0;
+    }
+};
+
 // общие настройки
 class DSP_params{
 public:
@@ -541,6 +577,7 @@ public:
     FLT_params          *flt_params;
     SHIFT_params        *shift_params;
     WAV_params          *wav_params;
+    SOUND_params        *sound_params;
 
     DSP_params(){
         read_params  = new READ_params();
@@ -548,6 +585,7 @@ public:
         flt_params   = new FLT_params();
         shift_params = new SHIFT_params();
         wav_params   = new WAV_params();
+        sound_params = new SOUND_params();
     }
 };
 

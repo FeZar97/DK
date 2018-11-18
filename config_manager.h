@@ -33,6 +33,8 @@ public:
     ~config_manager();
     QPoint previousPosition() const;
 
+    bool          is_visible;
+
     RPU           *rpu;
     SDR           *sdr;
     DSP           *dsp;
@@ -48,6 +50,8 @@ public slots:
     void update_adc_bar(int new_val);
     void update_flt_bar(int new_val);
     void update_real_bar(int new_val);
+
+    void on_CloseButton_clicked();
 
 private slots:
 /// -----------------------------------РПУ---------------------------------------------
@@ -85,6 +89,10 @@ private slots:
     void on_CurrentPathButton_clicked(); // выбор папки
 
 // фильтрация
+    void on_FiltrationCB_clicked(bool new_state);
+    void on_PassbandValSB_valueChanged(int new_passband_freq);
+    void on_BoombandValSB_valueChanged(int new_boomband_freq);
+    void on_OutSampleFreqCB_currentIndexChanged(int new_out_sample_rate_idx);
 
 // БПФ
     void on_FftModeCB_currentIndexChanged(int new_fft_mode); // смена "режима" БПФ
@@ -98,8 +106,8 @@ private slots:
     void on_DCOffsetRe_valueChanged(double new_offset_re);
     void on_DCOffsetIm_valueChanged(double new_offset_im);
     void on_FftShiftStepCB_clicked(bool new_state); // кратность шага изменения частоты сноса
+    void on_NullBinCircleCB_clicked(bool new_state); // вершина нулевого бина обводится окружностью
 
-    void on_CloseButton_clicked();
 
 /// АСКР
     void on_FirstValidatePB_clicked(); // АСКР проверка №1

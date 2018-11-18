@@ -23,6 +23,9 @@ signals:
     // обновление прогрес бара чтения
     void update_ReadProgressBar(int val);
 
+    // расчет спектра
+    void get_fft_step(Ipp32fc *read_cell, unsigned int cell_size);
+
     // отправка сигнала-запроса на фильтрацию порции
     void get_filtration_step(Ipp32fc *rb_cell);
 

@@ -46,7 +46,7 @@ void fft_shifter::get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size)
         emit write_to_file(dsp_params->shift_params->shift_rb[dsp_params->shift_params->shift_rb_cell_idx]);
 
     // бпф
-    if(dsp_params->fft_params->fft_mode == READER_FFT)
+    if(dsp_params->fft_params->fft_mode == SHIFT_FFT)
         emit get_fft_step(dsp_params->shift_params->shift_rb[dsp_params->shift_params->shift_rb_cell_idx],
                           dsp_params->shift_params->shift_rb_cell_size);
 
