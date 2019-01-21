@@ -4,8 +4,8 @@ simpleGraph::simpleGraph(QWidget *parent) : QWidget(parent), vScreen( DSP_FFT_SI
 {
     vRect.setTop(0);
     vRect.setLeft(0);
-    vRect.setHeight( 711 );
-    vRect.setWidth( DSP_FFT_SIZE );
+    vRect.setHeight(711);
+    vRect.setWidth(DSP_FFT_SIZE);
 
     sdr_params = new SDR_params();
     dsp_params = new DSP_params();
@@ -28,7 +28,7 @@ void simpleGraph::paintEvent(QPaintEvent *e)
 void simpleGraph::paint_spectrum(QPainter &painter)
 {
     QPointF p1, p2;
-    painter.setPen( QPen(Qt::white, 0.9) );
+    painter.setPen(QPen(Qt::white, 0.9));
     for(int i = 0 ; i < DSP_FFT_SIZE - 1; ++i){
         if(i != DSP_FFT_SIZE / 2 - 1){
 
@@ -69,7 +69,6 @@ void simpleGraph::paint_grid(QPainter &painter)
     painter.drawLine(1023, 0, 1023, vRect.height() - 20);
     painter.setPen(QPen(Qt::red, 1) );
     painter.drawLine( 512, 0,  512, vRect.height() - 20);
-
 
     // горизонтальные линии
     // от 70 до 630 с шагом 70 px
@@ -223,9 +222,8 @@ void simpleGraph::repaintGraph()
     QPainter painter(&vScreen);
 
     painter.setRenderHint(QPainter::Antialiasing,            true);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+    //painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
 
-    // экран
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(21,21,21));
     painter.drawRect(vRect);
@@ -240,5 +238,4 @@ void simpleGraph::repaintGraph()
     paint_grid(painter);
 
     update();
-    //repaint();
 }

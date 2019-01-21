@@ -2,25 +2,25 @@
 
 DSP::DSP(SDR *new_sdr, simpleGraph *new_graph)
 {
-    if(new_sdr != NULL)
+    if(new_sdr != nullptr)
         sdr = new_sdr;
     else
         sdr = new SDR();
 
     dsp_params = new DSP_params();
 
-    if(new_graph != NULL)
+    if(new_graph != nullptr)
         graph = new_graph;
     else
         graph = new simpleGraph();
 
-    reader = NULL;
-    flt = NULL;
-    fft = NULL;
-    shifter = NULL;
-    first_wav_rec = NULL;
-    second_wav_rec = NULL;
-    third_wav_rec = NULL;
+    reader          = nullptr;
+    flt             = nullptr;
+    fft             = nullptr;
+    shifter         = nullptr;
+    first_wav_rec   = nullptr;
+    second_wav_rec  = nullptr;
+    third_wav_rec   = nullptr;
 }
 
 DSP::~DSP()
@@ -37,9 +37,7 @@ bool DSP::prepair_to_record(SDR *new_sdr)
     sdr = new_sdr;
     sdr->set_params_to_device();
 
-    bool result = true;
-
-    result &= recalc_dsp_params();
+    bool result = recalc_dsp_params();
 
     set_record_flags(true);             // поготовка флагов
 
@@ -109,18 +107,24 @@ void DSP::create_threads()
     filtration_thread   = new QThread;
     fft_thread          = new QThread;
     fft_shift_thread    = new QThread;
+
+    qDebug() << "create threads...";
 }
 void DSP::create_reader()
 {
     reader = new READER(dsp_params, sdr->sdr_params);
     connect(reader_thread, &QThread::started, reader, &READER::start_reading); // начало записи
     reader->moveToThread(reader_thread);
+
+    qDebug() << "create reader...";
 }
 void DSP::create_filter()
 {
     flt = new MRFiltering(dsp_params, sdr->sdr_params);
     connect(reader, &READER::get_filtration_step, flt, &MRFiltering::get_filtration_step); // переход от чтения к фильтрации
     flt->moveToThread(filtration_thread);
+
+    qDebug() << "create filter...";
 }
 void DSP::create_shifter()
 {
@@ -128,6 +132,8 @@ void DSP::create_shifter()
     connect(reader, &READER::get_shift_step, shifter, &fft_shifter::get_shift_step);
     connect(flt, &MRFiltering::get_shift_step, shifter, &fft_shifter::get_shift_step);
     shifter->moveToThread(fft_shift_thread);
+
+    qDebug() << "create shifter...";
 }
 void DSP::create_fft_calcer()
 {
@@ -136,6 +142,8 @@ void DSP::create_fft_calcer()
     connect(flt, &MRFiltering::get_fft_step, fft, &fft_calcer::get_fft_step);
     connect(shifter, &fft_shifter::get_fft_step, fft, &fft_calcer::get_fft_step);
     fft->moveToThread(fft_thread);
+
+    qDebug() << "create fft calcer...";
 }
 void DSP::create_wav_recorders()
 {
@@ -153,6 +161,8 @@ void DSP::create_wav_recorders()
     first_wav_rec->moveToThread(wav_thread);
     second_wav_rec->moveToThread(wav_thread);
     third_wav_rec->moveToThread(wav_thread);
+
+    qDebug() << "create wav recorders...";
 }
 
 void DSP::create_sounder()
@@ -161,6 +171,8 @@ void DSP::create_sounder()
     connect(flt, &MRFiltering::get_sound_step, sounder, &sound_maker::get_sound_step);
     connect(shifter, &fft_shifter::get_sound_step, sounder, &sound_maker::get_sound_step);
     sounder->moveToThread(sound_thread);
+
+    qDebug() << "create sounder...";
 }
 
 // пересчет параметров
@@ -168,31 +180,44 @@ bool DSP::recalc_dsp_params()
 {
     bool success_flag = true;
 
+    if(!dsp_params->read_params->readout_per_seconds)
+        dsp_params->read_params->readout_per_seconds = 10;
+
     dsp_params->read_params->read_rb_cell_size = 2 * sdr->sdr_params->sample_rate / dsp_params->read_params->readout_per_seconds;
+    qDebug() << "read_rb_cell_size = " << dsp_params->read_params->read_rb_cell_size;
 
     if(dsp_params->read_params->read_rb_cell_size < 1)
         success_flag = false;
 
-    if(dsp_params->flt_params->is_using){
+    if(dsp_params->flt_params->is_using)
         dsp_params->flt_params->filtration_rb_cell_size = dsp_params->read_params->read_rb_cell_size;
-    }
 
     switch(dsp_params->fft_params->fft_mode){
+
         case READER_FFT:
             dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
             break;
+
         case FLT_FFT:
             dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
             break;
+
         case SHIFT_FFT:
             dsp_params->fft_params->fft_input_cell_size = dsp_params->read_params->read_rb_cell_size;
             break;
     }
 
+    qDebug() << "fft_input_cell_size = " << dsp_params->fft_params->fft_input_cell_size;
+
     dsp_params->fft_params->fft_max_averages_number = dsp_params->fft_params->fft_input_cell_size / (2 * DSP_FFT_SIZE);
+    qDebug() << "fft_max_averages_number = " << dsp_params->fft_params->fft_max_averages_number;
+
     if(dsp_params->fft_params->fft_max_averages_number < 1)
         success_flag = false;
+
     dsp_params->fft_params->fft_averages_number = dsp_params->fft_params->fft_max_averages_number;
+
+    qDebug() << "recalc_dsp_params... " << success_flag << endl;
 
     return success_flag;
 }
@@ -212,6 +237,7 @@ void DSP::prepair_reader()
     dsp_params->read_params->read_rb_cell_idx = 0;
 
     dsp_params->read_params->read_rb = new Ipp32fc*[DSP_READ_RB_SIZE];
+
     for(i = 0; i < DSP_READ_RB_SIZE; i++)
         dsp_params->read_params->read_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
 
@@ -221,6 +247,7 @@ void DSP::prepair_mr_filter()
 {
     // если используется этап фильтрации
     if(dsp_params->flt_params->is_using){
+
         int i;
 
         dsp_params->flt_params->filtration_rb = new Ipp32fc*[DSP_FLT_RB_SIZE];

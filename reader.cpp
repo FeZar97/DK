@@ -3,12 +3,12 @@
 READER::READER(DSP_params *new_dsp_params,
                SDR_params *new_sdr_params)
 {
-    if(new_dsp_params != NULL)
+    if(new_dsp_params != nullptr)
         dsp_params = new_dsp_params;
     else
         dsp_params = new DSP_params();
 
-    if(new_sdr_params != NULL)
+    if(new_sdr_params != nullptr)
         sdr_params = new_sdr_params;
     else
         sdr_params = new SDR_params();
@@ -16,7 +16,6 @@ READER::READER(DSP_params *new_dsp_params,
 
 READER::~READER()
 {
-    // еще один бесполезный деструктор
 }
 
 // воркер
@@ -32,19 +31,19 @@ void READER::start_reading()
         // общение с железкой
         rtlsdr_read_sync(sdr_params->sdr_ptr,
                          dsp_params->read_params->read_cell,
-                         dsp_params->read_params->read_rb_cell_size,
+                         int(dsp_params->read_params->read_rb_cell_size),
                          &n_read);
 
         // конвертация 8u -> 32f
         ippsConvert_8u32f(dsp_params->read_params->read_cell,
-                         (Ipp32f*)dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
-                          dsp_params->read_params->read_rb_cell_size);
+                          reinterpret_cast<Ipp32f*>(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]),
+                         //(Ipp32f*)dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+                          int(dsp_params->read_params->read_rb_cell_size));
 
         // подавление постоянной составляющей
-        if(dsp_params->fft_params->dc_offset.re != 0 || dsp_params->fft_params->dc_offset.im != 0)
-            ippsSubC_32fc_I(dsp_params->fft_params->dc_offset,
-                            dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
-                            dsp_params->read_params->read_rb_cell_size / 2);
+        ippsSubC_32fc_I(dsp_params->fft_params->dc_offset,
+                        dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+                        dsp_params->read_params->read_rb_cell_size / 2);
 
         // сопряжение
         if(dsp_params->fft_params->fft_inversion)
@@ -56,16 +55,15 @@ void READER::start_reading()
             emit get_fft_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                               dsp_params->read_params->read_rb_cell_size / 2);
 
-        // АКВАФОР убирает вредное, сохраняя полезное
+        // фильтрация
         if(dsp_params->flt_params->is_using){
-            emit get_filtration_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
-        }else{
+            //emit get_filtration_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
+        }else
             // частотный сдвиг
             emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                                 dsp_params->read_params->read_rb_cell_size);
-        }
 
-        // в файл
+        // вывод в файл
         if(dsp_params->read_params->use_first_file && dsp_params->read_params->use_files)
             emit write_to_file(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
 

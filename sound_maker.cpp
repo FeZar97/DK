@@ -26,5 +26,5 @@ void sound_maker::get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size)
     // отправить полученную ячейку в AudioOutput
 
 
-}
 
+}

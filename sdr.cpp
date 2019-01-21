@@ -8,13 +8,13 @@ SDR::SDR()
 // возвращает кол-во доступных приемников
 int SDR::get_sdr_count()
 {
-    return rtlsdr_get_device_count();
+    return int(rtlsdr_get_device_count());
 }
 
 // смена частоты настройки
 void SDR::set_central_freq(unsigned int new_central_freq)
 {
-    if(new_central_freq > ((unsigned int)SDR_MIN_TUNER_FREQ) && new_central_freq < ((unsigned int)SDR_MAX_TUNER_FREQ)){
+    if(new_central_freq > (uint(SDR_MIN_TUNER_FREQ) && new_central_freq < uint(SDR_MAX_TUNER_FREQ))){
         sdr_params->central_freq = new_central_freq;
         rtlsdr_set_center_freq(sdr_params->sdr_ptr, sdr_params->central_freq);
         emit global_update_interface();

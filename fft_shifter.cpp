@@ -3,12 +3,12 @@
 fft_shifter::fft_shifter(DSP_params *new_dsp_params,
                          SDR_params *new_sdr_params)
 {
-    if(new_dsp_params != NULL)
+    if(new_dsp_params != nullptr)
         dsp_params = new_dsp_params;
     else
         dsp_params = new DSP_params();
 
-    if(new_sdr_params != NULL)
+    if(new_sdr_params != nullptr)
         sdr_params = new_sdr_params;
     else
         sdr_params = new SDR_params();
@@ -16,7 +16,6 @@ fft_shifter::fft_shifter(DSP_params *new_dsp_params,
 
 fft_shifter::~fft_shifter()
 {
-    // еще один бесполезный деструктор
 }
 
 // сдвиг

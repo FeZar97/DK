@@ -11,7 +11,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings(
     sdr = new SDR();
     dsp = new DSP();
 
-    config_manager_form = new config_manager(NULL, rpu, sdr, dsp);
+    config_manager_form = new config_manager(nullptr, rpu, sdr, dsp);
     connect(config_manager_form, &config_manager::bind_slots_signals, this, &Widget::bind_slots_signals);
     connect(config_manager_form, &config_manager::stop, this, &Widget::on_StopButton_clicked);
 
@@ -65,7 +65,7 @@ void Widget::global_update_interface()
         ui->StopButton->setStyleSheet(StyleHelper::getStopStyleSheet(false));
     }
 
-    ui->DynamicRangeSlider->setValue(dsp->dsp_params->fft_params->fft_dynamic_range);
+    ui->DynamicRangeSlider->setValue(int(dsp->dsp_params->fft_params->fft_dynamic_range));
     ui->NoiseLevelSlider->setValue(dsp->dsp_params->fft_params->fft_noise_level);
 
     ui->FftGraph->repaintGraph();
@@ -111,7 +111,6 @@ void Widget::end_of_third_file_rec()
 
 void Widget::bind_slots_signals()
 {
-    connect(dsp->reader,            &READER::update_ReadProgressBar,        this,                     &Widget::update_ReadProgressBar);
     connect(dsp->reader,            &READER::end_of_recording,              this,                     &Widget::end_of_recording);
     connect(dsp->fft,               &fft_calcer::paint_fft,                 this,                     &Widget::paint_fft);
     connect(dsp->first_wav_rec,     &wav_recorder::end_of_recording,        this,                     &Widget::end_of_first_file_rec);
@@ -209,7 +208,7 @@ void Widget::on_NoiseLevelSlider_valueChanged(int new_noise_level)
 // регулировка динамического диапзона
 void Widget::on_DynamicRangeSlider_valueChanged(int new_dynamic_range)
 {
-    dsp->dsp_params->fft_params->fft_dynamic_range = new_dynamic_range;
+    dsp->dsp_params->fft_params->fft_dynamic_range = uint(new_dynamic_range);
     global_update_interface();
 }
 

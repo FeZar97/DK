@@ -11,23 +11,16 @@ public:
     SDR_params *sdr_params;
     DSP_params *dsp_params;
 
-    READER(DSP_params *new_dsp_params = NULL, SDR_params *new_sdr_params = NULL);
+    READER(DSP_params *new_dsp_params = nullptr, SDR_params *new_sdr_params = nullptr);
     ~READER();
 
-
 public slots:
-    // сигнал постпуает от кнопки начала записи
-    void start_reading();
+    void start_reading(); // сигнал постпуает от кнопки начала записи
 
 signals:
-    // обновление прогрес бара чтения
-    void update_ReadProgressBar(int val);
+    void get_fft_step(Ipp32fc *cell, unsigned int cell_size); // расчет спектра
 
-    // расчет спектра
-    void get_fft_step(Ipp32fc *read_cell, unsigned int cell_size);
-
-    // отправка сигнала-запроса на фильтрацию порции
-    void get_filtration_step(Ipp32fc *rb_cell);
+    void get_filtration_step(Ipp32fc *cell, unsigned int cell_size); // фильтрация
 
     // отправка сигнала на запись сырого ЦП
     void write_to_file(Ipp32fc *rb_cell);

@@ -123,20 +123,17 @@ enum NUMERALS{ZERO,
               FIFTH};
 
 // отображаемый спектр
-enum FFT_MODE{
-    READER_FFT, // спектр сигнала с АЦП
-    FLT_FFT,    // спектр отфильтрованного сигнала
-    SHIFT_FFT}; // спектр сдвинутого сигнала
+enum FFT_MODE{READER_FFT, // спектр сигнала с АЦП
+              FLT_FFT,    // спектр отфильтрованного сигнала
+              SHIFT_FFT}; // спектр сдвинутого сигнала
 
 // оконные функции
-enum WINDOW{
-    NONE,
-    BARLETT,
-    BLACKMANN,
-    HAMMING,
-    HANN,
-    KAISER};
-
+enum WINDOW{NONE,
+            BARLETT,
+            BLACKMANN,
+            HAMMING,
+            HANN,
+            KAISER};
 /// -----------------------------------объявления-----------------------------------------
 
 #define     CURRENT_DEGREE                          WITHOUT
@@ -226,7 +223,7 @@ enum WINDOW{
 const static int gains[] = {0, 9, 14, 27, 37, 77, 87, 125, 144, 157, 166, 197, 207, 229, 254, 280, 297, 328, 338, 364, 372, 386, 402, 421, 434, 439, 445, 480, 496};
 
 // длительность записи [в секундах]
-const static int times[] = {10, 30, 60, 90, 120, 360};
+const static unsigned int times[] = {10, 30, 60, 90, 120, 360};
 
 // стандартный заголовок *.wav файла
 struct WAVEHEADER
@@ -314,7 +311,7 @@ public:
         sample_rate         = SDR_DEFAULT_SAMPLE_RATE;
         direct_sampling_idx = SDR_DEFAULT_DIRECT_SAMPLING_IDX;
 
-        sdr_ptr             = NULL;
+        sdr_ptr             = nullptr;
         is_open             = false;
         is_already_open     = false;
     }
@@ -356,7 +353,7 @@ public:
         emergency_end_recording = false;
 
         read_rb_cell_idx        = 0;
-        read_rb                 = NULL;
+        read_rb                 = nullptr;
 
         rec_time_idx            = DSP_DEFAULT_RECORDING_TIME_IDX;
         readout_per_seconds     = DSP_READOUT_PER_SECONDS;
@@ -395,28 +392,28 @@ public:
     Ipp32f              *temp_32f_re;
     Ipp32f              *temp_32f_im;
 
-    FLT_params(){
-        is_using = false;
-        in_sample_rate = SDR_DEFAULT_SAMPLE_RATE;
-        out_sample_rate = 48000;
-        passband_freq = 250;
-        boomband_freq = 20000;
+    FLT_params():
+        is_using(false),
+        in_sample_rate(SDR_DEFAULT_SAMPLE_RATE),
+        out_sample_rate(48000),
+        passband_freq(250),
+        boomband_freq(2000),
 
-        filtration_rb = NULL;
-        filtration_rb_cell_size = 0;
-        filtration_rb_cell_idx = 0;
+        filtration_rb(nullptr),
+        filtration_rb_cell_size(0),
+        filtration_rb_cell_idx(0),
 
-        flt_spec = NULL;
-        buf = NULL;
+        flt_spec(nullptr),
+        buf(nullptr),
 
-        temp_32f_re = NULL;
-        temp_32f_im = NULL;
-    }
+        temp_32f_re(nullptr),
+        temp_32f_im(nullptr)
+    {}
 
     void recalc_flt_params(){
         int buf_size, spec_size;
-        flt_spec = NULL;
-        buf = NULL;
+        flt_spec = nullptr;
+        buf = nullptr;
 
         Ipp64f flt_taps64[DSP_FILTER_LENGTH];
         ippsFIRGenGetBufferSize(DSP_FILTER_LENGTH, &buf_size);
@@ -425,10 +422,10 @@ public:
         ippsConvert_64f32f(flt_taps64, flt_taps32, DSP_FILTER_LENGTH);
 
         delete[] buf;
-        buf = NULL;
+        buf = nullptr;
 
         ippsFIRSRGetSize(DSP_FILTER_LENGTH, ipp32f, &spec_size, &buf_size);
-        flt_spec = (IppsFIRSpec_32f*)new Ipp8u[spec_size];
+        flt_spec = reinterpret_cast<IppsFIRSpec_32f*>(new Ipp8u[spec_size]);
         buf = new Ipp8u[buf_size];
 
         ippsFIRSRInit_32f(flt_taps32, DSP_FILTER_LENGTH, ippAlgAuto, flt_spec);
@@ -501,76 +498,67 @@ public:
 // параметры сдвига
 class SHIFT_params
 {
+
 public:
-    // глобальные
     double              shift_freq;          // частота сдвига
     Ipp32fc             **shift_rb;          // КБ сдвига
     unsigned int        shift_rb_cell_size;  // размер ячейки КБ сдвига
     unsigned int        shift_rb_cell_idx;   // итератор по КБ сдвига
     bool                step;                // флаг кратности шага изменения частоты сноса
-
-    // локальные
     Ipp32fc             *complex_sin;       // комплексная синусоида для сдвига
     Ipp32f              CurrentPhase;       // фаза синусоиды
 
-    SHIFT_params(){
-        shift_freq = 0;
-        shift_rb = NULL;
-        shift_rb_cell_size = 0;
-        shift_rb_cell_idx = 0;
-        step = true;
-
-        complex_sin = 0;
-        CurrentPhase = 0;
-    }
+    SHIFT_params(): shift_freq{0},
+                    shift_rb{nullptr},
+                    shift_rb_cell_size{0},
+                    shift_rb_cell_idx{0},
+                    step{true},
+                    complex_sin{nullptr},
+                    CurrentPhase{0} {}
 };
 
 // параметры wav файлов
 class WAV_params{
-public:
 
+public:
     QFile          file;
     WAVEHEADER     header;
     quint64        pos;
     quint64        total_size;
     QString        file_name;
     QString        directory;
-
     int            input_cell_size;
     Ipp8s          *out_buf;
 
-    WAV_params(){
-        directory = "C:/";
-        pos = 0;
-        total_size = 0;
-        file_name = "";
-        input_cell_size = 0;
-        out_buf = NULL;
-    }
+    WAV_params(): file{nullptr},
+                  pos{0},
+                  total_size{0},
+                  file_name{""},
+                  directory{"C:/"},
+                  input_cell_size{0},
+                  out_buf{nullptr} {}
 };
 
 // параметры выходного аудиопотока
 class SOUND_params{
+
 public:
-    static const int sound_freq = 48000;
-    static const int channel_count = 2;
-    static const int sample_size = 16;
-
-
+    static const int sound_freq     = 48000;
+    static const int channel_count  = 2;
+    static const int sample_size    = 16;
 
     Ipp16s       **sound_rb;
     unsigned int sound_rb_cell_size;
     unsigned int sound_rb_cell_idx;
 
-    SOUND_params(){
-        sound_rb = NULL;
-        sound_rb_cell_size = 0;
-        sound_rb_cell_idx = 0;
-    }
+    SOUND_params(): sound_rb{nullptr},
+                    sound_rb_cell_size{0},
+                    sound_rb_cell_idx{0} {}
 };
 
 // общие настройки
 class DSP_params{
+
 public:
     READ_params         *read_params;
     FFT_params          *fft_params;
@@ -579,14 +567,13 @@ public:
     WAV_params          *wav_params;
     SOUND_params        *sound_params;
 
-    DSP_params(){
-        read_params  = new READ_params();
-        fft_params   = new FFT_params();
-        flt_params   = new FLT_params();
-        shift_params = new SHIFT_params();
-        wav_params   = new WAV_params();
-        sound_params = new SOUND_params();
-    }
+    DSP_params(): read_params{new READ_params()},
+                  fft_params{new FFT_params()},
+                  flt_params{new FLT_params()},
+                  shift_params{new SHIFT_params()},
+                  wav_params{new WAV_params()},
+                  sound_params{new SOUND_params()}
+                  {}
 };
 
 #endif // DEFINITIONS
