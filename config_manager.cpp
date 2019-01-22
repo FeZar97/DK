@@ -324,9 +324,13 @@ void config_manager::on_RefreshButton_clicked()
 // выбор приемника по его индексу
 void config_manager::on_ConfirmButton_clicked()
 {
+    qDebug() << "on_ConfirmButton_clicked";
+
     // если приемник еще не занят
     if(!sdr->sdr_params->is_open || (sdr->sdr_params->is_open && sdr->sdr_params->is_already_open)){
         int result = rtlsdr_open(&(sdr->sdr_params->sdr_ptr), ui->CurrentDevSpinBox->value());
+
+        qDebug() << "   result = " << result;
 
         if(!result || (result && sdr->sdr_params->is_already_open)){
             sdr->sdr_params->index = ui->CurrentDevSpinBox->value();

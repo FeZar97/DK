@@ -38,7 +38,7 @@ private:
     MouseType           checkResizableField(QMouseEvent *event); // определение области нажатия
 
 public:
-    explicit Widget(QWidget *parent = 0);
+    explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 
     QPoint              previousPosition() const;
@@ -51,58 +51,42 @@ public:
 public slots:
     void setPreviousPosition(QPoint previousPosition);
 
-    void update_ReadProgressBar(int val);
+    void paint_fft(); // отрисовка спектра
 
-    // отрисовка
-    void paint_fft();
+    void end_of_recording(); // окончание записи
 
-    // слот окончания записи
-    // принимает сигнал и при экстренном завершении записи (нажатие кнопки стоп)
-    //                  и при штатном завершении записи
-    void end_of_recording();
+    void global_update_interface(); // обновление интерфейса
 
-    // обновление окон
-    void global_update_interface();
-
-    // изменение интерфейса
-    void set_ui_style();
+    void set_ui_style(); // изменение интерфейса
 
     void end_of_first_file_rec();
     void end_of_second_file_rec();
     void end_of_third_file_rec();
 
-    void bind_slots_signals();
+    void bind_slots_signals(); // сигнально-слотовые соединения между объектами
 
 private slots:
-    // открытие/закрытие настройщика
-    void on_ConfigButton_clicked();
+    void on_ConfigButton_clicked(); // открытие/закрытие настройщика
 
-    // начало записи
-    void on_RecButton_clicked();
+    void on_RecButton_clicked(); // начало записи !!!!!!!!!!!!!!!!!
 
-    // принудительная остановка записи
-    void on_StopButton_clicked();
+    void on_StopButton_clicked(); // принудительная остановка записи
 
-    // изменение уровня шума
-    void on_NoiseLevelSlider_valueChanged(int new_noise_level);
+    void on_NoiseLevelSlider_valueChanged(int new_noise_level); // изменение уровня шума
 
-    // регулировка динамического диапзона
-    void on_DynamicRangeSlider_valueChanged(int new_dynamic_range);
+    void on_DynamicRangeSlider_valueChanged(int new_dynamic_range); // регулировка динамического диапзона
 
-    // закрытие окна
-    void on_CloseButton_clicked();
+    void on_CloseButton_clicked(); // закрытие программы
 
-    // сохранение настроек
-    void save_settings();
+    void save_settings(); // сохранение настроек
 
-    // восстановление настроек
-    void restore_settings();
+    void restore_settings(); // восстановление настроек
 
-    // тестировка калибратора
-    void test_kalibrator();
+    void test_kalibrator(); // тестировка калибратора
 
-    void hideEvent(QHideEvent *event);
-    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event); // обработка события сворачивания главного окна
+
+    void showEvent(QShowEvent *event); // обработка события разворачивания главного окна
 
 signals:
     void changeEvent(QEvent *e);

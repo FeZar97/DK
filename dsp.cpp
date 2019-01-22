@@ -45,7 +45,9 @@ bool DSP::prepair_to_record(SDR *new_sdr)
     prepair_memory();                   // выделение памяти в объектах
 
     // крайняя проверка перед запуском - если возвратится -1, то приемник недоступен => нельзя запускать
-    result &= (rtlsdr_set_center_freq(sdr->sdr_params->sdr_ptr, sdr->sdr_params->central_freq) == -1 ? false : true);
+    sdr->sdr_params->is_open = (rtlsdr_set_center_freq(sdr->sdr_params->sdr_ptr, sdr->sdr_params->central_freq) == -1 ? false : true);
+
+    qDebug() << "is open: " << sdr->sdr_params->is_open;
 
     return result;
 }
