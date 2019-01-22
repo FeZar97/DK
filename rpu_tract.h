@@ -90,6 +90,8 @@ public:
     // возвращает TRUE если окно активно в данном режима работы, FALSE иначе
     bool              get_tract_active();
 
+    // тестировка преселекторов
+    void              test_preselectors();
 /// КОДОГРАММЫ
     // отправка в РПУ кодограмм с настройками
     void              send_tract_settings_to_RPU();

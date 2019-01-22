@@ -158,6 +158,7 @@ void Widget::bind_slots_signals()
     connect(dsp->first_wav_rec,     &wav_recorder::update_progr_bar,            config_manager_form,    &config_manager::update_adc_bar);
     connect(dsp->second_wav_rec,    &wav_recorder::update_progr_bar,            config_manager_form,    &config_manager::update_flt_bar);
     connect(dsp->third_wav_rec,     &wav_recorder::update_progr_bar,            config_manager_form,    &config_manager::update_real_bar);
+    //connect(dsp->reader,            &READER::get_sound_step,                    soun,                   &Widget::end_of_recording);
 }
 
 // --------------------------- private slots ---------------------------

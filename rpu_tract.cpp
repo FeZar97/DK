@@ -217,10 +217,16 @@ void RPU_tract::set_tract_active(bool new_state)
     is_tract_active = new_state;
 }
 
-// возвращает TRUE если окно активно в данном режима работы, FALSE иначе
+// возвращает true если тракт активен в данном режиме работы
 bool RPU_tract::get_tract_active()
 {
     return is_tract_active;
+}
+
+// тестировка преселекторов
+void RPU_tract::test_preselectors()
+{
+
 }
 
 // отправка в РПУ кодограмм с настройками

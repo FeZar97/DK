@@ -44,12 +44,14 @@
 
 #include <ippCustom.h>
 
+#include <QAudioOutput>
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QEvent>
 #include <QFile>
 #include <QFileDialog>
+#include <QIODevice>
 #include <QMessageBox>
 #include <QObject>
 #include <QPainter>
@@ -193,7 +195,7 @@ enum WINDOW{NONE,
 // ---------------------------------------DSP---------------------------------------------
 #define     DSP_DEFAULT_UP_FACTOR                   1
 #define     DSP_DEFAULT_DOWN_FACTOR                 2
-#define     DSP_FILTER_LENGTH                       350
+#define     DSP_FILTER_LENGTH                       517
 #define     DSP_DEFAULT_FFT_MODE                    READER_FFT
 #define     DSP_DEFAULT_AVERAGE_NUMBER              8
 #define     DSP_DEFAULT_FFT_INVERSION               false
@@ -369,67 +371,52 @@ class FLT_params{
 public:
 // глобальные
     bool                is_using;                // флаг использования фильтрации
-    unsigned int        in_sample_rate;          // входная частота дискретизации
-    unsigned int        out_sample_rate;         // выходная частота дискретизации
-    unsigned int        passband_freq;           // выходная частота дискретизации
-    unsigned int        boomband_freq;           // выходная частота дискретизации
+    double              r_frec;                  // относительная частота среза
 
     Ipp32fc             **filtration_rb;         // КБ фильтрации
     unsigned int        filtration_rb_cell_size; // размер ячейки КБ фильтрации
     unsigned int        filtration_rb_cell_idx;  // итератор по КБ фильтрации
 
-// локальные
-    Ipp32f              flt_taps32[DSP_FILTER_LENGTH]; // массив отсчетов ИХ фильтра
-    Ipp32f              delay_re[DSP_FILTER_LENGTH - 1]; // линии задержки
-    Ipp32f              delay_im[DSP_FILTER_LENGTH - 1];
-
-    // спецификации для IPP
-    IppsFIRSpec_32f     *flt_spec;
+    IppsFIRSpec_32fc    *flt_spec;
+    Ipp32fc             flt_taps32[DSP_FILTER_LENGTH]; // ИХ
+    Ipp32fc             delay_line[DSP_FILTER_LENGTH - 1]; // линия задержки
     Ipp8u               *buf;
-
-    // входные вектора для фильтрации
-    Ipp32f              *temp_32f_re;
-    Ipp32f              *temp_32f_im;
 
     FLT_params():
         is_using(false),
-        in_sample_rate(SDR_DEFAULT_SAMPLE_RATE),
-        out_sample_rate(48000),
-        passband_freq(250),
-        boomband_freq(2000),
+        r_frec(0.15),
 
         filtration_rb(nullptr),
         filtration_rb_cell_size(0),
         filtration_rb_cell_idx(0),
 
         flt_spec(nullptr),
-        buf(nullptr),
-
-        temp_32f_re(nullptr),
-        temp_32f_im(nullptr)
+        buf(nullptr)
     {}
 
     void recalc_flt_params(){
-        int buf_size, spec_size;
-        flt_spec = nullptr;
-        buf = nullptr;
 
-        Ipp64f flt_taps64[DSP_FILTER_LENGTH];
+        ippsZero_32fc(delay_line, DSP_FILTER_LENGTH - 1);
+        int buf_size, spec_size;
+
+        Ipp64f tmp64[DSP_FILTER_LENGTH];
+        Ipp32f tmp32[DSP_FILTER_LENGTH];
+
         ippsFIRGenGetBufferSize(DSP_FILTER_LENGTH, &buf_size);
         buf = new Ipp8u[buf_size];
-        ippsFIRGenBandpass_64f(passband_freq/float(in_sample_rate), boomband_freq/float(in_sample_rate), flt_taps64, DSP_FILTER_LENGTH, ippWinBlackman, ippTrue, buf);
-        ippsConvert_64f32f(flt_taps64, flt_taps32, DSP_FILTER_LENGTH);
+        ippsFIRGenLowpass_64f(r_frec, tmp64, DSP_FILTER_LENGTH, ippWinBlackman, ippTrue, buf);
+        ippsConvert_64f32f(tmp64, tmp32, DSP_FILTER_LENGTH);
 
         delete[] buf;
         buf = nullptr;
 
-        ippsFIRSRGetSize(DSP_FILTER_LENGTH, ipp32f, &spec_size, &buf_size);
-        flt_spec = reinterpret_cast<IppsFIRSpec_32f*>(new Ipp8u[spec_size]);
+        ippsFIRSRGetSize(DSP_FILTER_LENGTH, ipp32fc, &spec_size, &buf_size);
+        flt_spec = reinterpret_cast<IppsFIRSpec_32fc*>(new Ipp8u[spec_size]);
         buf = new Ipp8u[buf_size];
 
-        ippsFIRSRInit_32f(flt_taps32, DSP_FILTER_LENGTH, ippAlgAuto, flt_spec);
-        ippsSet_32f(0, delay_re, DSP_FILTER_LENGTH - 1);
-        ippsSet_32f(0, delay_im, DSP_FILTER_LENGTH - 1);
+        ippsRealToCplx_32f(tmp32, nullptr, flt_taps32, DSP_FILTER_LENGTH);
+
+        ippsFIRSRInit_32fc(flt_taps32, DSP_FILTER_LENGTH, ippAlgAuto, flt_spec);
     }
 };
 

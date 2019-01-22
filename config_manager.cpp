@@ -9,17 +9,17 @@ config_manager::config_manager(QWidget *parent,
     ui->setupUi(this);
     this->setVisible(false);
 
-    if(new_rpu != NULL)
+    if(new_rpu != nullptr)
         rpu = new_rpu;
     else
         rpu = new RPU();
 
-    if(new_dsp != NULL)
+    if(new_dsp != nullptr)
         dsp = new_dsp;
     else
         dsp = new DSP();
 
-    if(new_sdr != NULL)
+    if(new_sdr != nullptr)
         sdr = new_sdr;
     else
         sdr = new SDR();
@@ -179,9 +179,6 @@ void config_manager::update_dsp_tab()
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
     ui->DCOffsetRe->setValue(dsp->dsp_params->fft_params->dc_offset.re);
     ui->DCOffsetIm->setValue(dsp->dsp_params->fft_params->dc_offset.im);
-
-    ui->PassbandValSB->setMaximum(dsp->dsp_params->flt_params->in_sample_rate / 2);
-    ui->BoombandValSB->setMaximum(dsp->dsp_params->flt_params->in_sample_rate / 2);
 
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
@@ -358,7 +355,6 @@ void config_manager::on_CentralFreqSB_editingFinished()
 void config_manager::on_SampleRateSB_valueChanged(int new_sample_rate)
 {
     sdr->set_sample_rate(new_sample_rate);
-    dsp->dsp_params->flt_params->in_sample_rate = new_sample_rate;
     dsp->dsp_params->flt_params->recalc_flt_params();
     emit global_update_interface();
 }
@@ -559,43 +555,12 @@ void config_manager::on_FiltrationCB_clicked(bool new_state)
     global_update_interface();
 }
 
-void config_manager::on_PassbandValSB_valueChanged(int new_passband_freq)
+void config_manager::on_RFrecDSB_valueChanged(double new_r_frec)
 {
-    dsp->dsp_params->flt_params->passband_freq = new_passband_freq;
+    dsp->dsp_params->flt_params->r_frec = new_r_frec;
     dsp->dsp_params->flt_params->recalc_flt_params();
-    global_update_interface();
+    emit global_update_interface();
 }
-
-void config_manager::on_BoombandValSB_valueChanged(int new_boomband_freq)
-{
-    dsp->dsp_params->flt_params->boomband_freq = new_boomband_freq;
-    dsp->dsp_params->flt_params->recalc_flt_params();
-    global_update_interface();
-}
-
-void config_manager::on_OutSampleFreqCB_currentIndexChanged(int new_out_sample_rate_idx)
-{
-    switch(new_out_sample_rate_idx){
-        case 0:
-            dsp->dsp_params->flt_params->out_sample_rate = 8000;
-            break;
-        case 1:
-            dsp->dsp_params->flt_params->out_sample_rate = 16000;
-            break;
-        case 2:
-            dsp->dsp_params->flt_params->out_sample_rate = 44100;
-            break;
-        case 3:
-            dsp->dsp_params->flt_params->out_sample_rate = 48000;
-            break;
-        default:
-            dsp->dsp_params->flt_params->out_sample_rate = 48000;
-            break;
-    }
-    dsp->dsp_params->flt_params->recalc_flt_params();
-    global_update_interface();
-}
-
 
 /*
  первый этап работы АСКР

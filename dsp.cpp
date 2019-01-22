@@ -109,6 +109,7 @@ void DSP::create_threads()
     filtration_thread   = new QThread;
     fft_thread          = new QThread;
     fft_shift_thread    = new QThread;
+    sound_thread        = new QThread;
 
     qDebug() << "create threads...";
 }
@@ -170,6 +171,7 @@ void DSP::create_wav_recorders()
 void DSP::create_sounder()
 {
     sounder = new sound_maker(dsp_params, sdr->sdr_params);
+    connect(reader, &READER::get_sound_step, sounder, &sound_maker::get_sound_step);
     connect(flt, &MRFiltering::get_sound_step, sounder, &sound_maker::get_sound_step);
     connect(shifter, &fft_shifter::get_sound_step, sounder, &sound_maker::get_sound_step);
     sounder->moveToThread(sound_thread);
@@ -255,9 +257,6 @@ void DSP::prepair_mr_filter()
         dsp_params->flt_params->filtration_rb = new Ipp32fc*[DSP_FLT_RB_SIZE];
         for(i = 0; i < DSP_FLT_RB_SIZE; i++)
             dsp_params->flt_params->filtration_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
-
-        dsp_params->flt_params->temp_32f_re = new Ipp32f[dsp_params->read_params->read_rb_cell_size / 2];
-        dsp_params->flt_params->temp_32f_im = new Ipp32f[dsp_params->read_params->read_rb_cell_size / 2];
     }
 }
 void DSP::prepair_fft_shifter()
@@ -374,6 +373,7 @@ void DSP::make_wav_headers()
 // старт потоков
 void DSP::start_threads()
 {
+    sound_thread->start();
     wav_thread->start();
     fft_shift_thread->start();
     fft_thread->start();

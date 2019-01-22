@@ -5,7 +5,7 @@ RPU::RPU()
 {
     // подтягиваем функцию
     HINSTANCE hinstLib = LoadLibrary(TEXT("inpout32.dll"));
-    gfpOut_char = (lpOutc)GetProcAddress(hinstLib, "DlPortWritePortUchar");
+    gfpOut_char = lpOutc(GetProcAddress(hinstLib, "DlPortWritePortUchar"));
 
     // перед конфигурацией надо раздать номера
     first_tract.set_index(FIRST);
@@ -22,13 +22,13 @@ RPU::RPU()
     fourth_tract.send_tract_settings_to_RPU();
 }
 
+RPU::~RPU()
+{
+}
+
 void RPU::send_code(unsigned short addr, unsigned char code)
 {
     gfpOut_char(addr, code);
-}
-
-RPU::~RPU()
-{
 }
 
 // изменение адреса LPT порта
@@ -119,12 +119,6 @@ void RPU::set_config(RPU_CONFIG new_config)
             third_tract.set_tract_active(true);
             fourth_tract.set_tract_active(true);
             break;
-        default:
-            first_tract.set_tract_active(false);
-            second_tract.set_tract_active(false);
-            third_tract.set_tract_active(false);
-            fourth_tract.set_tract_active(false);
-            break;
     }
 
     set_config_to_RPU();
@@ -148,10 +142,26 @@ int RPU::get_config_idx()
 
         case ONE_ONE_ONE_ONE_CHANNEL:
             return 4;
-        default:
-            break;
     }
     return -1;
+}
+
+int RPU::get_tract_number()
+{
+    switch(config){
+        case FOUR_CHANNEL:
+            return 1;
+
+        case THREE_ONE_CHANNEL:
+        case TWO_TWO_CHANNEL:
+            return 2;
+
+        case TWO_ONE_ONE_CHANNEL:
+            return 3;
+
+        case ONE_ONE_ONE_ONE_CHANNEL:
+            return 4;
+    }
 }
 
 // кодограмма управления режимами работы
@@ -189,8 +199,6 @@ void RPU::set_config_to_RPU()
                                         // .   .   .   R3  R2  R1  N2  N1
             OperationMode = 0x00;       // 0   0   0   0   0   0   0   0 = 0x00
             break;
-        default:
-            break;
     }
 
     // отправка кода
@@ -204,15 +212,39 @@ void RPU::set_config_to_RPU()
 
 void RPU::test_rpu()
 {
-    // первый этап - проверка всех преселекторов
-    test_preselektors();
+    test_preselectors();
+    test_attenuators();
 }
 
-void RPU::test_preselektors()
+void RPU::test_preselectors()
 {
-    int i;
+    switch(config){
+        case FOUR_CHANNEL:
+            first_tract.test_preselectors();
+            break;
 
-    for(i = 0; i < RPU_NUMBER_OF_PRESELECTORS; i++){
+        case THREE_ONE_CHANNEL:
+        case TWO_TWO_CHANNEL:
+            first_tract.test_preselectors();
+            second_tract.test_preselectors();
+            break;
 
+        case TWO_ONE_ONE_CHANNEL:
+            first_tract.test_preselectors();
+            second_tract.test_preselectors();
+            third_tract.test_preselectors();
+            break;
+
+        case ONE_ONE_ONE_ONE_CHANNEL:
+            first_tract.test_preselectors();
+            second_tract.test_preselectors();
+            third_tract.test_preselectors();
+            fourth_tract.test_preselectors();
+            break;
     }
+}
+
+void RPU::test_attenuators()
+{
+
 }

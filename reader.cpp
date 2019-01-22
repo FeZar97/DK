@@ -37,7 +37,6 @@ void READER::start_reading()
         // конвертация 8u -> 32f
         ippsConvert_8u32f(dsp_params->read_params->read_cell,
                           reinterpret_cast<Ipp32f*>(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]),
-                         //(Ipp32f*)dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                           int(dsp_params->read_params->read_rb_cell_size));
 
         // подавление постоянной составляющей
@@ -57,7 +56,8 @@ void READER::start_reading()
 
         // фильтрация
         if(dsp_params->flt_params->is_using){
-            //emit get_filtration_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);
+            emit get_filtration_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+                                     dsp_params->read_params->read_rb_cell_size);
         }else
             // частотный сдвиг
             emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
@@ -69,6 +69,10 @@ void READER::start_reading()
 
         // инкремент итератора
         dsp_params->read_params->read_rb_cell_idx = (dsp_params->read_params->read_rb_cell_idx + 1) % DSP_READ_RB_SIZE;
+
+        // вывод звука
+        //emit get_sound_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+        //                    dsp_params->read_params->read_rb_cell_size);
     }
 
     // если завершилось штатно, то флаг emergency_end_recording == 0

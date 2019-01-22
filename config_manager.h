@@ -26,10 +26,10 @@ class config_manager : public QDialog
 
 
 public:
-    explicit config_manager(QWidget *parent = 0,
-                            RPU *new_rpu = NULL,
-                            SDR *new_sdr = NULL,
-                            DSP *new_dsp = NULL);
+    explicit config_manager(QWidget *parent = nullptr,
+                            RPU *new_rpu    = nullptr,
+                            SDR *new_sdr    = nullptr,
+                            DSP *new_dsp    = nullptr);
     ~config_manager();
     QPoint previousPosition() const;
 
@@ -90,9 +90,7 @@ private slots:
 
 // фильтрация
     void on_FiltrationCB_clicked(bool new_state);
-    void on_PassbandValSB_valueChanged(int new_passband_freq);
-    void on_BoombandValSB_valueChanged(int new_boomband_freq);
-    void on_OutSampleFreqCB_currentIndexChanged(int new_out_sample_rate_idx);
+    void on_RFrecDSB_valueChanged(double new_r_frec);
 
 // БПФ
     void on_FftModeCB_currentIndexChanged(int new_fft_mode); // смена "режима" БПФ

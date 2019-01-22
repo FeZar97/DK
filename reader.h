@@ -31,6 +31,8 @@ signals:
     // если завершилось штатно, то флаг emergency_end_recording == 0
     // если завершилось экстренно, то emergency_end_recording == 1
     void end_of_recording(bool status);
+
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
 };
 
 #endif // READER_H

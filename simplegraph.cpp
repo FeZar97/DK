@@ -145,8 +145,6 @@ void simpleGraph::paint_signature(QPainter &painter)
             painter.drawText(894, vRect.height() - 5, QString::number(new_central_freq + sdr_params->sample_rate * 4/10));
             break;
         }
-        default:
-            break;
     }
 
     // подписи дБ
@@ -214,6 +212,17 @@ void simpleGraph::paint_signature(QPainter &painter)
 
 
     }
+
+    // полоса фильтрации
+    painter.setPen(Qt::NoPen);
+    QColor yel70 = Qt::yellow;
+    yel70.setAlphaF(0.06);
+    painter.setBrush(yel70);
+    QRect flt_rect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec),
+                   0,
+                   int(vRect.width() * dsp_params->flt_params->r_frec) * 2,
+                   vRect.height());
+    painter.drawRect(flt_rect);
 }
 
 // отрисовка всего графа

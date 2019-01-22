@@ -31,11 +31,13 @@ public:
 
     void                set_config(RPU_CONFIG new_config); // изменение конфигурации РПУ
     int                 get_config_idx(); // возвращает индекс конфигурации РПУ
+    int                 get_tract_number(); // возвращает кол-во активных трактов для данного конфига РПУ
 
     void                set_config_to_RPU(); // кодограмма управления режимами работы
 
     void                test_rpu(); // тестировка РПУ
-    void                test_preselektors(); // проверка преселекторов
+    void                test_preselectors(); // проверка преселекторов
+    void                test_attenuators(); // проверка аттенюаторов
 };
 
 #endif // RPU_H
