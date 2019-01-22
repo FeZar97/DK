@@ -30,9 +30,12 @@ public:
     unsigned int        get_lpt_addres(); // возвращает адрес LPT порта
 
     void                set_config(RPU_CONFIG new_config); // изменение конфигурации РПУ
-    unsigned int        get_config_idx(); // возвращает индекс конфигурации РПУ
+    int                 get_config_idx(); // возвращает индекс конфигурации РПУ
 
     void                set_config_to_RPU(); // кодограмма управления режимами работы
+
+    void                test_rpu(); // тестировка РПУ
+    void                test_preselektors(); // проверка преселекторов
 };
 
 #endif // RPU_H

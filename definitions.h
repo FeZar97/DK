@@ -92,9 +92,8 @@ enum RPU_CONFIG
      THREE_ONE_CHANNEL,       // тип 2 ~ 3 канала + 1 канал,
      TWO_TWO_CHANNEL,         // тип 3 ~ 2 канала + 2 канала,
      TWO_ONE_ONE_CHANNEL,     // тип 4 ~ 2 канала + 1 канал + 1 канал,
-     ONE_ONE_ONE_ONE_CHANNEL, // тип 5 ~ 1 канал  + 1 канал + 1 канал + 1 канал.
-     MIN_CONFIG = FOUR_CHANNEL,
-     MAX_CONFIG= ONE_ONE_ONE_ONE_CHANNEL};
+     ONE_ONE_ONE_ONE_CHANNEL, // тип 5 ~ 1 канал  + 1 канал + 1 канал + 1 канал
+};
 
 // модулирующий сигнал
 enum MOD_SIGNAL{SINUS,
@@ -153,9 +152,10 @@ enum WINDOW{NONE,
 
 //  режим работы РПУ
 #define     RPU_DEFAULT_CONFIG                      FOUR_CHANNEL                        // 4-х канальный режим
-#define     RPU_DEFAULT_TRACT_TYPE                  FOUR_CHANNEL                        // 4-х канальный режим
+#define     RPU_MIN_CONFIG                          FOUR_CHANNEL                        // 4-х канальный режим
+#define     RPU_MAX_CONFIG                          ONE_ONE_ONE_ONE_CHANNEL             // 1 канал  + 1 канал + 1 канал + 1 канал
 
-// парпаметры трактов
+// параметры трактов
 #define     RPU_DEFAULT_TRACT_FREQ                  15000000                            // 15 Мгц - частота по умолчанию
 #define     RPU_MAX_TRACT_FREQ                      32000000                            // 31,999999 Мгц - верхняя чатсота
 #define     RPU_MIN_TRACT_FREQ                      150000                              // 1 Мгц - нижняя частота
@@ -180,8 +180,7 @@ enum WINDOW{NONE,
 #define     RPU_MIN_ACTIVE_DIGIT                    ZERO                                // минимальный индекс разряда
 #define     RPU_MAX_ACTIVE_DIGIT                    FIFTH                               // максимальный индекс разряда
 
-#define     RPU_DEFAULT_TRACT_ACTIVE                true
-
+#define     RPU_NUMBER_OF_PRESELECTORS              10                                  // количество преселекторов
 // ---------------------------------------SDR---------------------------------------------
 #define     SDR_MAX_TUNER_FREQ                      2400000001
 #define     SDR_MIN_TUNER_FREQ                      100000

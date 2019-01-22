@@ -18,9 +18,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings{
     connect(config_manager_form,    &config_manager::bind_slots_signals,        this,                   &Widget::bind_slots_signals);
     connect(config_manager_form,    &config_manager::stop,                      this,                   &Widget::on_StopButton_clicked);
     connect(config_manager_form,    &config_manager::global_update_interface,   this,                   &Widget::global_update_interface);
+    connect(config_manager_form,    &config_manager::prepair_wav_recorder,      dsp,                    &DSP::prepair_wav_recorder);
     connect(sdr,                    &SDR::recalc_dsp_params,                    dsp,                    &DSP::recalc_dsp_params);
     connect(sdr,                    &SDR::global_update_interface,              this,                   &Widget::global_update_interface);
-    connect(config_manager_form,    &config_manager::prepair_wav_recorder,      dsp,                    &DSP::prepair_wav_recorder);
     connect(ui->MinimizeButton,     &QToolButton::clicked,                      this,                   &Widget::showMinimized);
 
     set_ui_style();
@@ -336,11 +336,6 @@ void Widget::restore_settings()
     global_update_interface();
 
     if(settings.value("DSP_is_recording").toBool()) on_RecButton_clicked();
-}
-
-void Widget::test_kalibrator()
-{
-
 }
 
 // обработка события сворачивания главного окна

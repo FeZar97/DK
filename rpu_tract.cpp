@@ -3,7 +3,7 @@
 RPU_tract::RPU_tract()
 {
     HINSTANCE hinstLib  = LoadLibrary(TEXT("inpout32.dll"));
-    gfpOut_char         = (lpOutc)GetProcAddress(hinstLib, "DlPortWritePortUchar");
+    gfpOut_char         = lpOutc(GetProcAddress(hinstLib, "DlPortWritePortUchar"));
 
     set_default_tract_params();
 }
@@ -23,7 +23,7 @@ void RPU_tract::set_default_tract_params()
 {
     set_lpt(RPU_DEFAULT_LPT);                       // LPT 1
 
-    set_config(RPU_DEFAULT_TRACT_TYPE);             // 4 канала в первом тракте
+    set_config(RPU_DEFAULT_CONFIG);                 // 4 канала в первом тракте
 
     set_central_freq(RPU_DEFAULT_TRACT_FREQ);       // 15 МГц
     set_in_att_idx(RPU_DEFAULT_IN_ATT_IDX);         // OFF
@@ -113,9 +113,9 @@ void RPU_tract::set_central_freq(unsigned int new_central_freq)
     }else{
         if(get_central_freq() == RPU_MIN_TRACT_FREQ || get_central_freq() == RPU_MAX_TRACT_FREQ){
             if(new_central_freq < RPU_MIN_TRACT_FREQ){
-                QMessageBox::information(NULL, NAME, "Достигнута минимальная частота настройки РПУ Кальмар.");
+                QMessageBox::information(nullptr, NAME, "Достигнута минимальная частота настройки РПУ Кальмар.");
             }else{
-                QMessageBox::information(NULL, NAME, "Достигнута максимальная частота настройки РПУ Кальмар.");
+                QMessageBox::information(nullptr, NAME, "Достигнута максимальная частота настройки РПУ Кальмар.");
             }
         }else{
             if(new_central_freq < RPU_MIN_TRACT_FREQ){
@@ -162,7 +162,7 @@ void RPU_tract::set_hf_att_idx(short new_hf_att_idx)
     }
 
     if(get_hf_att_idx() != new_hf_att_idx){
-        hf_att_idx = new_hf_att_idx;
+        hf_att_idx = ushort(new_hf_att_idx);
         send_tract_settings_to_RPU();
     }
 }
@@ -181,7 +181,7 @@ void RPU_tract::set_if_att_idx(short new_if_att_idx)
     }
 
     if(get_if_att_idx() != new_if_att_idx){
-        if_att_idx = new_if_att_idx;
+        if_att_idx = ushort(new_if_att_idx);
         send_tract_settings_to_RPU();
     }
 }
@@ -278,7 +278,7 @@ void RPU_tract::set_config_to_RPU()
 {
     int code = 0, geterodinNumber = 0;
 
-    if(config < MIN_CONFIG || config > MAX_CONFIG)
+    if(config < RPU_MIN_CONFIG || config > RPU_MAX_CONFIG)
         code = 0xFF;
 
     switch(config)
@@ -362,7 +362,7 @@ void RPU_tract::set_config_to_RPU()
         //                                                                 2(N1) + 4 + 8 + 16 + 0 = 30
 
         // код
-        send_code(lpt + LPT_DATA_REG, (byte)code);
+        send_code(lpt + LPT_DATA_REG, byte(code));
 
         // строб по адресу 010 ( с учетом инверсии сигналов DB25)
         send_code(lpt + LPT_CONTROL_REG, 0x4);
@@ -419,19 +419,15 @@ void RPU_tract::set_central_freq_to_RPU()
     int N2 = int(F_geterod / 1000) - 3 + A;
     int N3 = int(F_geterod / 100) + int( ( (N1 - 2500) - 100 * int( (N1 - 2500) / 100) ) / 50);
 
-    DWORD  D1 = 0;
-    DWORD  D2 = 0;
-    DWORD  D3 = 0;
-
     // в порт посылается код режима работы
     set_config_to_RPU();
 
     // откуда взяты эти значения
     // 0x64 = 100 (почему на 19?)
     // 0x0A = 10
-    D1 = (0x64 << 19) | (N1 << 1);
-    D2 = (0x0A << 19) | (N2 << 1) | 1;
-    D3 = (0x64 << 19) | (N3 << 1) | 1;
+    DWORD D1 = DWORD((0x64 << 19) | (N1 << 1)    );
+    DWORD D2 = DWORD((0x0A << 19) | (N2 << 1) | 1);
+    DWORD D3 = DWORD((0x64 << 19) | (N3 << 1) | 1);
 
     // учет особенности при P=1
     DWORD vrem1, vrem2, vrem3;
@@ -570,16 +566,14 @@ D4 - 14-ти разрядный последовательный код упра
 */
 void RPU_tract::set_tract_params_to_RPU()
 {
-    short  band_mask, preselektor_mask, InputAttenuator_mask;
+    short  band_mask = 0, preselektor_mask, InputAttenuator_mask;
     short  HFAttenuator_mask, IFAttenuator_mask, D4;
-    int    carrier;
+    int    carrier_kHz = get_central_freq() / 1000;
 
     // в порт посылается код конфигурации трактов
     set_config_to_RPU();
 
     // определяем маску полосы
-    band_mask = 0;
-
     /* 13) расхождение с документацией:
                        для полосы 150 кГц должен быть код 0x0000,
                        для 20 кГц - 0x0001,
@@ -613,47 +607,38 @@ void RPU_tract::set_tract_params_to_RPU()
 // определение маски преселектора
     preselektor_mask = 0;
 
-    // перевод в кГц
-    carrier = get_central_freq() / 1000;
-
 /*
  * UPD 7.9.2017
- * на главную панель добавлен выпадающий бокс со всеми преселекторами
- * значение преселктора можно выбрать вручную
- * программное определение преселктора временно закомментировано для
- * проверки правильности кодограмм
- *
- * UPD
  * все кодограммы корректны
  */
-    if(carrier > 200 && carrier <= 1000)
+    if(carrier_kHz > 200 && carrier_kHz <= 1000)
        preselektor_mask = 0x0009;
 
-    if(carrier > 1000 && carrier <= 1500)
+    if(carrier_kHz > 1000 && carrier_kHz <= 1500)
        preselektor_mask = 0x0008;
 
-    if(carrier > 1500 && carrier <= 2200)
+    if(carrier_kHz > 1500 && carrier_kHz <= 2200)
        preselektor_mask = 0x0007;
 
-    if(carrier > 2200 && carrier <= 3200)
+    if(carrier_kHz > 2200 && carrier_kHz <= 3200)
        preselektor_mask = 0x0006;
 
-    if(carrier > 3200 && carrier <= 4700)
+    if(carrier_kHz > 3200 && carrier_kHz <= 4700)
        preselektor_mask = 0x0005;
 
-    if(carrier > 4700 && carrier <= 6800)
+    if(carrier_kHz > 4700 && carrier_kHz <= 6800)
        preselektor_mask = 0x0004;
 
-    if(carrier > 6800 && carrier <= 9900)
+    if(carrier_kHz > 6800 && carrier_kHz <= 9900)
        preselektor_mask = 0x0003;
 
-    if(carrier > 9900 && carrier <= 14400)
+    if(carrier_kHz > 9900 && carrier_kHz <= 14400)
        preselektor_mask = 0x0002;
 
-    if(carrier > 14400 && carrier <= 20700)
+    if(carrier_kHz > 14400 && carrier_kHz <= 20700)
        preselektor_mask = 0x0001;
 
-    if(carrier > 20700 && carrier <= 32000)
+    if(carrier_kHz > 20700 && carrier_kHz <= 32000)
        preselektor_mask = 0x0000;
 
     // определяем маску АттВх
@@ -673,7 +658,7 @@ void RPU_tract::set_tract_params_to_RPU()
 
     //--- используя все данные формируем в D4 последовательный 14-ти разрядный код ---//
     // D4 - 2 байта, из которых 14 бит информационные
-    D4 = (short)((band_mask << 12) | (preselektor_mask << 8) | (InputAttenuator_mask << 7) | (HFAttenuator_mask << 4) | IFAttenuator_mask);
+    D4 = short((band_mask << 12) | (preselektor_mask << 8) | (InputAttenuator_mask << 7) | (HFAttenuator_mask << 4) | IFAttenuator_mask);
 
     // зачем этот сдвиг на два? (мб для полного заполнения двух байт?)
     D4 <<= 2;
@@ -687,7 +672,7 @@ void RPU_tract::set_tract_params_to_RPU()
     // 14 итераций
     for(int i = 0; i < 14; i++){
         // 0x80 = 1000 0000 = 128
-        ManageRPUKod  = 0x80;
+        ManageRPUKod  = char(0x80);
 
         // 0x8000 = 1000 0000 0000 0000 = 32768
 

@@ -82,8 +82,6 @@ private slots:
 
     void restore_settings(); // восстановление настроек
 
-    void test_kalibrator(); // тестировка калибратора
-
     void hideEvent(QHideEvent *event); // обработка события сворачивания главного окна
 
     void showEvent(QShowEvent *event); // обработка события разворачивания главного окна
@@ -91,6 +89,7 @@ private slots:
 signals:
     void changeEvent(QEvent *e);
     void previousPositionChanged(QPoint previousPosition);
+    void test_rpu();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

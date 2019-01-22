@@ -131,7 +131,7 @@ void RPU::set_config(RPU_CONFIG new_config)
 }
 
 // возвращает индекс конфигурации РПУ
-unsigned int RPU::get_config_idx()
+int RPU::get_config_idx()
 {
     switch(config){
         case FOUR_CHANNEL:
@@ -200,4 +200,19 @@ void RPU::set_config_to_RPU()
     send_code(lpt + LPT_CONTROL_REG, 0x4); // 0 1 0 0
     send_code(lpt + LPT_CONTROL_REG, 0x5); // 0 1 0 1
     send_code(lpt + LPT_CONTROL_REG, 0x4); // 0 1 0 0
+}
+
+void RPU::test_rpu()
+{
+    // первый этап - проверка всех преселекторов
+    test_preselektors();
+}
+
+void RPU::test_preselektors()
+{
+    int i;
+
+    for(i = 0; i < RPU_NUMBER_OF_PRESELECTORS; i++){
+
+    }
 }
