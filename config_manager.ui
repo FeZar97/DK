@@ -83,7 +83,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1582,7 +1582,7 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="RecordTab">
        <attribute name="title">
@@ -1854,30 +1854,11 @@
        <attribute name="title">
         <string>Фильтрация</string>
        </attribute>
-       <widget class="QCheckBox" name="FiltrationCB">
-        <property name="geometry">
-         <rect>
-          <x>188</x>
-          <y>14</y>
-          <width>15</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::RightToLeft</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="tristate">
-         <bool>false</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="PassbandLabel">
         <property name="geometry">
          <rect>
           <x>4</x>
-          <y>42</y>
+          <y>10</y>
           <width>243</width>
           <height>22</height>
          </rect>
@@ -1891,29 +1872,11 @@
          <string>Относительная частота среза:</string>
         </property>
        </widget>
-       <widget class="QLabel" name="UseFltLabel">
-        <property name="geometry">
-         <rect>
-          <x>4</x>
-          <y>9</y>
-          <width>177</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Использовать фильтр:</string>
-        </property>
-       </widget>
        <widget class="QDoubleSpinBox" name="RFrecDSB">
         <property name="geometry">
          <rect>
           <x>246</x>
-          <y>42</y>
+          <y>10</y>
           <width>62</width>
           <height>22</height>
          </rect>
@@ -1925,10 +1888,10 @@
          <double>0.010000000000000</double>
         </property>
         <property name="maximum">
-         <double>0.490000000000000</double>
+         <double>0.500000000000000</double>
         </property>
         <property name="singleStep">
-         <double>0.050000000000000</double>
+         <double>0.025000000000000</double>
         </property>
        </widget>
       </widget>

@@ -10,22 +10,18 @@ public:
     SDR_params *sdr_params;
     DSP_params *dsp_params;
 
-    explicit fft_shifter(DSP_params *new_dsp_params = NULL, SDR_params *new_sdr_params = NULL);
+    explicit fft_shifter(DSP_params *new_dsp_params = nullptr, SDR_params *new_sdr_params = nullptr);
     ~fft_shifter();
 
 public slots:
-    // прием сигнала с поста чтения
-    void get_shift_step(Ipp32fc *rb_cell = NULL, unsigned int cell_size = 0);
+    void get_shift_step(Ipp32fc *rb_cell = nullptr, unsigned int cell_size = 0);
 
 signals:
-    // сигнал для расчета спектра пересчитанного сигнала
-    void get_fft_step(Ipp32fc *shift_cell, unsigned int cell_size);
+    void get_fft_step(Ipp32fc *shift_cell, unsigned int cell_size); // БПФ
 
-    // сигнал на запись в третий файл сдвинутого сигнала
-    void write_to_file(Ipp32fc *shift_rb_cell);
+    void write_to_file(Ipp32fc *shift_rb_cell); // запись в файл
 
-    // сигнал для вывода
-    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size); // звук
 };
 
 #endif // FFT_SHIFTER_H

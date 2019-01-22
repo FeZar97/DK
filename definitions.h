@@ -212,6 +212,8 @@ enum WINDOW{NONE,
 #define     DSP_FFT_SIZE                            1024
 #define     DSP_NOISE_SIZE                          25
 
+#define     DSP_SOUND_SAMPLE_RATE                   48000
+
 // размеры кольцевых буферов
 #define     DSP_READ_RB_SIZE                        10
 #define     DSP_FLT_RB_SIZE                         10
@@ -359,18 +361,16 @@ public:
         rec_time_idx            = DSP_DEFAULT_RECORDING_TIME_IDX;
         readout_per_seconds     = DSP_READOUT_PER_SECONDS;
 
-        use_files = false;
-        use_first_file = false;
-        use_second_file = false;
-        use_third_file = false;
+        use_files               = false;
+        use_first_file          = false;
+        use_second_file         = false;
+        use_third_file          = false;
     }
 };
 
 // параметры фильтрации
 class FLT_params{
 public:
-// глобальные
-    bool                is_using;                // флаг использования фильтрации
     double              r_frec;                  // относительная частота среза
 
     Ipp32fc             **filtration_rb;         // КБ фильтрации
@@ -383,7 +383,6 @@ public:
     Ipp8u               *buf;
 
     FLT_params():
-        is_using(false),
         r_frec(0.15),
 
         filtration_rb(nullptr),

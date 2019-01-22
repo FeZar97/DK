@@ -216,6 +216,27 @@ void RPU::test_rpu()
     test_attenuators();
 }
 
+/*
+ первый этап работы АСКР
+ производится перестройка на центральные частоты преселекторов и измеряется уровень калибровочного сигнала
+   200  - 1000  : 600 кГц
+   1000 - 1500  : 1250 кГц
+   1500 - 2200  : 1850 кГц
+   2200 - 3200  : 2700 кГц
+   3200 - 4700  : 3800 кГц  (должно быть 3950)
+   4700 - 6800  : 5250 кГц  (должно быть 5750)
+   6800 - 9900  : 7350 кГц  (должно быть 8750)
+   9900 - 14400 : 12150 кГц
+  14400 - 20700 : 17550 кГц
+  20700 - 32000 : 26350 кГц
+
+  1) выставление четырехканального режима РПУ
+  2) выставление центральной частоты канала
+  3) настройка калибратора
+  4) код начала калибровки - строка 4 в таблице кодограмм
+  5) измерения
+  6) код окончания калибровки - строка 5 в таблице кодограмм
+*/
 void RPU::test_preselectors()
 {
     switch(config){
@@ -242,6 +263,72 @@ void RPU::test_preselectors()
             fourth_tract.test_preselectors();
             break;
     }
+
+    /*
+    if(dsp->dsp_params->read_params->is_recording)
+        emit stop();
+
+// настройки SDR
+    sdr->sdr_params->central_freq = 5500000;
+    sdr->sdr_params->direct_sampling_idx = 2;
+    sdr->sdr_params->gain_idx = 1;
+    sdr->sdr_params->sample_rate = 230000;
+
+// настройки тракта РПУ
+    rpu->first_tract.set_central_freq(15000000);
+    rpu->first_tract.set_if_band_idx(3);
+    rpu->first_tract.set_in_att_idx(OFF);
+    rpu->first_tract.set_hf_att_idx(0);
+    rpu->first_tract.set_if_att_idx(0);
+
+// настройки калибратора
+    rpu->kalibrator.set_work_status(ON);
+    rpu->kalibrator.set_att_idx(0);
+    rpu->kalibrator.set_exit_type(INTERNAL);
+    rpu->kalibrator.set_signal_type(SINUS);
+
+// настройки ЦОС
+    // для частоты 5 500 000 это оптимальные настройки для подавления DC
+    dsp->dsp_params->fft_params->dc_offset.re = 127.005;
+    dsp->dsp_params->fft_params->dc_offset.im = 127.005;
+    dsp->dsp_params->read_params->readout_per_seconds = 10;
+
+// кол-во обращений к преимнику/сек = 10
+// объем считываемых данных = 2 * 230 000 / 10 = 46 000 байт
+
+    if(dsp->prepair_to_record(sdr)){
+        emit bind_slots_signals();
+
+        dsp->fft_shift_thread->start();
+        dsp->fft_thread->start();
+        //dsp->reader_thread->start();
+
+        Sleep(50);
+
+        // на данном моменте на спектре должна быть видна синусоида калибратора
+        int freqs[10] = {600000, 1250000, 1850000, 2700000, 3800000, 5250000, 7350000, 12150000, 17550000, 26350000}, i, j, n_read;
+        char *input_buffer = new char[dsp->dsp_params->read_params->read_rb_cell_size];
+
+        // заполняется один кольцевой буфер
+        for(i = 0; i < DSP_READ_RB_SIZE; i++){
+            rtlsdr_read_sync(sdr->sdr_params->sdr_ptr,
+                             input_buffer,
+                             dsp->dsp_params->read_params->read_rb_cell_size,
+                             &n_read);
+
+            ippsConvert_8u32f(dsp->dsp_params->read_params->read_cell,
+                             (Ipp32f*)dsp->dsp_params->read_params->read_rb[dsp->dsp_params->read_params->read_rb_cell_idx],
+                              dsp->dsp_params->read_params->read_rb_cell_size);
+        }
+
+        global_update_interface();
+    }
+    else{
+        QMessageBox::critical(this, "Ошибка запуска", "Не удалось начать калибровку. Ошибка 1.");
+        sdr->sdr_params->is_open = false;
+        dsp->set_record_flags(false);
+    }
+    */
 }
 
 void RPU::test_attenuators()

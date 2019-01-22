@@ -59,11 +59,6 @@ void DSP::set_record_flags(bool flag)
      dsp_params->read_params->emergency_end_recording = false;
      dsp_params->read_params->end_reading = false;
 
-     if(dsp_params->flt_params->is_using)
-         dsp_params->read_params->end_filtering = false;
-     else
-         dsp_params->read_params->end_filtering = true;
-
      dsp_params->read_params->end_fft = false;
 }
 
@@ -193,7 +188,7 @@ bool DSP::recalc_dsp_params()
     if(dsp_params->read_params->read_rb_cell_size < 1)
         success_flag = false;
 
-    if(dsp_params->flt_params->is_using)
+    if(dsp_params->flt_params)
         dsp_params->flt_params->filtration_rb_cell_size = dsp_params->read_params->read_rb_cell_size;
 
     switch(dsp_params->fft_params->fft_mode){
@@ -250,12 +245,11 @@ void DSP::prepair_reader()
 void DSP::prepair_mr_filter()
 {
     // если используется этап фильтрации
-    if(dsp_params->flt_params->is_using){
-
-        int i;
+    if(dsp_params->flt_params->r_frec != 0.5){
 
         dsp_params->flt_params->filtration_rb = new Ipp32fc*[DSP_FLT_RB_SIZE];
-        for(i = 0; i < DSP_FLT_RB_SIZE; i++)
+
+        for(int i = 0; i < DSP_FLT_RB_SIZE; i++)
             dsp_params->flt_params->filtration_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
     }
 }

@@ -12,7 +12,7 @@ class simpleGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit            simpleGraph(QWidget *parent = 0);
+    explicit            simpleGraph(QWidget *parent = nullptr);
                        ~simpleGraph();
 
     SDR_params          *sdr_params;

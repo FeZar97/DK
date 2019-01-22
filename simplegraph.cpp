@@ -209,8 +209,6 @@ void simpleGraph::paint_signature(QPainter &painter)
                             10);
                 break;
         }
-
-
     }
 
     // полоса фильтрации
@@ -218,10 +216,22 @@ void simpleGraph::paint_signature(QPainter &painter)
     QColor yel70 = Qt::yellow;
     yel70.setAlphaF(0.06);
     painter.setBrush(yel70);
-    QRect flt_rect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec),
-                   0,
-                   int(vRect.width() * dsp_params->flt_params->r_frec) * 2,
-                   vRect.height());
+    QRect flt_rect;
+
+    switch(dsp_params->fft_params->fft_mode){
+        case READER_FFT:
+            flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
+                             int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
+            break;
+
+        case FLT_FFT:
+            break;
+
+        case SHIFT_FFT:
+            flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
+                             int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
+            break;
+    }
     painter.drawRect(flt_rect);
 }
 
@@ -234,10 +244,10 @@ void simpleGraph::repaintGraph()
     //painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(21,21,21));
+    painter.setBrush(QColor(21, 21, 21));
     painter.drawRect(vRect);
 
-    // подписи частот, уровней и отображении информации
+    // подписи частот, уровней и отображении информации, полоса фильтрации
     paint_signature(painter);
 
     // отрисовка энергетического спектра

@@ -24,16 +24,16 @@ sound_maker::sound_maker(DSP_params *new_dsp_params,
     //Настройка звука
     QAudioFormat format;
 
-    format.setSampleRate(BUF_SIZE);
+    format.setSampleRate(DSP_SOUND_SAMPLE_RATE);
     format.setChannelCount(1);
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
 
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice() );
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
-    if (info.isFormatSupported(format)){
+    if(info.isFormatSupported(format)){
         qDebug() << "sounder has been created";
         audio_out = new QAudioOutput(format, this);
         audio_device = audio_out->start();
@@ -57,7 +57,7 @@ void sound_maker::get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size)
         ippsCopy_32fc(rb_cell, in_buf_fc, cell_size / 2);
 
         // децимация
-        ippsSampleDown_32fc(in_buf_fc, cell_size / 2, down_buf_fc, &down_buf_len, 15, &phase);
+        ippsSampleDown_32fc(rb_cell, cell_size / 2, down_buf_fc, &down_buf_len, 15, &phase);
 
         ippsCplxToReal_32fc(down_buf_fc, down_buf_re, down_buf_im, BUF_SIZE);
         ippsAtan2_32f_A21(down_buf_re, down_buf_im, down_buf_re, BUF_SIZE);

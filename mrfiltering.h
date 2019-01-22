@@ -11,23 +11,21 @@ public:
     SDR_params *sdr_params;
     DSP_params *dsp_params;
 
-    MRFiltering(DSP_params *new_dsp_params = NULL, SDR_params *new_sdr_params = NULL);
+    MRFiltering(DSP_params *new_dsp_params = nullptr, SDR_params *new_sdr_params = nullptr);
 
     ~MRFiltering();
 
 public slots:
-    // слот фильтрации
-    void get_filtration_step(Ipp32fc *rb_cell = NULL);
+    void get_filtration_step(Ipp32fc *rb_cell = nullptr);
 
 signals:
-    // запись в файл
-    void write_to_file(Ipp32fc *cell);
-    // сигнал для расчета спектра
-    void get_fft_step(Ipp32fc *rb_cell, unsigned int cell_size);
-    // сигнал для частотного сдвига
-    void get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size);
-    // сигнал для вывода
-    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    void write_to_file(Ipp32fc *cell); // запись в файл
+
+    void get_fft_step(Ipp32fc *rb_cell, unsigned int cell_size); // БПФ
+
+    void get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size); // частотный сдвиг
+
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size); // вывод звука
 };
 
 #endif // MRFILTERING_H

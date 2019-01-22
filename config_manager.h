@@ -89,8 +89,7 @@ private slots:
     void on_CurrentPathButton_clicked(); // выбор папки
 
 // фильтрация
-    void on_FiltrationCB_clicked(bool new_state);
-    void on_RFrecDSB_valueChanged(double new_r_frec);
+    void on_RFrecDSB_valueChanged(double new_r_frec); // изменение относительной частоты фильтрации
 
 // БПФ
     void on_FftModeCB_currentIndexChanged(int new_fft_mode); // смена "режима" БПФ
@@ -105,11 +104,6 @@ private slots:
     void on_DCOffsetIm_valueChanged(double new_offset_im);
     void on_FftShiftStepCB_clicked(bool new_state); // кратность шага изменения частоты сноса
     void on_NullBinCircleCB_clicked(bool new_state); // вершина нулевого бина обводится окружностью
-
-
-/// АСКР
-    void on_FirstValidatePB_clicked(); // АСКР проверка №1
-    void on_comboBox_currentIndexChanged(int new_pres_idx); // выбор преселектора
 
 signals:
     void global_update_interface();
