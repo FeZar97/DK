@@ -179,6 +179,7 @@ void config_manager::update_dsp_tab()
     ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
     ui->DCOffsetRe->setValue(dsp->dsp_params->fft_params->dc_offset.re);
     ui->DCOffsetIm->setValue(dsp->dsp_params->fft_params->dc_offset.im);
+    ui->RFrecDSB->setValue(dsp->dsp_params->flt_params->r_frec);
 
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);

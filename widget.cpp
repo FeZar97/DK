@@ -69,6 +69,13 @@ void Widget::end_of_recording()
     if(dsp->third_wav_rec->params->file.isOpen())
         dsp->third_wav_rec->params->file.close();
 
+
+    if(dsp->sounder->out_file->isOpen())
+        dsp->sounder->out_file->close();
+
+    if(dsp->sounder->raw_file->isOpen())
+        dsp->sounder->raw_file->close();
+
     dsp->wav_thread->quit();
     dsp->fft_shift_thread->quit();
     dsp->fft_thread->quit();
@@ -276,6 +283,7 @@ void Widget::save_settings()
     settings.setValue("DSP_fft_shift_val",          dsp->dsp_params->shift_params->shift_freq);
     settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
     settings.setValue("DSP_wav_directory",          dsp->dsp_params->wav_params->directory);
+    settings.setValue("DSP_flt_r_frec",             dsp->dsp_params->flt_params->r_frec);
 
     settings.sync();
 }
@@ -332,6 +340,7 @@ void Widget::restore_settings()
     dsp->dsp_params->shift_params->shift_freq           = settings.value("DSP_fft_shift_val").toDouble();
     dsp->dsp_params->shift_params->step                 = settings.value("DSP_fft_shift_step").toBool();
     dsp->dsp_params->wav_params->directory              = settings.value("DSP_wav_directory").toString();
+    dsp->dsp_params->flt_params->r_frec                 = settings.value("DSP_flt_r_frec").toDouble();
 
     global_update_interface();
 

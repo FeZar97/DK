@@ -70,10 +70,6 @@ void READER::start_reading()
 
         // инкремент итератора
         dsp_params->read_params->read_rb_cell_idx = (dsp_params->read_params->read_rb_cell_idx + 1) % DSP_READ_RB_SIZE;
-
-        // вывод звука
-        //emit get_sound_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
-        //                    dsp_params->read_params->read_rb_cell_size);
     }
 
     // если завершилось штатно, то флаг emergency_end_recording == 0

@@ -9,7 +9,7 @@ class fft_calcer : public QObject
 public:
     DSP_params *dsp_params;
 
-    explicit fft_calcer(DSP_params *new_dsp_params = NULL);
+    explicit fft_calcer(DSP_params *new_dsp_params = nullptr);
     ~fft_calcer();
 
     // для бпф
@@ -19,7 +19,7 @@ public:
     Ipp32fc             fft_dst[DSP_FFT_SIZE];  // кусок сигнала
 public slots:
     // воркер
-    void get_fft_step(Ipp32fc *rb_cell = NULL, unsigned int cell_size = 0);
+    void get_fft_step(Ipp32fc *rb_cell = nullptr, unsigned int cell_size = 0);
 
 signals:
     // картинка для телевизора

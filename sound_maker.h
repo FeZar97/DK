@@ -7,13 +7,14 @@ class sound_maker : public QObject
 {
     Q_OBJECT
 public:
-    static const int BUF_SIZE = 48000;
+    static const int BUF_SIZE = 9600;
 
     SDR_params       *sdr_params;
     DSP_params       *dsp_params;
 
     int              phase;
-    Ipp32fc          *in_buf_fc;
+
+    QFile            *raw_file;
 
 // out
     Ipp32fc          down_buf_fc[BUF_SIZE];

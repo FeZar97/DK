@@ -44,10 +44,6 @@ void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
     emit get_shift_step(dsp_params->flt_params->filtration_rb[dsp_params->flt_params->filtration_rb_cell_idx],
                         dsp_params->read_params->read_rb_cell_size);
 
-    // вывод звука
-    emit get_sound_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
-                        dsp_params->read_params->read_rb_cell_size);
-
     // инкремент итератора по КБ
     dsp_params->flt_params->filtration_rb_cell_idx = (dsp_params->flt_params->filtration_rb_cell_idx + 1) % DSP_FLT_RB_SIZE;
 }

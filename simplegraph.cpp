@@ -220,16 +220,18 @@ void simpleGraph::paint_signature(QPainter &painter)
 
     switch(dsp_params->fft_params->fft_mode){
         case READER_FFT:
-            flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
-                             int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
+            if(dsp_params->flt_params->r_frec != 0.5)
+                flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
+                                 int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
             break;
 
         case FLT_FFT:
             break;
 
         case SHIFT_FFT:
-            flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
-                             int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
+            if(dsp_params->flt_params->r_frec != 0.5)
+                flt_rect = QRect(vRect.width()/2 - int(vRect.width() * dsp_params->flt_params->r_frec), 0,
+                                 int(vRect.width() * dsp_params->flt_params->r_frec) * 2, vRect.height());
             break;
     }
     painter.drawRect(flt_rect);
