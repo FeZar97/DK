@@ -2,7 +2,7 @@
 #ifndef DEFINITIONS
 #define DEFINITIONS
 
-#define     VERSION                             "v0.18.3.20"
+#define     VERSION                             "v0.19.1.22"
 #define     NAME                                "Цифровой тракт РПУ \"Кальмар\" "
 
 #include <cmath>
