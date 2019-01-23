@@ -335,23 +335,23 @@ public:
 // параметры фильтрации
 class FLT_params{
 public:
-    double              r_frec;                  // относительная частота среза
+    double           r_frec;                  // относительная частота среза
 
-    Ipp32fc             **filtration_rb;         // КБ фильтрации
-    unsigned int        filtration_rb_cell_size; // размер ячейки КБ фильтрации
-    unsigned int        filtration_rb_cell_idx;  // итератор по КБ фильтрации
+    Ipp32fc          **filtration_rb;         // КБ фильтрации
+    unsigned int     filtration_rb_cell_size; // размер ячейки КБ фильтрации
+    unsigned int     filtration_rb_cell_idx;  // итератор по КБ фильтрации
 
-    IppsFIRSpec_32fc    *flt_spec;
-    Ipp32fc             flt_taps32[DSP_FLT_LENGTH]; // ИХ
-    Ipp32fc             delay_line[DSP_FLT_LENGTH - 1]; // линия задержки
-    Ipp8u               *buf;
+    IppsFIRSpec_32fc *flt_spec;
+    Ipp32fc          flt_taps32[DSP_FLT_LENGTH]; // ИХ
+    Ipp32fc          delay_line[DSP_FLT_LENGTH - 1]; // линия задержки
+    Ipp8u            *buf;
 
-    FLT_params():       r_frec{DSP_FLT_DEFAULT_R_FREC},
-                        filtration_rb{nullptr},
-                        filtration_rb_cell_size{0},
-                        filtration_rb_cell_idx{0},
-                        flt_spec{nullptr},
-                        buf{nullptr} {}
+    FLT_params():    r_frec{DSP_FLT_DEFAULT_R_FREC},
+                     filtration_rb{nullptr},
+                     filtration_rb_cell_size{0},
+                     filtration_rb_cell_idx{0},
+                     flt_spec{nullptr},
+                     buf{nullptr} {}
 
     void recalc_flt_params(){
         ippsZero_32fc(delay_line, DSP_FLT_LENGTH - 1);
@@ -362,6 +362,7 @@ public:
 
         ippsFIRGenGetBufferSize(DSP_FLT_LENGTH, &buf_size);
         buf = new Ipp8u[buf_size];
+
         ippsFIRGenLowpass_64f(r_frec, tmp64, DSP_FLT_LENGTH, ippWinBlackman, ippTrue, buf);
         ippsConvert_64f32f(tmp64, tmp32, DSP_FLT_LENGTH);
 

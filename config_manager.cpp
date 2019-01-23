@@ -360,7 +360,6 @@ void config_manager::on_CentralFreqSB_editingFinished()
 void config_manager::on_SampleRateSB_valueChanged(int new_sample_rate)
 {
     sdr->set_sample_rate(new_sample_rate);
-    dsp->dsp_params->flt_params->recalc_flt_params();
     emit global_update_interface();
 }
 

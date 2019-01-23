@@ -17,10 +17,10 @@ public:
     QFile            *raw_file;
 
 // out
-    Ipp32fc          down_buf_fc[BUF_SIZE];
     int              down_buf_len;
-
     Ipp32f           last_sample;
+
+    Ipp32fc          down_buf_fc[BUF_SIZE];
     Ipp32f           down_buf_re[BUF_SIZE];
     Ipp32f           down_buf_im[BUF_SIZE];
 

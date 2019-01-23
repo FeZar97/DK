@@ -54,7 +54,7 @@ void fft_shifter::get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size)
                           dsp_params->shift_params->shift_rb_cell_size);
 
     // вывод звука
-    emit get_sound_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
+    emit get_sound_step(dsp_params->shift_params->shift_rb[dsp_params->shift_params->shift_rb_cell_idx],
                         dsp_params->read_params->read_rb_cell_size);
 
     // инкремент итератора
