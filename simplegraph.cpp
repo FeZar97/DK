@@ -176,6 +176,7 @@ void simpleGraph::paint_signature(QPainter &painter)
         painter.drawText(930, 96, "dfreq: "  + QString::number(dsp_params->shift_params->shift_freq));
         painter.drawText(930, 108, "max: "   + QString::number(dsp_params->fft_params->fft_res[dsp_params->fft_params->max_level_idx]
                                                              - dsp_params->fft_params->fft_dynamic_range - 1, 'f', 1));
+        // окружность у max бина
         painter.setPen(QPen(Qt::magenta, 1));
         painter.drawEllipse((dsp_params->fft_params->max_level_idx + DSP_FFT_SIZE/2) % DSP_FFT_SIZE - 7,
                             vRect.height() * (1. - (dsp_params->fft_params->fft_res[dsp_params->fft_params->max_level_idx] - dsp_params->fft_params->fft_noise_level) / dsp_params->fft_params->fft_dynamic_range) - 7,
@@ -183,13 +184,11 @@ void simpleGraph::paint_signature(QPainter &painter)
                             14);
     }
 
-
     // уровень шума
     painter.setPen(QPen(Qt::yellow, 1));
     int height = vRect.height() * (1. - (dsp_params->fft_params->noise_level - dsp_params->fft_params->fft_noise_level) / dsp_params->fft_params->fft_dynamic_range);
     painter.drawLine(0, height, (dsp_params->fft_params->fft_info ? 1023 : 15), height);
     painter.drawText(5, height - 3, QString::number(dsp_params->fft_params->noise_level - dsp_params->fft_params->fft_dynamic_range - 1, 'f', 1));
-
 
     // нулевой бин
     painter.setPen(QPen(Qt::cyan));

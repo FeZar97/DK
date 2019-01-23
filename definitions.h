@@ -1,48 +1,12 @@
-
-/* TODO
- *        1) получение информации из регистров статуса;
- *        2) правильно добавить иконки в проект;
- *        3) ошибка в конфигурации аттенюатора ВЧ;
- *        4) интерфейс вывода спектра и управления SDR;*/
-
-/* In Progress
-          1) ;*/
-
-/* for discussion
- * 1)   как передавать QSettings в другой класс;
- * 6)   в разделе "Код управления режимами работы" (файл CurrentTractForm.cpp) для режимов
- *      и с синхронными и с автономными каналами нет указаний к выбору каналов для автономных каналов
- *      (вероятно это можно сделать самостоятельно, но все же стоит спросить);
- * 7)   в разделе "Код управления режимами работы" (файл CurrentTractForm.cpp) для режима
- *      "Две пары синхронных каналов" по вордовскому описанию ВЕДУЩИМИ каналами являются первый и третий,
- *      а в коде одной паре соответсвует второй канал, а другой паре - третий канал. Чему верить? В кьюте
- *      код переделан согласно вордовскому описанию, билдеровский вариант (RpuClass, строка 464) не изменял;
- * 8)   РАБОТАЮЩАЯ ВЕРСИЯ ОПРЕДЕЛЕНИЯ СТРОБА:
- *      чтобы определить значение строба для данной кодограммы нужно:
- *         1) взять из Таблицы_Кодограмм трехразрядное значение, соответсвующее данной кодограмме,
- *            с учетом инверсий в разрядах 9 и 11;
- *         2) добавить СПРАВА один разряд;
- *         3) полученное четырехразрядное число и определяет нужный строб;
- *         При записи в крайний правый разряд единицы получаем "верхнее" значение строба (в двоичном виде);
- *         При записи в крайний правый разряд нуля получаем "нижнее" значение строба (в двоичном виде).
- * 12) в разделе "КОД УПРАВЛЕНИЯ БЛОКАМИ ПРИЕМНИКОВ" (файл CurrentTractForm.cpp строка 803) две первых строки
- *     перемнных были формата шорт, но им присваиваются интовые значения - это норма?
- * 15) файл CurrentTractForm.cpp строка 834 - магические числа
- * 16) файл CurrentTractForm.cpp строка 845 - побитовые операции с магическими числами*/
-
 #ifndef DEFINITIONS
 #define DEFINITIONS
 
-#define     VERSION                             "v0.18.3.20"
-#define     NAME                                "Цифровой тракт РПУ \"Кальмар\" "
+#define     VERSION   "v0.19.1.21"
+#define     NAME      "Цифровой тракт РПУ \"Кальмар\" "
 
 #include <cmath>
-
 #include <float.h>
-
-#include <inpout32.h>
-
-#include <ippCustom.h>
+#include <windows.h>
 
 #include <QAudioOutput>
 #include <QDateTime>
@@ -60,14 +24,15 @@
 #include <QString>
 #include <QThread>
 
+#include <inpout32.h>
 #include <rtl-sdr.h>
+
+#include <ippCustom.h>
 
 typedef void	(__stdcall *lpOutc)(unsigned short, unsigned char);
 
-#include <windows.h>
-/// ----------------------------------перечисления---------------------------------------
-// тип клика мыши, при перемещении курсора по этому типу будем определять
-// что именно нужно сделать, перенести окно, или изменить его размер с одной из сторон
+/// ----------------------------------enums---------------------------------------
+// типы действия при зажатии ЛКМ в области окна программы
 enum MouseType {
     Move,
     Spectr,
@@ -109,7 +74,7 @@ enum KALIB_TYPE{INTERNAL,
 enum STATUS{OFF,
             ON};
 
-// полоса ПЧ
+// полосы ПЧ
 enum IF_BAND{FIRST_BAND,   //   3 кГц,
              SECOND_BAND,  //   8 кГц,
              THIRD_BAND,   //  20 кГц,
@@ -135,7 +100,7 @@ enum WINDOW{NONE,
             HAMMING,
             HANN,
             KAISER};
-/// -----------------------------------объявления-----------------------------------------
+/// -----------------------------------defs-----------------------------------------
 
 #define     CURRENT_DEGREE                          WITHOUT
 
@@ -193,14 +158,16 @@ enum WINDOW{NONE,
 #define     SDR_DEFAULT_DIRECT_SAMPLING_IDX         0
 
 // ---------------------------------------DSP---------------------------------------------
-#define     DSP_DEFAULT_UP_FACTOR                   1
-#define     DSP_DEFAULT_DOWN_FACTOR                 2
-#define     DSP_FILTER_LENGTH                       517
-#define     DSP_DEFAULT_FFT_MODE                    READER_FFT
-#define     DSP_DEFAULT_AVERAGE_NUMBER              8
-#define     DSP_DEFAULT_FFT_INVERSION               false
-#define     DSP_DEFAULT_DYNAMIC_RANGE               30
-#define     DSP_DEFAULT_NOISE_LEVEL                 -10
+#define     DSP_FLT_LENGTH                          517
+#define     DSP_FLT_DEFAULT_R_FREC                  0.15
+#define     DSP_FFT_DEFAULT_MODE                    READER_FFT
+#define     DSP_FFT_DEFAULT_AVERAGE_NUMBER          8
+#define     DSP_FFT_DEFAULT_INVERSION               false
+#define     DSP_FFT_DEFAULT_DYNAMIC_RANGE           30
+#define     DSP_FFT_DEFAULT_NOISE_LEVEL             -10
+#define     DSP_FFT_ORDER                           10
+#define     DSP_FFT_SIZE                            1024
+#define     DSP_NOISE_SIZE                      25
 #define     DSP_DEFAULT_RECORDING_TIME_IDX          0
 #define     DSP_READOUT_PER_SECONDS                 20
 #define     DSP_DEFAULT_FFT_WINDOW                  NONE
@@ -208,9 +175,6 @@ enum WINDOW{NONE,
 #define     DSP_DEFAULT_WIN_ALPHA                   0.5
 
 #define     DSP_DEFAULT_FILE_RECORD                 false
-
-#define     DSP_FFT_SIZE                            1024
-#define     DSP_NOISE_SIZE                          25
 
 #define     DSP_SOUND_SAMPLE_RATE                   48000
 
@@ -220,7 +184,7 @@ enum WINDOW{NONE,
 #define     DSP_SHIFT_RB_SIZE                       10
 #define     DSP_SOUND_RB_SIZE                       10
 
-#define     LINE                                "\n-----------------------------------------------------------------------------"
+#define     LINE                                    "\n-----------------------------------------------------------------------------"
 
 // набор КУ [дБ * 10]
 const static int gains[] = {0, 9, 14, 27, 37, 77, 87, 125, 144, 157, 166, 197, 207, 229, 254, 280, 297, 328, 338, 364, 372, 386, 402, 421, 434, 439, 445, 480, 496};
@@ -378,44 +342,39 @@ public:
     unsigned int        filtration_rb_cell_idx;  // итератор по КБ фильтрации
 
     IppsFIRSpec_32fc    *flt_spec;
-    Ipp32fc             flt_taps32[DSP_FILTER_LENGTH]; // ИХ
-    Ipp32fc             delay_line[DSP_FILTER_LENGTH - 1]; // линия задержки
+    Ipp32fc             flt_taps32[DSP_FLT_LENGTH]; // ИХ
+    Ipp32fc             delay_line[DSP_FLT_LENGTH - 1]; // линия задержки
     Ipp8u               *buf;
 
-    FLT_params():
-        r_frec(0.15),
-
-        filtration_rb(nullptr),
-        filtration_rb_cell_size(0),
-        filtration_rb_cell_idx(0),
-
-        flt_spec(nullptr),
-        buf(nullptr)
-    {}
+    FLT_params():       r_frec{DSP_FLT_DEFAULT_R_FREC},
+                        filtration_rb{nullptr},
+                        filtration_rb_cell_size{0},
+                        filtration_rb_cell_idx{0},
+                        flt_spec{nullptr},
+                        buf{nullptr} {}
 
     void recalc_flt_params(){
-
-        ippsZero_32fc(delay_line, DSP_FILTER_LENGTH - 1);
+        ippsZero_32fc(delay_line, DSP_FLT_LENGTH - 1);
         int buf_size, spec_size;
 
-        Ipp64f tmp64[DSP_FILTER_LENGTH];
-        Ipp32f tmp32[DSP_FILTER_LENGTH];
+        Ipp64f tmp64[DSP_FLT_LENGTH];
+        Ipp32f tmp32[DSP_FLT_LENGTH];
 
-        ippsFIRGenGetBufferSize(DSP_FILTER_LENGTH, &buf_size);
+        ippsFIRGenGetBufferSize(DSP_FLT_LENGTH, &buf_size);
         buf = new Ipp8u[buf_size];
-        ippsFIRGenLowpass_64f(r_frec, tmp64, DSP_FILTER_LENGTH, ippWinBlackman, ippTrue, buf);
-        ippsConvert_64f32f(tmp64, tmp32, DSP_FILTER_LENGTH);
+        ippsFIRGenLowpass_64f(r_frec, tmp64, DSP_FLT_LENGTH, ippWinBlackman, ippTrue, buf);
+        ippsConvert_64f32f(tmp64, tmp32, DSP_FLT_LENGTH);
 
         delete[] buf;
         buf = nullptr;
 
-        ippsFIRSRGetSize(DSP_FILTER_LENGTH, ipp32fc, &spec_size, &buf_size);
+        ippsFIRSRGetSize(DSP_FLT_LENGTH, ipp32fc, &spec_size, &buf_size);
         flt_spec = reinterpret_cast<IppsFIRSpec_32fc*>(new Ipp8u[spec_size]);
         buf = new Ipp8u[buf_size];
 
-        ippsRealToCplx_32f(tmp32, nullptr, flt_taps32, DSP_FILTER_LENGTH);
+        ippsRealToCplx_32f(tmp32, nullptr, flt_taps32, DSP_FLT_LENGTH);
 
-        ippsFIRSRInit_32fc(flt_taps32, DSP_FILTER_LENGTH, ippAlgAuto, flt_spec);
+        ippsFIRSRInit_32fc(flt_taps32, DSP_FLT_LENGTH, ippAlgAuto, flt_spec);
     }
 };
 
@@ -423,75 +382,78 @@ public:
 class FFT_params
 {
 public:
-    // глобальные
-    unsigned int       fft_dynamic_range;       // динамический диапазон
-    int                fft_noise_level;         // уровень шума
+    unsigned int        fft_dynamic_range;         // динамический диапазон
+    int                 fft_noise_level;           // уровень шума
 
-    Ipp32fc            dc_offset;            // величина коррекции
+    Ipp32fc             dc_offset;                 // величина коррекции
 
-    FFT_MODE           fft_mode;                // спектр какого сигнала выводить
-    unsigned int       fft_input_cell_size;     // размер входного массива
-    unsigned int       fft_averages_number;     // кол-во усреднений спектра
-    unsigned int       fft_max_averages_number; // максимально допустимое число усреднений
-    bool               fft_inversion;           // флаг инверсии спектра
-    WINDOW             fft_current_window;      // используемое окно
-    bool               fft_info;                // флаг вывода информации на экран
-    float              fft_win_alpha;           // параметр оконной функции
+    FFT_MODE            fft_mode;                  // спектр какого сигнала выводить
+    unsigned int        fft_input_cell_size;       // размер входного массива
+    unsigned int        fft_averages_number;       // кол-во усреднений спектра
+    unsigned int        fft_max_averages_number;   // максимально допустимое число усреднений
+    bool                fft_inversion;             // флаг инверсии спектра
+    WINDOW              fft_current_window;        // используемое окно
+    bool                fft_info;                  // флаг вывода информации на экран
+    float               fft_win_alpha;             // параметр оконной функции
 
-    Ipp32f             fft_res[DSP_FFT_SIZE];   // энергетический спектр
+    Ipp32f              fft_res[DSP_FFT_SIZE];     // энергетический спектр
 
-    Ipp32f             noise_level;
-    Ipp32f             noise_buf[DSP_NOISE_SIZE];
-    int                noise_idx;
-    Ipp32f             accum;
-    int                accum_weight;
+    Ipp32f              noise_level;               // скользящее среднее шума
+    Ipp32f              noise_buf[DSP_NOISE_SIZE]; // память(массив с последними DSP_NOISE_SIZE отсчетами шума)
+    int                 noise_idx;                 // итератор по noise_buf
+    Ipp32f              noise_accum;               // шумовой аккум
 
-    int                max_level_idx;
+    int                 max_level_idx;             // номер максимального бина БПФ
 
-    bool               null_bin_circle;
+    bool                null_bin_circle;           // флаг отрисовки окружности соответствующей нулевому бину БПФ
 
-    FFT_params(){
-        fft_win_alpha = DSP_DEFAULT_WIN_ALPHA;
-        fft_dynamic_range = DSP_DEFAULT_DYNAMIC_RANGE;
-        fft_noise_level = DSP_DEFAULT_NOISE_LEVEL;
+    IppsFFTSpec_C_32fc  *pFftSpec;                 // спецификация
+    Ipp8u               *fft_buf;                  // буфер БПФ
 
-        dc_offset.re = 0;
-        dc_offset.im = 0;
+    Ipp32fc             fft_dst[DSP_FFT_SIZE];
 
-        fft_mode = DSP_DEFAULT_FFT_MODE;
-        fft_input_cell_size = 0;
-        fft_averages_number = DSP_DEFAULT_AVERAGE_NUMBER;
-        fft_max_averages_number = 0;
-        fft_inversion = DSP_DEFAULT_FFT_INVERSION;
-        fft_current_window = DSP_DEFAULT_FFT_WINDOW;
-        fft_info = DSP_DEFAULT_FFT_INFO;
+    FFT_params():       fft_dynamic_range{DSP_FFT_DEFAULT_DYNAMIC_RANGE},
+                        fft_noise_level{DSP_FFT_DEFAULT_NOISE_LEVEL},
 
-        noise_level = 0;
-        noise_idx = 0;
-        accum = 0;
-        accum_weight = 0;
+                        dc_offset{0, 0},
 
-        max_level_idx = 0;
+                        fft_mode{DSP_FFT_DEFAULT_MODE},
+                        fft_input_cell_size{0},
+                        fft_averages_number{DSP_FFT_DEFAULT_AVERAGE_NUMBER},
+                        fft_max_averages_number{0},
+                        fft_inversion{DSP_FFT_DEFAULT_INVERSION},
+                        fft_current_window{DSP_DEFAULT_FFT_WINDOW},
+                        fft_info{DSP_DEFAULT_FFT_INFO},
+                        fft_win_alpha{DSP_DEFAULT_WIN_ALPHA},
 
-        null_bin_circle = false;
+                        noise_level{0},
+                        noise_idx{0},
+                        noise_accum{0},
 
-        ippsZero_32f(fft_res, DSP_FFT_SIZE);
-        ippsZero_32f(noise_buf, DSP_NOISE_SIZE);
-    }
+                        max_level_idx{0},
+
+                        null_bin_circle{false},
+
+                        pFftSpec{nullptr},
+                        fft_buf{nullptr}
+                        {
+                            ippsZero_32f(fft_res, DSP_FFT_SIZE);
+                            ippsZero_32f(noise_buf, DSP_NOISE_SIZE);
+                            ippsZero_32fc(fft_dst, DSP_FFT_SIZE);
+                        }
 };
 
 // параметры сдвига
 class SHIFT_params
 {
-
 public:
-    double              shift_freq;          // частота сдвига
-    Ipp32fc             **shift_rb;          // КБ сдвига
-    unsigned int        shift_rb_cell_size;  // размер ячейки КБ сдвига
-    unsigned int        shift_rb_cell_idx;   // итератор по КБ сдвига
-    bool                step;                // флаг кратности шага изменения частоты сноса
-    Ipp32fc             *complex_sin;       // комплексная синусоида для сдвига
-    Ipp32f              CurrentPhase;       // фаза синусоиды
+    double          shift_freq;          // частота сдвига
+    Ipp32fc         **shift_rb;          // КБ сдвига
+    unsigned int    shift_rb_cell_size;  // размер ячейки КБ сдвига
+    unsigned int    shift_rb_cell_idx;   // итератор по КБ сдвига
+    bool            step;                // флаг кратности шага изменения частоты сноса
+    Ipp32fc         *complex_sin;        // комплексная синусоида для сдвига
+    Ipp32f          CurrentPhase;        // фаза синусоиды
 
     SHIFT_params(): shift_freq{0},
                     shift_rb{nullptr},
@@ -506,14 +468,14 @@ public:
 class WAV_params{
 
 public:
-    QFile          file;
-    WAVEHEADER     header;
-    quint64        pos;
-    quint64        total_size;
-    QString        file_name;
-    QString        directory;
-    int            input_cell_size;
-    Ipp8s          *out_buf;
+    QFile         file;
+    WAVEHEADER    header;
+    quint64       pos;
+    quint64       total_size;
+    QString       file_name;
+    QString       directory;
+    int           input_cell_size;
+    Ipp8s         *out_buf;
 
     WAV_params(): file{nullptr},
                   pos{0},
@@ -528,13 +490,9 @@ public:
 class SOUND_params{
 
 public:
-    static const int sound_freq     = 48000;
-    static const int channel_count  = 2;
-    static const int sample_size    = 16;
-
-    Ipp16s       **sound_rb;
-    unsigned int sound_rb_cell_size;
-    unsigned int sound_rb_cell_idx;
+    Ipp16s          **sound_rb;
+    unsigned int    sound_rb_cell_size;
+    unsigned int    sound_rb_cell_idx;
 
     SOUND_params(): sound_rb{nullptr},
                     sound_rb_cell_size{0},
@@ -545,12 +503,12 @@ public:
 class DSP_params{
 
 public:
-    READ_params         *read_params;
-    FFT_params          *fft_params;
-    FLT_params          *flt_params;
-    SHIFT_params        *shift_params;
-    WAV_params          *wav_params;
-    SOUND_params        *sound_params;
+    READ_params   *read_params;
+    FFT_params    *fft_params;
+    FLT_params    *flt_params;
+    SHIFT_params  *shift_params;
+    WAV_params    *wav_params;
+    SOUND_params  *sound_params;
 
     DSP_params(): read_params{new READ_params()},
                   fft_params{new FFT_params()},

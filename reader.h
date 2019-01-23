@@ -15,24 +15,20 @@ public:
     ~READER();
 
 public slots:
-    void start_reading(); // сигнал постпуает от кнопки начала записи
+    void start_reading();
 
 signals:
-    void get_fft_step(Ipp32fc *cell, unsigned int cell_size); // расчет спектра
+    void get_fft_step(Ipp32fc *cell, unsigned int cell_size); // БПФ
 
     void get_filtration_step(Ipp32fc *cell, unsigned int cell_size); // фильтрация
 
-    // отправка сигнала на запись сырого ЦП
-    void write_to_file(Ipp32fc *rb_cell);
-
-    // сдвиг спектра
-    void get_shift_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    void write_to_file(Ipp32fc *rb_cell); // запись в файл
 
     // если завершилось штатно, то флаг emergency_end_recording == 0
     // если завершилось экстренно, то emergency_end_recording == 1
     void end_of_recording(bool status);
 
-    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size);
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size); // вывод звука
 };
 
 #endif // READER_H

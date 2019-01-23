@@ -127,7 +127,6 @@ void DSP::create_filter()
 void DSP::create_shifter()
 {
     shifter = new fft_shifter(dsp_params, sdr->sdr_params);
-    connect(reader, &READER::get_shift_step, shifter, &fft_shifter::get_shift_step);
     connect(flt, &MRFiltering::get_shift_step, shifter, &fft_shifter::get_shift_step);
     shifter->moveToThread(fft_shift_thread);
 
@@ -224,12 +223,13 @@ bool DSP::recalc_dsp_params()
 // выделение памяти под необходимые КБ, создание потоков
 void DSP::prepair_memory()
 {
-    prepair_reader(); // подготовка reader к началу записи
-    prepair_mr_filter(); // подготовка mr_filter к началу записи
-    prepair_fft_shifter(); // подготовка fft_shifter к началу записи
-    prepair_sound_maker(); // подготовка sounder к началу записи
+    prepair_reader();
+    prepair_mr_filter();
+    prepair_fft_shifter();
+    prepair_fft_calcer();
+    prepair_sound_maker();
 }
-// подготовка reader к началу записи
+
 void DSP::prepair_reader()
 {
     int i;
@@ -263,6 +263,15 @@ void DSP::prepair_fft_shifter()
         dsp_params->shift_params->shift_rb[i] = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
 
     dsp_params->shift_params->complex_sin = new Ipp32fc[dsp_params->read_params->read_rb_cell_size / 2];
+}
+void DSP::prepair_fft_calcer()
+{
+    int sizeSpec = 0, sizeInit = 0, sizeBuffer = 0;
+    ippsFFTGetSize_C_32fc(DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer);
+    Ipp8u *FFTSpec = new Ipp8u[sizeSpec];
+    Ipp8u *FFTSpecBuf = new Ipp8u[sizeInit];
+    dsp_params->fft_params->fft_buf = new Ipp8u[sizeBuffer];
+    ippsFFTInit_C_32fc(&dsp_params->fft_params->pFftSpec, DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, FFTSpec, FFTSpecBuf);
 }
 void DSP::prepair_wav_recorder()
 {
@@ -298,11 +307,11 @@ void DSP::prepair_wav_recorder()
     make_wav_headers();
 
     if(dsp_params->read_params->use_first_file)
-        first_wav_rec->params->file.write((char*)(&first_wav_rec->params->header), sizeof(WAVEHEADER));
+        first_wav_rec->params->file.write(reinterpret_cast<char*>(&first_wav_rec->params->header), sizeof(WAVEHEADER));
     if(dsp_params->read_params->use_second_file)
-        second_wav_rec->params->file.write((char*)(&second_wav_rec->params->header), sizeof(WAVEHEADER));
+        second_wav_rec->params->file.write(reinterpret_cast<char*>(&second_wav_rec->params->header), sizeof(WAVEHEADER));
     if(dsp_params->read_params->use_third_file)
-        third_wav_rec->params->file.write((char*)(&third_wav_rec->params->header), sizeof(WAVEHEADER));
+        third_wav_rec->params->file.write(reinterpret_cast<char*>(&third_wav_rec->params->header), sizeof(WAVEHEADER));
 }
 void DSP::prepair_sound_maker()
 {
@@ -331,7 +340,6 @@ void DSP::make_wav_headers()
     memcpy(first_wav_rec->params->header.subchunk2Id, "data", 4);
     first_wav_rec->params->header.subchunk2Size = first_wav_rec->params->total_size;
 
-
     // второй файл
     memcpy(second_wav_rec->params->header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении
     second_wav_rec->params->header.chunkSize = second_wav_rec->params->total_size - 8; // data_size + 36
@@ -346,7 +354,6 @@ void DSP::make_wav_headers()
     second_wav_rec->params->header.bitsPerSample = 8;
     memcpy(second_wav_rec->params->header.subchunk2Id, "data", 4);
     second_wav_rec->params->header.subchunk2Size = second_wav_rec->params->total_size;
-
 
     // третий файл
     memcpy(third_wav_rec->params->header.chunkId, "RIFF", 4); // 0x52494646 в big-endian представлении

@@ -21,7 +21,7 @@ signals:
 
     void write_to_file(Ipp32fc *shift_rb_cell); // запись в файл
 
-    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size); // звук
+    void get_sound_step(Ipp32fc *rb_cell, unsigned int cell_size); // вывод звука
 };
 
 #endif // FFT_SHIFTER_H

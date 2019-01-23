@@ -12,20 +12,11 @@ public:
     explicit fft_calcer(DSP_params *new_dsp_params = nullptr);
     ~fft_calcer();
 
-    // для бпф
-    IppsFFTSpec_C_32fc  *pFftSpec;              // спецификация
-    Ipp8u               *fft_buf;               // буфер БПФ
-
-    Ipp32fc             fft_dst[DSP_FFT_SIZE];  // кусок сигнала
 public slots:
-    // воркер
     void get_fft_step(Ipp32fc *rb_cell = nullptr, unsigned int cell_size = 0);
 
 signals:
-    // картинка для телевизора
     void paint_fft();
-    // занавес
-    void end_fft();
 
 };
 

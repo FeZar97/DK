@@ -16,6 +16,11 @@ READER::READER(DSP_params *new_dsp_params,
 
 READER::~READER()
 {
+    if(dsp_params)
+        delete dsp_params;
+
+    if(sdr_params)
+        delete sdr_params;
 }
 
 // воркер
@@ -44,26 +49,20 @@ void READER::start_reading()
                         dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                         dsp_params->read_params->read_rb_cell_size / 2);
 
-        // сопряжение
+        // инверсия спектра
         if(dsp_params->fft_params->fft_inversion)
             ippsConj_32fc_I(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                             dsp_params->read_params->read_rb_cell_size / 2);
 
-        // спектр
+        // БПФ
         if(dsp_params->fft_params->fft_mode == READER_FFT)
             emit get_fft_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                               dsp_params->read_params->read_rb_cell_size / 2);
 
         // фильтрация
-        if(dsp_params->flt_params->r_frec != 0.5){
+        if(dsp_params->flt_params->r_frec != 0.5)
             emit get_filtration_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
                                      dsp_params->read_params->read_rb_cell_size);
-        }else{
-            // частотный сдвиг
-            emit get_shift_step(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx],
-                                dsp_params->read_params->read_rb_cell_size);
-        }
-
         // вывод в файл
         if(dsp_params->read_params->use_first_file && dsp_params->read_params->use_files)
             emit write_to_file(dsp_params->read_params->read_rb[dsp_params->read_params->read_rb_cell_idx]);

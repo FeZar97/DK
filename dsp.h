@@ -54,6 +54,7 @@ public:
     void                prepair_reader();                 // подготовка reader к началу записи
     void                prepair_mr_filter();              // подготовка mr_filter к началу записи
     void                prepair_fft_shifter();            // подготовка fft_shifter к началу записи
+    void                prepair_fft_calcer();             // подготовка fft_calcer к началу записи
     void                prepair_wav_recorder();           // подготовка wav_recorder к началу записи
     void                prepair_sound_maker();            // подготовка sounder к началу записи
     void                make_wav_headers();

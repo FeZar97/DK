@@ -17,9 +17,13 @@ MRFiltering::MRFiltering(DSP_params *new_dsp_params,
 
 MRFiltering::~MRFiltering()
 {
+    if(dsp_params)
+        delete dsp_params;
+
+    if(sdr_params)
+        delete sdr_params;
 }
 
-// передается указатель на массив принятого комплексного ЦП с поста чтения
 void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
 {
     // фильтрация
@@ -47,4 +51,3 @@ void MRFiltering::get_filtration_step(Ipp32fc *rb_cell)
     // инкремент итератора по КБ
     dsp_params->flt_params->filtration_rb_cell_idx = (dsp_params->flt_params->filtration_rb_cell_idx + 1) % DSP_FLT_RB_SIZE;
 }
-

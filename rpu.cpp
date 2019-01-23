@@ -162,6 +162,7 @@ int RPU::get_tract_number()
         case ONE_ONE_ONE_ONE_CHANNEL:
             return 4;
     }
+    return 0;
 }
 
 // кодограмма управления режимами работы
