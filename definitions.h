@@ -1,17 +1,8 @@
-<<<<<<< HEAD
 #ifndef DEFINITIONS
 #define DEFINITIONS
 
-#define     VERSION   "v0.19.1.21"
-#define     NAME      "Цифровой тракт РПУ \"Кальмар\" "
-=======
-
-#ifndef DEFINITIONS
-#define DEFINITIONS
-
-#define     VERSION                             "v0.19.1.22"
-#define     NAME                                "Цифровой тракт РПУ \"Кальмар\" "
->>>>>>> f29ff0cc2fd998cf29d79b2da4c14bba67f9c845
+#define     VERSION  "v0.19.1.23"
+#define     NAME     "Цифровой тракт РПУ \"Кальмар\" "
 
 #include <cmath>
 #include <float.h>

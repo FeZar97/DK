@@ -166,20 +166,25 @@ void config_manager::update_dsp_tab()
     bool enabled_flag = !dsp->dsp_params->read_params->is_recording;
 
     // значения
+    ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
+    ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
+
+    ui->RFrecDSB->setValue(dsp->dsp_params->flt_params->r_frec);
+
+    ui->ShiftFreqSB->setValue(dsp->dsp_params->shift_params->shift_freq);
+    ui->FftShiftStepCB->setChecked(dsp->dsp_params->shift_params->step);
     ui->ShiftFreqSB->setMaximum(sdr->sdr_params->sample_rate / 2);
     ui->ShiftFreqSB->setMinimum((-1) * double(sdr->sdr_params->sample_rate / 2));
-    ui->ShiftFreqSB->setValue(dsp->dsp_params->shift_params->shift_freq);
+
     ui->InversionCB->setChecked(dsp->dsp_params->fft_params->fft_inversion);
     ui->FftModeCB->setCurrentIndex(dsp->dsp_params->fft_params->fft_mode);
     ui->MaxAverageNumber->setText(QString::number(dsp->dsp_params->fft_params->fft_max_averages_number));
     ui->AverageNumSB->setMaximum(dsp->dsp_params->fft_params->fft_max_averages_number);
     ui->AverageNumSB->setValue(dsp->dsp_params->fft_params->fft_averages_number);
     ui->InfoCB->setChecked(dsp->dsp_params->fft_params->fft_info);
-    ui->ReadOutPerSecSB->setValue(dsp->dsp_params->read_params->readout_per_seconds);
-    ui->RecordTimeCB->setCurrentIndex(dsp->dsp_params->read_params->rec_time_idx);
     ui->DCOffsetRe->setValue(dsp->dsp_params->fft_params->dc_offset.re);
     ui->DCOffsetIm->setValue(dsp->dsp_params->fft_params->dc_offset.im);
-    ui->RFrecDSB->setValue(dsp->dsp_params->flt_params->r_frec);
+    ui->WindowCB->setCurrentIndex(dsp->dsp_params->fft_params->fft_current_window);
 
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
@@ -206,7 +211,6 @@ void config_manager::update_dsp_tab()
 
     // если флаг кратности == true, то шаг = (частота дискретизации) / (DSP_FFT_SIZE)
     // если флаг кратности == false, то шаг = 1
-    ui->FftShiftStepCB->setChecked(dsp->dsp_params->shift_params->step);
     if(dsp->dsp_params->shift_params->step)
         ui->ShiftFreqSB->setSingleStep(sdr->sdr_params->sample_rate / float(DSP_FFT_SIZE));
     else

@@ -272,6 +272,12 @@ void Widget::save_settings()
 /// DSP
     settings.setValue("DSP_is_recording",           dsp->dsp_params->read_params->is_recording);
     settings.setValue("DSP_readout_per_second",     dsp->dsp_params->read_params->readout_per_seconds);
+
+    settings.setValue("DSP_flt_r_frec",             dsp->dsp_params->flt_params->r_frec);
+
+    settings.setValue("DSP_fft_shift_freq",         dsp->dsp_params->shift_params->shift_freq);
+    settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
+
     settings.setValue("DSP_fft_dynamic_range",      dsp->dsp_params->fft_params->fft_dynamic_range);
     settings.setValue("DSP_fft_noise_level",        dsp->dsp_params->fft_params->fft_noise_level);
     settings.setValue("DSP_fft_info",               dsp->dsp_params->fft_params->fft_info);
@@ -280,10 +286,9 @@ void Widget::save_settings()
     settings.setValue("DSP_fft_dc_offset_re",       dsp->dsp_params->fft_params->dc_offset.re);
     settings.setValue("DSP_fft_dc_offset_im",       dsp->dsp_params->fft_params->dc_offset.im);
     settings.setValue("DSP_fft_0_bin_circle",       dsp->dsp_params->fft_params->null_bin_circle);
-    settings.setValue("DSP_fft_shift_val",          dsp->dsp_params->shift_params->shift_freq);
-    settings.setValue("DSP_fft_shift_step",         dsp->dsp_params->shift_params->step);
+    settings.setValue("DSP_fft_current_window",     dsp->dsp_params->fft_params->fft_current_window);
+
     settings.setValue("DSP_wav_directory",          dsp->dsp_params->wav_params->directory);
-    settings.setValue("DSP_flt_r_frec",             dsp->dsp_params->flt_params->r_frec);
 
     settings.sync();
 }
@@ -329,6 +334,13 @@ void Widget::restore_settings()
 
 /// DSP
     dsp->dsp_params->read_params->readout_per_seconds   = uint(settings.value("DSP_readout_per_second").toInt());
+    dsp->dsp_params->read_params->is_recording          = settings.value("DSP_is_recording").toBool();
+
+    dsp->dsp_params->flt_params->r_frec                 = settings.value("DSP_flt_r_frec").toDouble();
+
+    dsp->dsp_params->shift_params->shift_freq           = settings.value("DSP_fft_shift_freq").toDouble();
+    dsp->dsp_params->shift_params->step                 = settings.value("DSP_fft_shift_step").toBool();
+
     dsp->dsp_params->fft_params->fft_dynamic_range      = uint(settings.value("DSP_fft_dynamic_range").toInt());
     dsp->dsp_params->fft_params->fft_noise_level        = settings.value("DSP_fft_noise_level").toInt();
     dsp->dsp_params->fft_params->fft_info               = settings.value("DSP_fft_info").toBool();
@@ -337,14 +349,13 @@ void Widget::restore_settings()
     dsp->dsp_params->fft_params->dc_offset.re           = settings.value("DSP_fft_dc_offset_re").toFloat();
     dsp->dsp_params->fft_params->dc_offset.im           = settings.value("DSP_fft_dc_offset_im").toFloat();
     dsp->dsp_params->fft_params->null_bin_circle        = settings.value("DSP_fft_0_bin_circle").toBool();
-    dsp->dsp_params->shift_params->shift_freq           = settings.value("DSP_fft_shift_val").toDouble();
-    dsp->dsp_params->shift_params->step                 = settings.value("DSP_fft_shift_step").toBool();
+    dsp->dsp_params->fft_params->fft_current_window     = WINDOW(settings.value("DSP_fft_current_window").toInt());
+
     dsp->dsp_params->wav_params->directory              = settings.value("DSP_wav_directory").toString();
-    dsp->dsp_params->flt_params->r_frec                 = settings.value("DSP_flt_r_frec").toDouble();
 
     global_update_interface();
 
-    if(settings.value("DSP_is_recording").toBool()) on_RecButton_clicked();
+    if(dsp->dsp_params->read_params->is_recording) on_RecButton_clicked();
 }
 
 // обработка события сворачивания главного окна
