@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>buttons/CLOSE_GRAY.png</file>
+        <file>buttons/CLOSE_ORANGE.png</file>
+        <file>buttons/CLOSE_WHITE.png</file>
+        <file>buttons/confirm.png</file>
+        <file>buttons/MIN_GRAY.png</file>
+        <file>buttons/MIN_WHITE.png</file>
+        <file>buttons/PLAY_GRAY.png</file>
+        <file>buttons/PLAY_GRAYGREEN.png</file>
+        <file>buttons/PLAY_GREEN.png</file>
+        <file>buttons/REFRESH_ORANGE.png</file>
+        <file>buttons/REFRESH_ORANGEGRAY.png</file>
+        <file>buttons/settings.png</file>
+        <file>buttons/SQUID.png</file>
+        <file>buttons/SquidLow.png</file>
+        <file>buttons/STOP_GRAY.png</file>
+        <file>buttons/STOP_GRAYRED.png</file>
+        <file>buttons/STOP_RED.png</file>
+        <file>buttons/DISABLED_RB_C.png</file>
+        <file>buttons/ENABLED_RB_C.png</file>
+        <file>buttons/SOUND_OFF.png</file>
+        <file>buttons/SOUND_ON.png</file>
+        <file>buttons/FOLDER.png</file>
+    </qresource>
+</RCC>
