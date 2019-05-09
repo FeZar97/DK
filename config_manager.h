@@ -79,12 +79,13 @@ private slots:
     void on_FreqPresNbSB_valueChanged(int _freqPresNb);
 
 /// -----------------------------------SDR---------------------------------------------
-    void on_RefreshButton_clicked(); // поиск новых приемников
-    void on_ConfirmButton_clicked(); // подключение к новому приемнику
+    void on_ReloadButton_clicked(); // поиск новых приемников
+    void on_ClearButton_clicked(); // очистка информационного поля
+    void on_ConnectButton_clicked(); // подключение к новому приемнику
+    void on_DisconnectButton_clicked(); // отключение от приемника
     void on_SdrSampleRateCB_currentIndexChanged(int new_sample_rate_idx); // изменение частоты дискретизации
     void on_GainValBox_currentIndexChanged(int new_gain_idx); // изменение КУ
     void on_DirectSamplingCB_currentIndexChanged(int new_direct_sampling_idx); // изменение режима оцифровки
-    void on_SdrTestModeButton_clicked();
     void on_RtlAgcCB_clicked(bool new_agc_state);
 
 /// -----------------------------------DSP---------------------------------------------
@@ -119,6 +120,7 @@ private slots:
     void on_LSBDemodRB_clicked();
     void on_FMDemodRB_clicked();
     void on_ScaleFactorSB_valueChanged(int _scFct);
+
 
 signals:
     void global_update_interface();

@@ -46,8 +46,6 @@ int rtlsdr_open(rtlsdr_dev_t **dev,
 
 int rtlsdr_close(rtlsdr_dev_t *dev);
 
-/* configuration functions */
-
 /*!
  * Set crystal oscillator frequencies used for the RTL2832 and the tuner IC.
  *
@@ -91,6 +89,7 @@ int rtlsdr_get_xtal_freq(rtlsdr_dev_t *dev,
  * \param serial serial number, may be NULL
  * \return 0 on success
  */
+// инфа о конкретном приемнике
 int rtlsdr_get_usb_strings(rtlsdr_dev_t *dev,
 									  char *manufact, 
 									  char *product, 

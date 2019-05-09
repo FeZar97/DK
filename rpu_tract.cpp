@@ -225,11 +225,6 @@ bool RPU_tract::get_tract_active()
 // отправка в РПУ кодограмм с настройками
 void RPU_tract::send_tract_settings_to_RPU(int presNb, int freq)
 {
-    //if(presNb == -1){
-    //    qDebug() << "auto def RPU params";
-    //}else{
-    //    qDebug() << "RPU params sets in hands mode: presNb == " << presNb << " freq = " << freq;
-    //}
     set_central_freq_to_RPU(presNb, freq);
     set_tract_params_to_RPU(presNb);
 }

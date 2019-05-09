@@ -1,7 +1,7 @@
 #ifndef DEFINITIONS
 #define DEFINITIONS
 
-#define VERSION  "v0.19.3.24"
+#define VERSION  "v0.19.5.8"
 #define NAME     "Цифровой тракт РПУ \"Кальмар\" "
 
 #include <cmath>
@@ -324,6 +324,9 @@ public:
 // параметры SDR приемника
 class SDR_params{
 public:
+    QVector<int>  findedIdxs;
+    QString       sdrInfo;
+
     int           index;               // номер используемого SDR приемника
 
     int           central_freq;        // центральная частота
@@ -336,13 +339,8 @@ public:
     bool          is_open;             // флаг готовности приемника
     bool          is_already_open;     // флаг занятости приемника другим процессом
 
-    bool          rtl_test;            // флаг включения режима, в котором ацп работает как счетчик
-
-    char          manufact[256];
-    char          product[256];
-    char          serial[256];
-
-    SDR_params(): index{0},
+    SDR_params(): sdrInfo{""},
+                  index{0},
                   central_freq{SDR_DEFAULT_CENTRAL_FREQ},
                   gain_idx {SDR_DEFAULT_GAIN_IDX},
                   rtl_agc {SDR_DEFAULT_RTL_AGC},
@@ -350,8 +348,7 @@ public:
                   direct_sampling_idx{SDR_DEFAULT_DIRECT_SAMPLING_IDX},
                   sdr_ptr{nullptr},
                   is_open{false},
-                  is_already_open{false},
-                  rtl_test{false} {}
+                  is_already_open{false}{}
 };
 
 // параметры чтения

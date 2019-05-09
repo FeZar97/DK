@@ -7,7 +7,7 @@ config_manager::config_manager(QWidget *parent, RPU *new_rpu, SDR *new_sdr, DSP 
     ui->setupUi(this);
 
     set_ui_style();
-    on_RefreshButton_clicked();
+    on_ReloadButton_clicked();
 }
 
 config_manager::~config_manager()
@@ -113,17 +113,14 @@ void config_manager::update_sdr_tab()
     ui->RtlAgcCB->setChecked(sdr->sdr_params->rtl_agc);
     ui->DirectSamplingCB->setCurrentIndex(sdr->sdr_params->direct_sampling_idx);
 
-    // если приемник не добвлен, то кнопка доступна
-    // если приемник уже подключен, то обновлять незачем
-    ui->RefreshButton->setEnabled(!sdr->sdr_params->is_open);
-
     // если приемник еще не добавлен, но есть доступные приемники
     ui->CurrentDevNumLabel->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
     ui->CurrentDevSpinBox->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
 
     // кнопка выбора индекса используемого приемника также доступна, пока примник не подключен
     // и есть свободные приемники
-    ui->ConfirmButton->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
+    ui->ConnectButton->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
+    ui->DisconnectButton->setEnabled(sdr->sdr_params->is_open);
 
     // частота дискретизации может меняться только при условии подключенного приемника и пока не идет запись
     ui->SampleRateLabel->setEnabled(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving);
@@ -136,10 +133,6 @@ void config_manager::update_sdr_tab()
     // режим оцифровки может меняться только при условии подключенного приемника и пока не идет запись
     ui->DirectSamplingLabel->setEnabled(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving);
     ui->DirectSamplingCB->setEnabled(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving);
-
-    sdr->read_sdr_info();
-    ui->SdrProductLabelOut->setText(sdr->sdr_params->product);
-    ui->SdrSerialLabelOut->setText(sdr->sdr_params->serial);
 }
 
 // обновление вкладки "ЦОС"
@@ -243,8 +236,8 @@ void config_manager::set_ui_style()
     ui->FMDemodRB->setStyleSheet(StyleHelper::getDemodRBStyleSheet());
 
     // SDR
-    ui->RefreshButton->setStyleSheet(StyleHelper::getRefreshStyleSheet());
-    ui->ConfirmButton->setStyleSheet(StyleHelper::getConfirmStyleSheet(true));
+    //ui->RefreshButton->setStyleSheet(StyleHelper::getRefreshStyleSheet());
+    //ui->ConfirmButton->setStyleSheet(StyleHelper::getConfirmStyleSheet(true));
 
     // запись
     ui->AdcPathButton->setStyleSheet(StyleHelper::getPathButtonStyleSheet());
@@ -332,14 +325,21 @@ void config_manager::on_Tract1_BandIFBox_currentIndexChanged(int new_band_if_idx
     rpu->first_tract.set_if_band_idx(new_band_if_idx);
 }
 
-// поиск новых приемников
-void config_manager::on_RefreshButton_clicked()
+
+// обновление инфомрации о подключенных приемниках
+void config_manager::on_ReloadButton_clicked()
 {
-    update_interface();
+    sdr->read_sdr_info();
+    ui->FindedSdrTE->setText(sdr->sdr_params->sdrInfo);
 }
 
-// выбор приемника по его индексу
-void config_manager::on_ConfirmButton_clicked()
+// очистка информационного поля
+void config_manager::on_ClearButton_clicked()
+{
+    ui->FindedSdrTE->clear();
+}
+
+void config_manager::on_ConnectButton_clicked()
 {
     // если приемник еще не занят
     if(!sdr->sdr_params->is_open || (sdr->sdr_params->is_open && sdr->sdr_params->is_already_open)){
@@ -356,6 +356,21 @@ void config_manager::on_ConfirmButton_clicked()
     }
 
     emit global_update_interface();
+}
+
+// отключение от приемника
+void config_manager::on_DisconnectButton_clicked()
+{
+    if(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving){
+        int result = rtlsdr_close(sdr->sdr_params->sdr_ptr);
+
+        if(!result){
+            sdr->sdr_params->is_open = false;
+        }else{
+            sdr->sdr_params->is_open = true;
+        }
+        emit global_update_interface();
+    }
 }
 
 // изменение частоты дисркетизации
@@ -377,12 +392,6 @@ void config_manager::on_DirectSamplingCB_currentIndexChanged(int new_direct_samp
 {
     sdr->sdr_params->direct_sampling_idx = new_direct_sampling_idx;
     emit global_update_interface();
-}
-
-void config_manager::on_SdrTestModeButton_clicked()
-{
-    sdr->sdr_params->rtl_test = !sdr->sdr_params->rtl_test;
-    rtlsdr_set_testmode(sdr->sdr_params->sdr_ptr, sdr->sdr_params->rtl_test);
 }
 
 // управление усиление на чипе realtek

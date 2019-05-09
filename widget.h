@@ -16,6 +16,7 @@
 #include <sdr.h>
 #include <dsp.h>
 #include <config_manager.h>
+#include <askr.h>
 #include <FftGraph.h>
 #include <SonoGraph.h>
 #include <stylehelper.h>
@@ -50,6 +51,7 @@ public:
     SDR             *sdr;
     DSP             *dsp;
     config_manager  *config_manager_form;
+    ASKR            *askr;
 
     FFT_GRAPH       *fft_graph;
     SONO_GRAPH      *sono_graph;

@@ -112,8 +112,26 @@ QString SDR::get_device_params()
             + "\n   Квадратуры: "  + QString::number(rtlsdr_get_direct_sampling(sdr_params->sdr_ptr));
 }
 
-// считывание инфы о приемнике из EEPROM
+// считывание инфы о всех подключенных приемниках
 void SDR::read_sdr_info()
 {
-    rtlsdr_get_usb_strings(sdr_params->sdr_ptr, sdr_params->manufact, sdr_params->product, sdr_params->serial);
+    int _sdrCnt = int(rtlsdr_get_device_count());
+
+    if(_sdrCnt){
+        sdr_params->sdrInfo = "Найденные SDR приемники:\n";
+
+        sdr_params->sdrInfo += QString("Производитель").leftJustified(14) + QString("Модель").leftJustified(14) + QString("ID").leftJustified(5) + "\n";
+        sdr_params->findedIdxs.clear();
+
+        char manufact[256], product[256], serial[256];
+
+        for(int sdrIdx = 0; sdrIdx < _sdrCnt; sdrIdx++){
+
+            rtlsdr_get_device_usb_strings(uint(sdrIdx), manufact, product, serial);
+
+            sdr_params->sdrInfo += QString(manufact).leftJustified(14) + QString(product).leftJustified(14) + QString::number(QString(serial).toInt()).leftJustified(5);
+        }
+    }else{
+        sdr_params->sdrInfo = "Не удалось обнаружить подключенные приемники";
+    }
 }

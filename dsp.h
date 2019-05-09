@@ -43,6 +43,7 @@ public:
     QThread      demod_thread;
     QThread      sound_thread;
     QThread      wav_thread;
+    QThread      askr_thread;
 
     DSP(SDR *new_sdr = nullptr);
     ~DSP();

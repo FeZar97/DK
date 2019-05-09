@@ -22,5 +22,9 @@
         <file>buttons/SOUND_OFF.png</file>
         <file>buttons/SOUND_ON.png</file>
         <file>buttons/FOLDER.png</file>
+        <file>buttons/CONNECT.png</file>
+        <file>buttons/DISCONNECT.png</file>
+        <file>buttons/REFRESH.png</file>
+        <file>buttons/CLEAR.png</file>
     </qresource>
 </RCC>

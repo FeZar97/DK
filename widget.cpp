@@ -10,6 +10,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings{
     sdr = new SDR();
     dsp = new DSP(sdr);
     config_manager_form = new config_manager(parent, rpu, sdr, dsp);
+    askr = new ASKR(rpu, sdr, dsp);
     fft_graph = ui->FftGraph;
     sono_graph = ui->SonoGraph;
 

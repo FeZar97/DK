@@ -33,7 +33,8 @@ SOURCES += main.cpp\
            sounder.cpp \
            FftGraph.cpp \
            SonoGraph.cpp \
-           iqcompensator.cpp
+           iqcompensator.cpp \
+    askr.cpp
 
 HEADERS  += definitions.h \
             widget.h \
@@ -55,7 +56,8 @@ HEADERS  += definitions.h \
             sounder.h \
             FftGraph.h \
             SonoGraph.h \
-            iqcompensator.h
+            iqcompensator.h \
+    askr.h
 
 FORMS    += widget.ui \
             config_manager.ui
