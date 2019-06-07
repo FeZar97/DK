@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "SonoGraph.h"
 
 SONO_GRAPH::SONO_GRAPH(QWidget *parent):
@@ -5,13 +22,13 @@ SONO_GRAPH::SONO_GRAPH(QWidget *parent):
                        dnRng{nullptr},
                        nsLvl{nullptr},
                        fps{nullptr},
+                       snStl{nullptr},
                        w{DEFAULT_SONO_WIDTH},
                        h{DEFAULT_SONO_HEIGHT},
                        fftSz{DEFAULT_FFT_SIZE},
                        sPtr{0},
                        lPtr{0},
                        lNb{0},
-                       snStl{TIRADA},
                        fftRes{new float[DEFAULT_FFT_SIZE]},
                        vSc{QImage(w,h,QImage::Format_Indexed8)},
                        vSc2{w,h}
@@ -34,6 +51,62 @@ void SONO_GRAPH::resize(const QSize &s)
     resize(s.width(), s.height());
 }
 
+void SONO_GRAPH::changePalette()
+{
+    QImage tmpV = QImage(w, h, QImage::Format_Indexed8);
+
+    switch(*snStl){
+
+        case 0:
+        {
+            for(int i = 0; i <= 255; i++)
+                if(i >= 225)
+                    tmpV.setColor(i, QColor(255 - (i - 225), i - 225, i - 225).rgb());
+                else
+                    if(i != 0 && i < 225)
+                        tmpV.setColor(i, QColor(255, 256 - i, 0).rgb());
+                    else
+                    tmpV.setColor(i, QColor(0,0,0).rgb());
+            break;
+        }
+
+        case 1:
+        {
+            for(int i = 0; i <= 255; i++){
+                // от черного до темно-синего 35 уровней
+                // 10,5,30 --- 78,39,213 c шагом 1 px
+                if(i < 35)
+                    tmpV.setColor(i, QColor(10 + i*2, 5 + i, 30 + int(i*5.4)).rgb());
+
+                // от темно-синего до фиолетового 40 уровней
+                // 81,39,213 --- 198,39,213 с шагом 3 px
+                if(i >= 35 && i < 75)
+                    tmpV.setColor(i, QColor(78 + (i-35 + 1)*3, 39, 213).rgb());
+
+                // от фиолетового до красного 35 уровней
+                // 200,40,210 --- 224,16,18 с шагом 1/1/8 px
+                if(i >= 75 && i < 100)
+                    tmpV.setColor(i, QColor(200 + (i-75), 40 - (i-75), 210 - (i-75)*8).rgb());
+
+                // от красного до желтого 50 уровней
+                // 224,20,20 --- 234,220,0 с шагом (1/5)/(4)/(2/5) px
+                if(i >= 100 && i <= 150)
+                    tmpV.setColor(i, QColor(224 + (i-100)/5, 20 + (i-100)*4, 20 - (i-100)*2/5).rgb());
+
+                // от желтого до белого 105 уровней
+                // 234,220,0 --- 255,255,255 с шагом (31/105)/(35/105)/(235/105) px
+                if(i >= 151 && i <= 255)
+                    tmpV.setColor(i, QColor(224 + (i-151)*31/105, 220 + (i-151)*35/105, (i-151)*255/105).rgb());
+            }
+            break;
+        }
+    }
+
+    tmpV.fill(0);
+
+    vSc = tmpV;
+}
+
 void SONO_GRAPH::resize(int _w, int _h)
 {
     if(_w > 0 && _h > 0){
@@ -43,61 +116,10 @@ void SONO_GRAPH::resize(int _w, int _h)
         vSc.rect().setSize(QSize(w, h));
         vSc2.rect().setSize(QSize(w, h));
 
-        QImage tmpV = QImage(w, h, QImage::Format_Indexed8);
-
-        switch(snStl){
-
-            case SHARP:{
-                for(int i = 0; i <= 255; i++)
-                    if(i >= 225)
-                        tmpV.setColor(i, QColor(255 - (i - 225), i - 225, i - 225).rgb());
-                    else
-                        if(i != 0 && i < 225)
-                            tmpV.setColor(i, QColor(255, 256 - i, 0).rgb());
-                        else
-                        tmpV.setColor(i, QColor(0,0,0).rgb());
-                break;
-            }
-
-            case TIRADA:{
-                for(int i = 0; i <= 255; i++){
-                    // от черного до темно-синего 35 уровней
-                    // 10,5,30 --- 78,39,213 c шагом 1 px
-                    if(i < 35)
-                        tmpV.setColor(i, QColor(10 + i*2, 5 + i, 30 + int(i*5.4)).rgb());
-
-                    // от темно-синего до фиолетового 40 уровней
-                    // 81,39,213 --- 198,39,213 с шагом 3 px
-                    if(i >= 35 && i < 75)
-                        tmpV.setColor(i, QColor(78 + (i-35 + 1)*3, 39, 213).rgb());
-
-                    // от фиолетового до красного 35 уровней
-                    // 200,40,210 --- 224,16,18 с шагом 1/1/8 px
-                    if(i >= 75 && i < 100)
-                        tmpV.setColor(i, QColor(200 + (i-75), 40 - (i-75), 210 - (i-75)*8).rgb());
-
-                    // от красного до желтого 50 уровней
-                    // 224,20,20 --- 234,220,0 с шагом (1/5)/(4)/(2/5) px
-                    if(i >= 100 && i <= 150)
-                        tmpV.setColor(i, QColor(224 + (i-100)/5, 20 + (i-100)*4, 20 - (i-100)*2/5).rgb());
-
-                    // от желтого до белого 105 уровней
-                    // 234,220,0 --- 255,255,255 с шагом (31/105)/(35/105)/(235/105) px
-                    if(i >= 151 && i <= 255)
-                        tmpV.setColor(i, QColor(224 + (i-151)*31/105, 220 + (i-151)*35/105, (i-151)*255/105).rgb());
-                }
-                break;
-            }
-        }
-
-        tmpV.fill(0);
-
-        vSc = tmpV;
+        changePalette();
 
         lNb = h;
         lPtr = lNb - 1;
-
-        //update();
     }
 }
 
@@ -122,11 +144,12 @@ void SONO_GRAPH::setPreviousPosition(QPoint previousPosition)
     emit previousPositionChanged(previousPosition);
 }
 
-void SONO_GRAPH::connectParams(float *extDnRng, float *extNsLvl, int *extFps)
+void SONO_GRAPH::connectParams(float *extDnRng, float *extNsLvl, int *extFps, int *extSnStl)
 {
     dnRng = extDnRng;
     nsLvl = extNsLvl;
     fps = extFps;
+    snStl = extSnStl;
 }
 
 SONO_MOUSE_TYPE SONO_GRAPH::getMouseField(QMouseEvent *e)
@@ -190,7 +213,6 @@ void SONO_GRAPH::paintScreen()
         int time_markers_number = (lNb - 1) / 100 + 1;
         for(int i = 1; i < time_markers_number; i++)
             p.drawText(5, i * 100 + 5, "-" + QString::number(i*100/(*fps)) + " сек");
-        update();
     }
 }
 
@@ -205,6 +227,7 @@ void SONO_GRAPH::paintStep(float *_fftRes)
 {
     memcpy(fftRes, _fftRes, uint(fftSz)*sizeof(float));
     paintScreen();
+    update();
 }
 
 void SONO_GRAPH::mouseMoveEvent(QMouseEvent *e)

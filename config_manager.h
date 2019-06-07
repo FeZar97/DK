@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef CONFIG_MANAGER_H
 #define CONFIG_MANAGER_H
 
@@ -46,6 +63,8 @@ public slots:
     void update_sdr_tab(); // обновление вкладки "SDR"
     void update_dsp_tab(); // обновление вкладки "ЦОС"
     void set_ui_style(); // применение стиля
+    void appendAskrTextBrowser(QString additionalText);
+    void updateAskrProgressBar(int val);
 
     void on_CloseButton_clicked();
 
@@ -54,7 +73,7 @@ public slots:
     void update_shift_rec_label();
     void update_sound_rec_label();
 
-private slots:
+public slots:
 /// -----------------------------------РПУ---------------------------------------------
     void on_LPTPortCB_currentIndexChanged(int new_lpt_port_idx); // смена адреса LPT порта
     void on_TractConfigCB_currentIndexChanged(int new_rpu_config_idx); // смена конфигурации трактов
@@ -74,9 +93,7 @@ private slots:
     void on_KalibSignalTypeBox_currentIndexChanged(int new_signal_type_idx); // изменение типа модулирующего сигнала
 
     // АСКР
-    void on_FirstValidatePB_clicked();
-    void on_spinBox_valueChanged(int _presNb);
-    void on_FreqPresNbSB_valueChanged(int _freqPresNb);
+    void on_AskrStartButton_clicked();
 
 /// -----------------------------------SDR---------------------------------------------
     void on_ReloadButton_clicked(); // поиск новых приемников
@@ -111,8 +128,11 @@ private slots:
     void on_WindowAlphaSB_valueChanged(double new_aplha); // изменение коэффициента alpha
     void on_ShiftFreqSB_valueChanged(double new_r_frec); // изменение частотного сдвига
     void on_DCOffsetGain_valueChanged(double new_dc_gain);
-    void on_FftShiftStepCB_clicked(bool new_state); // кратность шага изменения частоты сноса
     void on_NullBinCircleCB_clicked(bool new_state); // вершина нулевого бина обводится окружностью
+    void on_FreqGridCB_currentIndexChanged(int _freq_grid); // смена частотной сетки
+    void on_FftStyleCB_currentIndexChanged(int _style_idx); // смена стиля спектрограммы
+    void on_FftSonoPaletteCB_currentIndexChanged(int _palette_idx); // смена палитры сонограммы
+    void on_TransparencySB_valueChanged(double _fltBwAlpha); // изменение прозрачности полосы фильтрации
 
 // демодуляция
     void on_AMDemodRB_clicked();
@@ -121,14 +141,15 @@ private slots:
     void on_FMDemodRB_clicked();
     void on_ScaleFactorSB_valueChanged(int _scFct);
 
-
 signals:
     void global_update_interface();
     void previousPositionChanged(QPoint previousPosition);
     void prepair_wav_recorder();
-    void first_rpu_test(); // первый тест РПУ
+    void startAskr(); // АСКР
     void stop_receiving();
     void start_receiving();
+    void repaintFftGraph();
+    void repaintSonoGraph();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

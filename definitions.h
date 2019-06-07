@@ -1,7 +1,24 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef DEFINITIONS
 #define DEFINITIONS
 
-#define VERSION  "v0.19.5.8"
+#define VERSION  "v0.19.5.27"
 #define NAME     "Цифровой тракт РПУ \"Кальмар\" "
 
 #include <cmath>
@@ -23,6 +40,7 @@
 #include <QSettings>
 #include <QString>
 #include <QThread>
+#include <QTime>
 #include <QTimer>
 
 #include <inpout32.h>
@@ -88,7 +106,8 @@ enum NUMERALS{ZERO,
 // отображаемый спектр
 enum FFT_MODE{READER_FFT, // спектр сигнала с АЦП
               FLT_FFT,    // спектр отфильтрованного сигнала
-              SHIFT_FFT}; // спектр сдвинутого сигнала
+              SHIFT_FFT,  // спектр сдвинутого сигнала
+              DEMOD_FFT}; // спектр звукового сигнала
 
 // оконные функции
 enum WINDOW{NONE,
@@ -125,10 +144,13 @@ enum DEMOD_MODE{AM,
 
 // параметры трактов
 #define     RPU_DEFAULT_TRACT_FREQ                  15000000                            // 15 Мгц - частота по умолчанию
-#define     RPU_MAX_TRACT_FREQ                      32000000                            // 31,999999 Мгц - верхняя чатсота
-#define     RPU_MIN_TRACT_FREQ                      150000                              // 1 Мгц - нижняя частота
+#define     RPU_MAX_TRACT_FREQ                      31999999                            // 31,999999 Мгц - верхняя чатсота
+#define     RPU_MIN_TRACT_FREQ                      150000                              // 150 кГц - нижняя частота
 
 #define     RPU_DEFAULT_IN_ATT_IDX                  OFF                                 // по умолчанию входной аттенюатор отключен
+#define     RPU_IN_ATT_STEP                         10                                  // шаг сетки входного аттенюатора (дБ)
+#define     RPU_MAX_IN_ATT_IDX                      1                                   // максимальный индекс элемента из выпадающего списка входного аттенюатора
+#define     RPU_MIN_IN_ATT_IDX                      0                                   // минимальный индекс элемента из выпадающего списка входного аттенюатора
 
 #define     RPU_DEFAULT_HF_ATT_IDX                  OFF                                 // по умолчанию ВЧ аттенюатор отключен
 #define     RPU_HF_ATT_STEP                         6                                   // шаг сетки аттенюатора ВЧ (дБ)
@@ -137,7 +159,7 @@ enum DEMOD_MODE{AM,
 
 #define     RPU_DEFAULT_IF_ATT_IDX                  OFF                                 // выключен
 #define     RPU_IF_ATT_STEP                         2                                   // шаг сетки аттенюатора ПЧ (дБ)
-#define     RPU_MAX_IF_ATT_IDX                      15                                   // максимальный индекс элемента из выпадающего списка ПЧ аттенюатора
+#define     RPU_MAX_IF_ATT_IDX                      15                                  // максимальный индекс элемента из выпадающего списка ПЧ аттенюатора
 #define     RPU_MIN_IF_ATT_IDX                      0                                   // минимальный индекс элемента из выпадающего списка ВЧ аттенюатора
 
 #define     RPU_DEFAULT_IF_BAND_IDX                 0                                   // 3 кГц
@@ -177,6 +199,10 @@ enum DEMOD_MODE{AM,
 #define     DSP_FFT_DEFAULT_INVERSION               false
 #define     DSP_DEFAULT_FFT_WINDOW                  NONE
 #define     DSP_DEFAULT_WIN_ALPHA                   0.5
+#define     DSP_DEFAULT_FFT_STYLE_IDX               0
+#define     DSP_DEFAULT_FFT_GRID_IDX                0
+#define     DSP_DEFAULT_FFT_SONO_PALETTE_IDX        0
+#define     DSP_DEFAULT_FFT_FLT_ALPHA               0.2
 #define     DSP_COMPENSATE_BUF_SIZE                 10
 
 #define     DSP_DEMOD_DEFAULT_MODE                  FM
@@ -459,13 +485,20 @@ public:
     bool                fft_inversion;             // флаг инверсии спектра
     WINDOW              fft_current_window;        // используемое окно
     float               fft_win_alpha;             // параметр оконной функции
+    int                 fft_stlIdx;                // индекс стиля отображения спектра
+    int                 fft_frqGrdIdx;             // индекс сетки частот, используемой для подписи
+    int                 fft_sonoPltIdx;            // индекс палитры сонограммы
+    double              fft_fltBwAlpha;            // прозрачность полосы фильтрации
 
     Ipp32f              fft_res[DSP_FFT_SIZE];     // энергетический спектр
 
-    IppsFFTSpec_C_32fc  *pFftSpec;                 // спецификация
-    Ipp8u               *fft_buf;                  // буфер БПФ
+    IppsFFTSpec_C_32fc  *pFftSpec_fc;              // спецификация fc
+    IppsFFTSpec_R_32f   *pFftSpec_f;               // спецификация r
+    Ipp8u               *fft_buf_fc;               // буфер БПФ fc
+    Ipp8u               *fft_buf_f;                // буфер БПФ f
 
-    Ipp32fc             fft_dst[DSP_FFT_SIZE];
+    Ipp32fc             fft_dst_fc[DSP_FFT_SIZE];
+    Ipp32f              fft_dst_f[DSP_FFT_SIZE + 2]; // in CCS format required N + 1 cells
 
     FFT_params():       fft_dynamic_range{DSP_FFT_DEFAULT_DYNAMIC_RANGE},
                         fft_noise_level{DSP_FFT_DEFAULT_NOISE_LEVEL},
@@ -481,19 +514,35 @@ public:
                         fft_inversion{DSP_FFT_DEFAULT_INVERSION},
                         fft_current_window{DSP_DEFAULT_FFT_WINDOW},
                         fft_win_alpha{DSP_DEFAULT_WIN_ALPHA},
+                        fft_stlIdx{DSP_DEFAULT_FFT_STYLE_IDX},
+                        fft_frqGrdIdx{DSP_DEFAULT_FFT_GRID_IDX},
+                        fft_sonoPltIdx{DSP_DEFAULT_FFT_SONO_PALETTE_IDX},
+                        fft_fltBwAlpha{DSP_DEFAULT_FFT_FLT_ALPHA},
 
-                        pFftSpec{nullptr},
-                        fft_buf{nullptr}
+                        pFftSpec_fc{nullptr},
+                        pFftSpec_f{nullptr},
+                        fft_buf_fc{nullptr},
+                        fft_buf_f{nullptr}
                         {
                             ippsZero_32f(fft_res, DSP_FFT_SIZE);
                             ippsZero_32f(compensateBuf, 20);
 
                             int sizeSpec = 0, sizeInit = 0, sizeBuffer = 0;
+
                             ippsFFTGetSize_C_32fc(DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer);
-                            Ipp8u *FFTSpec = new Ipp8u[sizeSpec];
-                            Ipp8u *FFTSpecBuf = new Ipp8u[sizeInit];
-                            fft_buf = new Ipp8u[sizeBuffer];
-                            ippsFFTInit_C_32fc(&pFftSpec, DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, FFTSpec, FFTSpecBuf);
+                            Ipp8u *FFTSpec_fc = new Ipp8u[sizeSpec];
+                            Ipp8u *FFTSpecBuf_fc = new Ipp8u[sizeInit];
+                            fft_buf_fc = new Ipp8u[sizeBuffer];
+                            ippsFFTInit_C_32fc(&pFftSpec_fc, DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, FFTSpec_fc, FFTSpecBuf_fc);
+
+                            Ipp8u *FFTSpec_f = new Ipp8u[sizeSpec];
+                            Ipp8u *FFTSpecBuf_f = new Ipp8u[sizeInit];
+
+                            ippsFFTGetSize_R_32f(DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer);
+                            FFTSpec_f = new Ipp8u[sizeSpec];
+                            FFTSpecBuf_f = new Ipp8u[sizeInit];
+                            fft_buf_f = new Ipp8u[sizeBuffer];
+                            ippsFFTInit_R_32f(&pFftSpec_f, DSP_FFT_ORDER, IPP_FFT_DIV_BY_SQRTN, ippAlgHintNone, FFTSpec_f, FFTSpecBuf_f);
                         }
 };
 
@@ -549,9 +598,15 @@ public:
 
     DEMOD_MODE      demod_mode;         // вид модуляции
 
+    // для двухполосной АМ
     int             am_down_sample_factor; // коэф-т прореживания
     int             am_down_sample_phase;  // фаза прореживание (при опредленных расчетах не используется)
 
+    // для ОБП
+    Ipp32fc         *complex_sin;        // комплексная синусоида для сдвига
+    Ipp32f          sin_phase;           // фаза синусоиды
+
+    // для ЧМ
     int             fm_first_down_sample_factor; // коэф-т прореживания
     int             fm_first_down_sample_phase;  // фаза прореживание (при опредленных расчетах не используется)
     Ipp32f          first_last_sample;        // последний отсчет предыдущего блока. предотввращает разрыв фазы между блоками
@@ -579,6 +634,8 @@ public:
     DEMOD_params(): demod_mode{DSP_DEMOD_DEFAULT_MODE},
                     am_down_sample_factor{SDR_DEFAULT_SAMPLE_RATE / DSP_SOUND_SAMPLE_RATE},
                     am_down_sample_phase{0},
+                    complex_sin{nullptr},
+                    sin_phase{0},
                     fm_first_down_sample_factor{SDR_DEFAULT_SAMPLE_RATE / DSP_FM_DEMOD_SAMPLE_RATE},
                     fm_first_down_sample_phase{0},
                     first_last_sample{0},
@@ -627,6 +684,12 @@ public:
     void realloc_mem(int flt_buf_size){
 
         rb.realloc_mem();
+
+        if(complex_sin){
+            delete[] complex_sin;
+            complex_sin = nullptr;
+        }
+        complex_sin = new Ipp32fc[flt_buf_size / 2];
 
         if(down_buf_fc){
             delete[] down_buf_fc;

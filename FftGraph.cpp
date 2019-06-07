@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "FftGraph.h"
 
 FFT_GRAPH::FFT_GRAPH(QWidget *parent):
@@ -10,6 +27,10 @@ FFT_GRAPH::FFT_GRAPH(QWidget *parent):
                      cSdrFr{nullptr},
                      cRpuFr{nullptr},
                      sRt{nullptr},
+                     stlIdx{nullptr},
+                     frqGrdIdx{nullptr},
+                     fltBwAlp{nullptr},
+                     invFlg{nullptr},
                      w{DEFAULT_WIDTH},
                      h{DEFAULT_HEIGHT},
                      fftSz{DEFAULT_FFT_SIZE},
@@ -22,9 +43,7 @@ FFT_GRAPH::FFT_GRAPH(QWidget *parent):
                      x{0},
                      y{0},
                      cFrRct{QRect(0,0,1,1)},
-                     fltBwAlp{FLT_BW_ALPHA},
                      bckClr{Qt::black},
-                     fftStl{MOUNTAINS},
                      mPsX{0},
                      mPsY{0},
                      avgNLvl{0},// то же самое что и nsLvLn
@@ -97,7 +116,8 @@ void FFT_GRAPH::setFftSize(int _s)
 }
 
 void FFT_GRAPH::connectParams(float *extDnRng, float *extNsLvl, bool *extNBinFlag, double *extRFltFreq,
-                              double *extShFr, int *extCSdrFr, int *extCRpuFr, int *extSRt)
+                              double *extShFr, int *extCSdrFr, int *extCRpuFr, int *extSRt,
+                              int *extStlIdx, int *extFrqGrdIdx, double *extFltBwAlp, bool *extInvFlg)
 {
     dnRng = extDnRng;
     nsLvl = extNsLvl;
@@ -107,6 +127,10 @@ void FFT_GRAPH::connectParams(float *extDnRng, float *extNsLvl, bool *extNBinFla
     cSdrFr = extCSdrFr;
     cRpuFr = extCRpuFr;
     sRt = extSRt;
+    stlIdx = extStlIdx;
+    frqGrdIdx = extFrqGrdIdx;
+    fltBwAlp = extFltBwAlp;
+    invFlg = extInvFlg;
 }
 
 void FFT_GRAPH::setPreviousPosition(QPoint previousPosition)
@@ -149,8 +173,10 @@ void FFT_GRAPH::paintSpectrum(QPainter &p)
     // число, показывающее количество бинов БПФ, влияющих на каждый пиксель отрисовки спектра
     // если DSP_FFT_SIZE == 4, а width == 6, то interpoly_coef = 1,5 => каждый бин БПФ оказывает влияние на int(interpoly_coef) + 1 = 2 пикселя БПФ
 
-    switch(fftStl){
-        case MOUNTAINS:{
+    switch(*stlIdx){
+
+        // ломаная
+        case 0:{
             for(i = 0 ; i < fftSz - 1; ++i){
                 if(i != fftSz/2 - 1){
                     p1.setX((i + fftSz/2) % fftSz);
@@ -165,7 +191,8 @@ void FFT_GRAPH::paintSpectrum(QPainter &p)
             break;
         }
 
-        case BINS:{
+        // бины
+        case 1:{
             for(i = 0 ; i < fftSz ; i++){
                 p1.setX((i + fftSz/2) % fftSz);
                 p1.setY(int(h * (1 - (fftRes[i] - *nsLvl) / *dnRng)));
@@ -176,11 +203,12 @@ void FFT_GRAPH::paintSpectrum(QPainter &p)
             break;
         }
 
-        case DOTS:{
+        // точки
+        case 2:{
             for(i = 0 ; i < fftSz ; i++){
                 p1.setX((i + fftSz/2) % fftSz);
                 p1.setY(int(h * (1 - (fftRes[i] - *nsLvl) / *dnRng)));
-                p.drawEllipse(p1, 5, 5);
+                p.drawEllipse(p1, 1, 1);
             }
             break;
         }
@@ -217,17 +245,30 @@ void FFT_GRAPH::paintGrid(QPainter &p)
 // подписи частот, уровней и отображении информации
 void FFT_GRAPH::paintSignature(QPainter &p)
 {
+// полоса фильтрации
+    p.setPen(Qt::NoPen);
+    QColor clr = Qt::gray;
+    clr.setAlphaF(*fltBwAlp);
+    p.setBrush(clr);
+    p.drawRect(QRectF(w/2 - int(w * *rFltFreq), 0, int(w * *rFltFreq * 2), h));
+
 // частоты
+    // поле frqGrdIdx определяет источник частот для подписей - частоты БПО (idx == 0) или частоты SDR (idx == 1)
+    int srcFrq = *frqGrdIdx  ? *cSdrFr + *shFr : *cRpuFr;
     // fi - i-я частота сетки, dNb - рарядность частоты
     int i, fi, dNb;
     p.setPen(QPen(QColor("#ff8306"), 1));
+
     for(i = 0; i < vLN; i++){
-        fi = int(*cSdrFr + *shFr + (*sRt / vRN) * (i - vLN/2));
+        // с учетом инверсии
+        // fi = int(srcFrq + (*sRt / vRN) * (*invFlg ? (vLN/2 - i) : (i - vLN/2)));
+        fi = int(srcFrq + (*sRt / vRN) * (i - vLN/2));
         dNb = 1 + static_cast<int>(log10(fi));
         // середина числа должна располагаться точно под линией сетки
         // 7 разрядов ~ 22px, 8 ~ 24 px, 9 ~ 26 px
         // x_coord = (delta_x + delta_x * i + i/2) - (dig_num * 2 + 8)
-        p.drawText(int(dx + dx * i + i/2 - (dNb * 2 + 8)), h - 5, QString::number(fi));
+        //p.drawText(int(dx + dx * i + i/2 - (dNb * 2 + 8)), h - 5, QString::number(fi));
+        p.drawText(int(dx + dx * i + i/2 - (dNb * 2 + 8)), h - 5, separateFreq(fi));
     }
 
 // дБ
@@ -246,18 +287,15 @@ void FFT_GRAPH::paintSignature(QPainter &p)
     p.setPen(QPen(Qt::cyan));
     if(*nBin) p.drawEllipse(w/2 - 5 + (w * *shFr / *sRt), int(h * (1 - (fftRes[int(w * *shFr / *sRt)] - *nsLvl) / *dnRng) - 5), 10, 10);
 
-// полоса фильтрации
-    p.setPen(Qt::NoPen);
-    QColor clr = Qt::gray;
-    clr.setAlphaF(FLT_BW_ALPHA);
-    p.setBrush(clr);
-    p.drawRect(QRectF(w/2 - int(w * *rFltFreq), 0, int(w * *rFltFreq * 2), h));
-
 // линия трекера
-    p.setPen(QPen(QColor("#6f72ff"), 1));
+    // поле frqGrdIdx определяет источник частот для подписей - частоты БПО (idx == 0) или частоты SDR (idx == 1)
+    srcFrq = *frqGrdIdx  ? *cSdrFr + *shFr : *cRpuFr;
+    // #6f72ff
+    p.setPen(QPen(QColor("#2d0fff"), 1));
     p.drawLine(mPsX, 0, mPsX, h - 15);
+    p.setPen(QPen(QColor("#6f72ff"), 1));
     // значение частоты, соответствующей линии трекера
-    p.drawText(mPsX + 4, h - 19, QString::number(*cSdrFr + (mPsX/double(w) - 0.5) * *sRt, 'f', 0));
+    p.drawText(mPsX + 4, h - 19, separateFreq(srcFrq + (mPsX/double(w) - 0.5) * *sRt));
 }
 
 // изменение размеров виджета
@@ -405,6 +443,14 @@ void FFT_GRAPH::findMaxBin()
         if(fftRes[i] > fftRes[mBin]) mBin = i;
 }
 
+QString FFT_GRAPH::separateFreq(int freq)
+{
+    QString res = QString::number(freq);
+    for (int i = res.size() - 3; i >= 1; i -= 3)
+        res.insert(i, ' ');
+    return res;
+}
+
 // итерация отрисовки
 void FFT_GRAPH::paintStep(float *_fftRes)
 {
@@ -433,8 +479,10 @@ void FFT_GRAPH::mouseMoveEvent(QMouseEvent *e)
 
     switch(m_rightMouseButtonPressed){
         case FREQ_CHANGE:{
-            *cRpuFr += int((-1) * (e->x() - m_previousPosition.x()) * (*sRt / float(w)));
-            emit changeRpuFreq(*cRpuFr);
+            int newTractFreq = (int(*cRpuFr + int((-1) * (e->x() - m_previousPosition.x()) * (*sRt / float(w))))/1000)*1000;
+            //int newTractFreq = int(*cRpuFr + int((-1) * (e->x() - m_previousPosition.x()) * 1000));
+            //*cRpuFr += int((-1) * (e->x() - m_previousPosition.x()) * (*sRt / float(w)));
+            emit changeRpuFreq(newTractFreq);
             setPreviousPosition(e->pos());
             break;
         }
@@ -442,6 +490,9 @@ void FFT_GRAPH::mouseMoveEvent(QMouseEvent *e)
             getMouseField(e);
             break;
     }
+
+    // new
+    paintScreen();
 
     return QWidget::mouseMoveEvent(e);
 }

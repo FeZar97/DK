@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef FFTGRAPH_H
 #define FFTGRAPH_H
 
@@ -11,16 +28,8 @@
 #define     DEFAULT_HEIGHT             706
 #define     NOISE_PANEL_WIDTH          35
 #define     DEFAULT_FFT_SIZE           1024
-#define     FLT_BW_ALPHA               0.2
-#define     DEFAULT_FLT_BAND_VISIBLE   true
-#define     DEFAULT_COLOR_ALPHA        0.2
 
-enum FFT_STYLE{
-    MOUNTAINS,
-    BINS,
-    DOTS
-};
-
+// тип лкм/пкм
 enum MOUSE_TYPE{FREQ_CHANGE,
                 NONE_MT};
 
@@ -33,40 +42,40 @@ public:
                        ~FFT_GRAPH();
 
     // экспортируемое
-    float               *dnRng; // динамиечский диапазон
-    float               *nsLvl; // уровень шума
-    bool                *nBin;  // флаг отображения нулевого бина бпф
-    double              *rFltFreq;// полоса фильтрации
-    double              *shFr;  // смещение нулевой частоты на спектре
-    int                 *cSdrFr;// центральная частота SDR
-    int                 *cRpuFr;// центральная частота РПУ
-    int                 *sRt;   // частота дискретизации
+    float               *dnRng;    // динамиечский диапазон
+    float               *nsLvl;    // уровень шума
+    bool                *nBin;     // флаг отображения нулевого бина бпф
+    double              *rFltFreq; // полоса фильтрации
+    double              *shFr;     // смещение нулевой частоты на спектре
+    int                 *cSdrFr;   // центральная частота SDR
+    int                 *cRpuFr;   // центральная частота РПУ
+    int                 *sRt;      // частота дискретизации
+    int                 *stlIdx;   // стиль отображения спектра
+    int                 *frqGrdIdx;// источник подписей для сетки частот
+    double              *fltBwAlp; // прозрачность полосы фильтрации
+    bool                *invFlg;   // инверсия спектра
 
     // внутренние поля
-    int                 w;     // ширина виджета
-    int                 h;     // высота виджета
+    int                 w;         // ширина виджета
+    int                 h;         // высота виджета
 
-    int                 fftSz; // размерность БПФ
+    int                 fftSz;     // размерность БПФ
 
-    int                 vRN;   // количество вертикальных регионов
-    int                 hRN;   // количество горизонтальных регионов
-    int                 vLN;   // количество вертикальных линий сетки
-    int                 hLN;   // количество горизонтальных линий сетки
+    int                 vRN;       // количество вертикальных регионов
+    int                 hRN;       // количество горизонтальных регионов
+    int                 vLN;       // количество вертикальных линий сетки
+    int                 hLN;       // количество горизонтальных линий сетки
 
-    float               dx;    // ширина горизонтального региона
-    float               dy;    // ширина вертикального региона
-    float               x;     // абсцисса
-    float               y;     // ордината
-    QRectF              cFrRct;// прямоугольник соответствующий области изменения частоты
+    float               dx;        // ширина горизонтального региона
+    float               dy;        // ширина вертикального региона
+    float               x;         // абсцисса
+    float               y;         // ордината
+    QRectF              cFrRct;    // прямоугольник соответствующий области изменения частоты
 
-    double              fltBwAlp;// прозрачность полосы
+    QColor              bckClr;    // цвет подложки
 
-    QColor              bckClr;// цвет подложки
-
-    FFT_STYLE           fftStl;// стиль отображения спектра
-
-    int                 mPsX;  // абсцисса указтеля мыши
-    int                 mPsY;  // ордината указтеля мыши
+    int                 mPsX;      // абсцисса указтеля мыши
+    int                 mPsY;      // ордината указтеля мыши
 
     float               avgNLvl;   // скользящее среднее шума
     QMap<int, QVector<float>>
@@ -75,11 +84,11 @@ public:
     bool                fcdMXUpd;  // флаг принудительного обновления шумовой матрицы
     bool                avgNlvlRd; // флаг готовности среднего значения
 
-    int                 mBin;  // максимальный бин БПФ
+    int                 mBin;      // максимальный бин БПФ
 
-    float              *fftRes;// буфер для хранения энергетического спектра
+    float              *fftRes;    // буфер для хранения энергетического спектра
 
-    QPixmap             vSc;   // виртуальный экран
+    QPixmap             vSc;       // виртуальный экран
 
     void                setPreviousPosition(QPoint previousPosition);
 
@@ -89,7 +98,9 @@ public:
     void                setFftSize(int _s);
 
     void                connectParams(float *extDnRng, float *extNsLvl, bool *extNBinFlag, double *extRFltFreq,
-                                      double *extShFr, int *extCSdrFr, int *extCRpuFr, int *extSRt);
+                                      double *extShFr, int *extCSdrFr, int *extCRpuFr, int *extSRt,
+                                      int *extStlIdx, int *extFrqGrdIdx, double *extFltBwAlp,
+                                      bool *extInvFlg);
 
 private:
     MOUSE_TYPE          m_leftMouseButtonPressed;
@@ -104,15 +115,16 @@ private:
     void                paintSpectrum(QPainter &p);  // отрисовка спектра
     void                paintGrid(QPainter &p);      // отрисовка сетки
     void                paintSignature(QPainter &p); // подписи частот, уровней и отображении информации
-    void                paintScreen();
 
     void                clearFftRes();
 
     void                calcNoiseLevel();
     void                findMaxBin();
+    QString             separateFreq(int freq);
 
 public slots:
     void                paintStep(float *_fftRes);
+    void                paintScreen();
 
 protected:
     void                mouseMoveEvent(QMouseEvent *e);

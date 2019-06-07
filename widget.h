@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef WIDGET_H
 #define WIDGET_H
 
@@ -20,6 +37,7 @@
 #include <FftGraph.h>
 #include <SonoGraph.h>
 #include <stylehelper.h>
+#include <splashscreen.h>
 
 namespace Ui {
 class Widget;
@@ -52,16 +70,19 @@ public:
     DSP             *dsp;
     config_manager  *config_manager_form;
     ASKR            *askr;
+    SplashScreen    *spl;
 
     FFT_GRAPH       *fft_graph;
     SONO_GRAPH      *sono_graph;
+
+    QThread         askrThread;
 
 public slots:
     void setPreviousPosition(QPoint previousPosition);
     void global_update_interface(); // обновление интерфейса
     void set_ui_style(); // изменение интерфейса
     void bind_slots_signals(); // сигнально-слотовые соединения между объектами
-    void first_rpu_test(); // первый тест РПУ
+    void startAskr();
 
 private slots:
     void on_ConfigButton_clicked(); // открытие/закрытие настройщика
@@ -85,6 +106,8 @@ signals:
     void changeEvent(QEvent *e);
     void previousPositionChanged(QPoint previousPosition);
     void start_reading();
+    void repaintFftGraph();
+    void repaintSonoGraph();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "widget.h"
 #include "ui_widget.h"
 
@@ -11,6 +28,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings{
     dsp = new DSP(sdr);
     config_manager_form = new config_manager(parent, rpu, sdr, dsp);
     askr = new ASKR(rpu, sdr, dsp);
+    askrThread.start();
+    askr->moveToThread(&askrThread);
     fft_graph = ui->FftGraph;
     sono_graph = ui->SonoGraph;
 
@@ -24,6 +43,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget), settings{
 
 Widget::~Widget()
 {
+    askrThread.quit();
+    askrThread.wait();
+
     delete rpu;
     delete sdr;
     delete dsp;
@@ -71,12 +93,12 @@ void Widget::global_update_interface()
     ui->NoiseLevelHS->setValue(int(dsp->dsp_params->fft_params.fft_noise_level));
     ui->SoundButton->setStyleSheet(StyleHelper::getSoundButton(dsp->dsp_params->sound_params.is_mute));
 
-    ui->SoundVolumeHS->setStyleSheet(StyleHelper::getSoundVolumeHS(!dsp->dsp_params->sound_params.is_mute));
     ui->SoundVolumeHS->setValue(dsp->dsp_params->sound_params.sound_volume);
     ui->SoundVolumeHS->setEnabled(!dsp->dsp_params->sound_params.is_mute);
+    ui->SoundVolumeHS->setStyleSheet(StyleHelper::getSoundVolumeHS(!dsp->dsp_params->sound_params.is_mute));
 
 // подписи громкости звука, динамического диапазона и уровня шума
-    ui->SoundLabel->setText("Громкость ( " + (dsp->dsp_params->sound_params.is_mute ? " 0 % )" : QString::number(ui->SoundVolumeHS->value()) + " % )"));
+    ui->SoundLabel->setText("Громкость ( " + (dsp->dsp_params->sound_params.is_mute ? "0 % )" : QString::number(ui->SoundVolumeHS->value()) + " % )"));
     ui->DynRangeLabel->setText("Динамический диапазон ( " + QString::number(int(dsp->dsp_params->fft_params.fft_dynamic_range)) + " дБ )");
     ui->NoiseLevelLabel->setText("Смещение ( " + QString::number(int(dsp->dsp_params->fft_params.fft_noise_level)) + " дБ )");
 
@@ -111,16 +133,27 @@ void Widget::set_ui_style()
 // сигнально-слотовые соединения между объектами
 void Widget::bind_slots_signals()
 {
+    connect(config_manager_form, &config_manager::startAskr,               askr,                &ASKR::testRpu);
+
+    connect(askr,                &ASKR::updateAskrResTextBrowser,          config_manager_form, &config_manager::appendAskrTextBrowser);
+    connect(askr,                &ASKR::updateAskrProgressBar,             config_manager_form, &config_manager::updateAskrProgressBar);
+    connect(askr,                &ASKR::globalUpdateInterface,             this,                &Widget::global_update_interface);
+    connect(&askrThread,         &QThread::finished,                       askr,                &QObject::deleteLater);
+
     connect(config_manager_form, &config_manager::global_update_interface, this,                &Widget::global_update_interface);
-    connect(config_manager_form, &config_manager::first_rpu_test,          this,                &Widget::first_rpu_test);
+    connect(config_manager_form, &config_manager::repaintFftGraph,         ui->FftGraph,        &FFT_GRAPH::paintScreen);
+    connect(config_manager_form, &config_manager::repaintSonoGraph,        ui->SonoGraph,       &SONO_GRAPH::changePalette);
     connect(sdr,                 &SDR::recalc_dsp_params,                  dsp,                 &DSP::recalc_dsp_params);
     connect(dsp,                 &DSP::global_update_interface,            this,                &Widget::global_update_interface);
     connect(ui->MinimizeButton,  &QToolButton::clicked,                    this,                &Widget::showMinimized);
+    connect(&rpu->first_tract,   &RPU_tract::global_update_interface,      this,                &Widget::global_update_interface);
 
     // отрисовка спектра
     connect(this,                &Widget::start_reading,                   dsp->reader,         &READER::start_reading);
+    connect(this,                &Widget::repaintFftGraph,                 ui->FftGraph,        &FFT_GRAPH::paintScreen);
     connect(dsp->fft,            &FFT_CALCER::paint_fft,                   ui->FftGraph,        &FFT_GRAPH::paintStep);
     connect(dsp->fft,            &FFT_CALCER::paint_fft,                   ui->SonoGraph,       &SONO_GRAPH::paintStep);
+    connect(this,                &Widget::repaintSonoGraph,                ui->SonoGraph,       &SONO_GRAPH::changePalette);
 
     // старт-стоп
     connect(config_manager_form, &config_manager::stop_receiving,          this,                &Widget::on_StopButton_clicked);
@@ -150,12 +183,22 @@ void Widget::bind_slots_signals()
                              &dsp->dsp_params->shift_params.r_frec,
                              &sdr->sdr_params->central_freq,
                              &rpu->first_tract.central_freq,
-                             &sdr->sdr_params->sample_rate);
+                             &sdr->sdr_params->sample_rate,
+                             &dsp->dsp_params->fft_params.fft_stlIdx,
+                             &dsp->dsp_params->fft_params.fft_frqGrdIdx,
+                             &dsp->dsp_params->fft_params.fft_fltBwAlpha,
+                             &dsp->dsp_params->fft_params.fft_inversion);
 
     // передача в sono_graph валидных указателей
     sono_graph->connectParams(&dsp->dsp_params->fft_params.fft_dynamic_range,
                               &dsp->dsp_params->fft_params.fft_noise_level,
-                              &dsp->dsp_params->read_params.readout_per_seconds);
+                              &dsp->dsp_params->read_params.readout_per_seconds,
+                              &dsp->dsp_params->fft_params.fft_sonoPltIdx);
+}
+
+void Widget::startAskr()
+{
+    askr->testRpu();
 }
 
 void Widget::on_ConfigButton_clicked()
@@ -226,12 +269,16 @@ void Widget::on_DynamicRangeHS_valueChanged(int new_dnRng)
 {
     dsp->dsp_params->fft_params.fft_dynamic_range = float(new_dnRng);
     global_update_interface();
+    emit repaintFftGraph();
+    emit repaintSonoGraph();
 }
 
 void Widget::on_NoiseLevelHS_valueChanged(int new_noiseLvl)
 {
     dsp->dsp_params->fft_params.fft_noise_level = float(new_noiseLvl);
     global_update_interface();
+    emit repaintFftGraph();
+    emit repaintSonoGraph();
 }
 
 
@@ -309,6 +356,11 @@ void Widget::save_settings()
     settings.setValue("inversion",          dsp->dsp_params->fft_params.fft_inversion);
     settings.setValue("current_window",     dsp->dsp_params->fft_params.fft_current_window);
     settings.setValue("win_alpha",          dsp->dsp_params->fft_params.fft_win_alpha);
+    settings.setValue("win_alpha",          dsp->dsp_params->fft_params.fft_win_alpha);
+    settings.setValue("fftStl",             dsp->dsp_params->fft_params.fft_stlIdx);
+    settings.setValue("frqGrdIdx",          dsp->dsp_params->fft_params.fft_frqGrdIdx);
+    settings.setValue("sonoPaletteIdx",     dsp->dsp_params->fft_params.fft_sonoPltIdx);
+    settings.setValue("fltBwAlpha",         dsp->dsp_params->fft_params.fft_fltBwAlpha);
     settings.endGroup();
 
     settings.beginGroup("/wav_rec");
@@ -394,7 +446,7 @@ void Widget::restore_settings()
 
     settings.beginGroup("/flt");
     dsp->dsp_params->flt_params.fltBw                  = settings.value("fltBw", DSP_FLT_DEFAULT_BW).toInt();
-    dsp->dsp_params->flt_params.fltRFrec               = dsp->dsp_params->flt_params.fltBw / sdr->sdr_params->sample_rate;
+    dsp->dsp_params->flt_params.fltRFrec               = dsp->dsp_params->flt_params.fltBw / (2 * sdr->sdr_params->sample_rate);
     dsp->dsp_params->flt_params.recalc_flt_coeffs();
     settings.endGroup();
 
@@ -413,6 +465,10 @@ void Widget::restore_settings()
     dsp->dsp_params->fft_params.fft_inversion          =          settings.value("inversion",       DSP_FFT_DEFAULT_INVERSION).toBool();
     dsp->dsp_params->fft_params.fft_current_window     =   WINDOW(settings.value("current_window",  DSP_DEFAULT_FFT_WINDOW).toInt());
     dsp->dsp_params->fft_params.fft_win_alpha          =          settings.value("win_alpha",       DSP_DEFAULT_WIN_ALPHA).toFloat();
+    dsp->dsp_params->fft_params.fft_stlIdx             =          settings.value("fftStl",          DSP_DEFAULT_FFT_STYLE_IDX).toInt();
+    dsp->dsp_params->fft_params.fft_frqGrdIdx          =          settings.value("frqGrdIdx",       DSP_DEFAULT_FFT_GRID_IDX).toInt();
+    dsp->dsp_params->fft_params.fft_sonoPltIdx         =          settings.value("sonoPaletteIdx",  DSP_DEFAULT_FFT_SONO_PALETTE_IDX).toInt();
+    dsp->dsp_params->fft_params.fft_fltBwAlpha         =          settings.value("fltBwAlpha",      DSP_DEFAULT_FFT_FLT_ALPHA).toDouble();
     settings.endGroup();
 
     settings.beginGroup("/wav_rec");
@@ -441,10 +497,7 @@ void Widget::restore_settings()
         else dsp->dsp_params->sound_params.audio_out->setVolume(dsp->dsp_params->sound_params.sound_volume / 100.);
     }
 
-    if(is_receiving)
-        on_RecButton_clicked();
-    else
-        dsp->recalc_dsp_params();
+    dsp->recalc_dsp_params();
 }
 
 // обработка события сворачивания главного окна
@@ -468,129 +521,6 @@ void Widget::showEvent(QShowEvent *event)
 QPoint Widget::previousPosition() const
 {
     return m_previousPosition;
-}
-
-/*
-первый этап работы АСКР
-производится перестройка на центральные частоты преселекторов и измеряется уровень калибровочного сигнала
- 200  - 1000  : 600 кГц
- 1000 - 1500  : 1250 кГц
- 1500 - 2200  : 1850 кГц
- 2200 - 3200  : 2700 кГц
- 3200 - 4700  : 3800 кГц  (должно быть 3950)
- 4700 - 6800  : 5250 кГц  (должно быть 5750)
- 6800 - 9900  : 7350 кГц  (должно быть 8750)
- 9900 - 14400 : 12150 кГц
-14400 - 20700 : 17550 кГц
-20700 - 32000 : 26350 кГц
-*/
-void Widget::first_rpu_test()
-{
-    dsp->dsp_params->read_params.is_receiving = false;
-    rtlsdr_reset_buffer(sdr->sdr_params->sdr_ptr);
-
-/// настройки РПУ
-    // перевод РПУ в четырехканальных режим
-    rpu->set_config(FOUR_CHANNEL);
-
-    // настройки тракта РПУ
-    rpu->first_tract.set_central_freq(15000000);
-    rpu->first_tract.set_if_band_idx(3); // 150кГц
-    rpu->first_tract.set_in_att_idx(OFF);
-    rpu->first_tract.set_hf_att_idx(OFF);
-    rpu->first_tract.set_if_att_idx(OFF);
-
-    // настройки калибратора
-    rpu->kalibrator.set_work_status(ON);
-    rpu->kalibrator.set_att_idx(30);
-    rpu->kalibrator.set_exit_type(INTERNAL);
-    rpu->kalibrator.set_signal_type(SINUS);
-
-/// настройки SDR
-    // если нет коннекта к SDR - выход
-    if(!sdr->sdr_params->is_open) return;
-
-    sdr->sdr_params->central_freq = 5500000;
-    sdr->sdr_params->direct_sampling_idx = 2;
-    sdr->sdr_params->gain_idx = 1;
-    sdr->sdr_params->rtl_agc = false;
-    sdr->sdr_params->sample_rate = 240000;
-
-/// настройки ЦОС
-    dsp->dsp_params->fft_params.fft_mode = READER_FFT;
-    dsp->dsp_params->fft_params.dc_offset_gain = float(127.384);
-    // кол-во обращений к преимнику/сек = 10
-    // объем считываемых данных = 2 * 230к / 10 = 46к сэмплов в секунду = 23к комплексных сэмплов
-    dsp->dsp_params->read_params.readout_per_seconds = 10;
-
-    // если при подготовке возникли ошибки - выход
-    if(dsp->prepair_to_record()) return;
-
-    // если подготовка к записи завершена успешно, то можно начинать калибровку
-    sdr->sdr_params->is_open = true;
-
-// в качестве тестировки можно здесь запустить все потоки - должен начаться прием с кальмара с выставленными настройками
-
-    // массив средних значений уровня калибратора при различных преселекторах
-    // при выбранной центральной частоте X максимальное значение должна иметь ячейка X
-    float avg_measurments[RPU_NUMBER_OF_PRESELECTORS], max;
-    int i, j, k, maxIdx = -1;
-    QString test_res;
-
-    dsp->dsp_params->read_params.is_receiving = true;
-
-    // для каждого из десяти преселекторов осуществляется заполнение одного КБ чтения
-    for(i = 0; i < RPU_NUMBER_OF_PRESELECTORS; i++){
-        test_res = "   Testing freq №" + QString::number(i) + " (" + QString::number(preselectors_central_freqs[i]) + "): ";
-        max = -200.; // -200 dB - вряд ли будет меньше
-
-        // выставляется центральная частота преселектора
-        // калибратор должен автоматически начать генерацию колебания с этой частотой
-        rpu->first_tract.set_central_freq(preselectors_central_freqs[i]);
-
-        // обнуляем массив средних значений
-        ippsZero_32f(avg_measurments, RPU_NUMBER_OF_PRESELECTORS);
-
-        // не понятно в какой последовательности нужно отсылать кодограммы в приемник
-        for(j = 0; j < RPU_NUMBER_OF_PRESELECTORS; j++){
-            // ------------------------------
-            // ручной выбор j-го преселектора
-            rpu->first_tract.send_tract_settings_to_RPU(j, preselectors_central_freqs[i]);
-            // ------------------------------
-
-            //wait(10); // время для перстройки каскадов
-            // прием в течении секунды
-            dsp->dsp_params->read_params.is_receiving = false;
-            for(int c = 0; c < 15; c++) dsp->reader->get_one_read_step();
-
-            dsp->dsp_params->read_params.is_receiving = true;
-            dsp->reader->get_one_read_step();// - прогонка одного цикла приема
-
-            // qDebug() << "   get calc";
-
-            // считаем сумму 12 центральных бинов БПФ
-            for(k = 0; k < 12; k++){
-                // 0..5
-                if(k < 6) avg_measurments[j] += dsp->dsp_params->fft_params.fft_res[k];
-                // 6..11
-                else avg_measurments[j] += dsp->dsp_params->fft_params.fft_res[DSP_FFT_SIZE - 1 - (11 - k)];
-            }
-            // усредняем полученный результат
-            avg_measurments[j] /= 12;
-            test_res += QString::number(double(avg_measurments[j]), 'g', 2) + ' ';
-            if(avg_measurments[j] > max){
-                max = avg_measurments[j];
-                maxIdx = j;
-            }
-        }
-
-        qDebug() << test_res;
-        qDebug() << "max freq is " << maxIdx;
-    }
-
-    dsp->dsp_params->read_params.is_receiving = false;
-
-    global_update_interface();
 }
 
 // перенос окна при зажатой ЛКМ

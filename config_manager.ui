@@ -76,8 +76,11 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="BPOTab">
      <attribute name="title">
@@ -202,7 +205,7 @@
      <widget class="QTabWidget" name="RPUTabs">
       <property name="geometry">
        <rect>
-        <x>9</x>
+        <x>6</x>
         <y>45</y>
         <width>587</width>
         <height>311</height>
@@ -1089,78 +1092,75 @@
         </item>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="AskrTab">
        <attribute name="title">
         <string>АСКР</string>
        </attribute>
-       <widget class="QPushButton" name="FirstValidatePB">
+       <widget class="QPushButton" name="AskrStartButton">
         <property name="geometry">
          <rect>
           <x>6</x>
-          <y>10</y>
-          <width>167</width>
+          <y>6</y>
+          <width>99</width>
           <height>25</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Тест преселекторов</string>
+         <string>Запуск АСКР</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="spinBox">
+       <widget class="QPlainTextEdit" name="AskrResTextBrowser">
         <property name="geometry">
          <rect>
-          <x>314</x>
-          <y>10</y>
-          <width>42</width>
-          <height>22</height>
+          <x>6</x>
+          <y>34</y>
+          <width>377</width>
+          <height>139</height>
          </rect>
         </property>
-        <property name="maximum">
-         <number>9</number>
+        <property name="font">
+         <font>
+          <family>Courier</family>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label">
+       <widget class="QProgressBar" name="AskrProgressBar">
         <property name="geometry">
          <rect>
-          <x>254</x>
-          <y>14</y>
-          <width>55</width>
-          <height>13</height>
+          <x>108</x>
+          <y>6</y>
+          <width>274</width>
+          <height>24</height>
          </rect>
         </property>
-        <property name="text">
-         <string>Прес. №</string>
+        <property name="minimumSize">
+         <size>
+          <width>274</width>
+          <height>24</height>
+         </size>
         </property>
-       </widget>
-       <widget class="QLabel" name="FreqPresNbL">
-        <property name="geometry">
-         <rect>
-          <x>236</x>
-          <y>42</y>
-          <width>75</width>
-          <height>16</height>
-         </rect>
+        <property name="maximumSize">
+         <size>
+          <width>274</width>
+          <height>24</height>
+         </size>
         </property>
-        <property name="text">
-         <string>Частота. №</string>
+        <property name="value">
+         <number>0</number>
         </property>
-       </widget>
-       <widget class="QSpinBox" name="FreqPresNbSB">
-        <property name="geometry">
-         <rect>
-          <x>314</x>
-          <y>40</y>
-          <width>42</width>
-          <height>22</height>
-         </rect>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
-        <property name="maximum">
-         <number>9</number>
+        <property name="textVisible">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -1179,7 +1179,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="SDRTab">
+    <widget class="QWidget" name="SdrTab">
      <attribute name="title">
       <string>SDR</string>
      </attribute>
@@ -1340,9 +1340,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>94</x>
-        <y>132</y>
+        <y>133</y>
         <width>59</width>
-        <height>25</height>
+        <height>23</height>
        </rect>
       </property>
       <property name="font">
@@ -1505,7 +1505,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="FftInversionLabel_2">
       <property name="geometry">
        <rect>
-        <x>167</x>
+        <x>232</x>
         <y>134</y>
         <width>67</width>
         <height>20</height>
@@ -1523,7 +1523,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="RtlAgcCB">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>302</x>
         <y>140</y>
         <width>13</width>
         <height>13</height>
@@ -1602,8 +1602,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="SampleRateLabel">
       <property name="geometry">
        <rect>
-        <x>263</x>
-        <y>134</y>
+        <x>232</x>
+        <y>102</y>
         <width>23</width>
         <height>20</height>
        </rect>
@@ -1620,10 +1620,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="SdrSampleRateCB">
       <property name="geometry">
        <rect>
-        <x>291</x>
-        <y>130</y>
-        <width>101</width>
-        <height>25</height>
+        <x>260</x>
+        <y>101</y>
+        <width>99</width>
+        <height>23</height>
        </rect>
       </property>
       <property name="font">
@@ -1664,9 +1664,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>166</y>
+        <y>167</y>
         <width>150</width>
-        <height>25</height>
+        <height>23</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1725,6 +1725,24 @@ p, li { white-space: pre-wrap; }
        </size>
       </property>
      </widget>
+     <widget class="QLabel" name="GainDbLabel">
+      <property name="geometry">
+       <rect>
+        <x>156</x>
+        <y>134</y>
+        <width>21</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>дБ</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="DSPTab">
      <attribute name="title">
@@ -1736,14 +1754,14 @@ p, li { white-space: pre-wrap; }
         <x>6</x>
         <y>14</y>
         <width>501</width>
-        <height>223</height>
+        <height>317</height>
        </rect>
       </property>
       <property name="tabShape">
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="RecordTab">
        <attribute name="title">
@@ -2097,8 +2115,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="InversionCB">
         <property name="geometry">
          <rect>
-          <x>348</x>
-          <y>16</y>
+          <x>366</x>
+          <y>15</y>
           <width>16</width>
           <height>16</height>
          </rect>
@@ -2119,10 +2137,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="FftModeLabel">
         <property name="geometry">
          <rect>
-          <x>3</x>
-          <y>11</y>
+          <x>4</x>
+          <y>10</y>
           <width>57</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2137,8 +2155,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QComboBox" name="WindowCB">
         <property name="geometry">
          <rect>
-          <x>52</x>
-          <y>77</y>
+          <x>50</x>
+          <y>69</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -2177,15 +2195,15 @@ p, li { white-space: pre-wrap; }
        <widget class="QSpinBox" name="AverageNumSB">
         <property name="geometry">
          <rect>
-          <x>132</x>
-          <y>44</y>
+          <x>138</x>
+          <y>40</y>
           <width>61</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>11</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="layoutDirection">
@@ -2207,15 +2225,15 @@ p, li { white-space: pre-wrap; }
        <widget class="QComboBox" name="FftModeCB">
         <property name="geometry">
          <rect>
-          <x>69</x>
-          <y>11</y>
+          <x>64</x>
+          <y>8</y>
           <width>153</width>
-          <height>22</height>
+          <height>23</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>11</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="currentIndex">
@@ -2239,14 +2257,19 @@ p, li { white-space: pre-wrap; }
           <string>смещенный</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>демодулированный</string>
+         </property>
+        </item>
        </widget>
        <widget class="QLabel" name="AveragesNumLabel">
         <property name="geometry">
          <rect>
-          <x>94</x>
-          <y>44</y>
+          <x>100</x>
+          <y>40</y>
           <width>36</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2261,33 +2284,33 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="FftInversionLabel">
         <property name="geometry">
          <rect>
-          <x>264</x>
-          <y>11</y>
-          <width>81</width>
-          <height>22</height>
+          <x>224</x>
+          <y>10</y>
+          <width>139</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>13</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Инверсия:</string>
+         <string>Инверсия спектра:</string>
         </property>
        </widget>
        <widget class="QSpinBox" name="ReadOutPerSecSB">
         <property name="geometry">
          <rect>
-          <x>39</x>
-          <y>44</y>
+          <x>42</x>
+          <y>40</y>
           <width>47</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>11</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="frame">
@@ -2306,10 +2329,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="MaxAverageNumber">
         <property name="geometry">
          <rect>
-          <x>196</x>
-          <y>44</y>
+          <x>206</x>
+          <y>40</y>
           <width>49</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2325,9 +2348,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>3</x>
-          <y>77</y>
+          <y>70</y>
           <width>49</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2342,15 +2365,15 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="ReadOutPerSecLabel">
         <property name="geometry">
          <rect>
-          <x>3</x>
-          <y>44</y>
+          <x>4</x>
+          <y>40</y>
           <width>35</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>13</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
@@ -2360,15 +2383,15 @@ p, li { white-space: pre-wrap; }
        <widget class="QDoubleSpinBox" name="ShiftFreqSB">
         <property name="geometry">
          <rect>
-          <x>141</x>
-          <y>110</y>
+          <x>140</x>
+          <y>100</y>
           <width>136</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>13</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="frame">
@@ -2388,9 +2411,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>285</x>
-          <y>110</y>
+          <y>100</y>
           <width>22</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2406,9 +2429,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>3</x>
-          <y>110</y>
+          <y>100</y>
           <width>132</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2423,10 +2446,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="WindowAlphaLabel">
         <property name="geometry">
          <rect>
-          <x>158</x>
-          <y>77</y>
+          <x>166</x>
+          <y>68</y>
           <width>47</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2441,15 +2464,15 @@ p, li { white-space: pre-wrap; }
        <widget class="QDoubleSpinBox" name="WindowAlphaSB">
         <property name="geometry">
          <rect>
-          <x>208</x>
-          <y>77</y>
+          <x>218</x>
+          <y>68</y>
           <width>67</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>13</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="frame">
@@ -2471,29 +2494,11 @@ p, li { white-space: pre-wrap; }
          <double>0.500000000000000</double>
         </property>
        </widget>
-       <widget class="QCheckBox" name="FftShiftStepCB">
-        <property name="geometry">
-         <rect>
-          <x>309</x>
-          <y>111</y>
-          <width>52</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>шаг</string>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="NullBinCircleCB">
         <property name="geometry">
          <rect>
-          <x>348</x>
-          <y>44</y>
+          <x>364</x>
+          <y>162</y>
           <width>17</width>
           <height>21</height>
          </rect>
@@ -2510,20 +2515,154 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="NullBinLabel">
         <property name="geometry">
          <rect>
-          <x>279</x>
-          <y>44</y>
+          <x>298</x>
+          <y>160</y>
           <width>65</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>13</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
          <string>0-й бин:</string>
         </property>
+       </widget>
+       <widget class="QLabel" name="FreqGridLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>130</y>
+          <width>107</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Сетка частот:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="FreqGridCB">
+        <property name="geometry">
+         <rect>
+          <x>108</x>
+          <y>130</y>
+          <width>57</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>БПО</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SDR</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="FftStyleLabel">
+        <property name="geometry">
+         <rect>
+          <x>176</x>
+          <y>130</y>
+          <width>115</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Стиль спектра:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="FftStyleCB">
+        <property name="geometry">
+         <rect>
+          <x>292</x>
+          <y>129</y>
+          <width>85</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>ломаная</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>бины</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>точки</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="FftSonoPaletteLabel">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>160</y>
+          <width>169</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Палитра сонограммы:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="FftSonoPaletteCB">
+        <property name="geometry">
+         <rect>
+          <x>168</x>
+          <y>158</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>Палитра №1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Палитра №2</string>
+         </property>
+        </item>
        </widget>
       </widget>
       <widget class="QWidget" name="DemodTab">
@@ -2533,10 +2672,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QRadioButton" name="AMDemodRB">
         <property name="geometry">
          <rect>
-          <x>8</x>
-          <y>44</y>
+          <x>10</x>
+          <y>70</y>
           <width>51</width>
-          <height>17</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2557,10 +2696,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QRadioButton" name="USBDemodRB">
         <property name="geometry">
          <rect>
-          <x>62</x>
-          <y>44</y>
+          <x>64</x>
+          <y>70</y>
           <width>57</width>
-          <height>17</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2582,9 +2721,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>128</x>
-          <y>44</y>
+          <y>70</y>
           <width>53</width>
-          <height>17</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2606,9 +2745,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>194</x>
-          <y>44</y>
+          <y>70</y>
           <width>49</width>
-          <height>17</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2632,26 +2771,34 @@ p, li { white-space: pre-wrap; }
        <widget class="QSpinBox" name="ScaleFactorSB">
         <property name="geometry">
          <rect>
-          <x>168</x>
-          <y>72</y>
+          <x>208</x>
+          <y>100</y>
           <width>42</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
-         <number>-10</number>
+         <number>-20</number>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>20</number>
         </property>
        </widget>
        <widget class="QSpinBox" name="FltBwSB">
         <property name="geometry">
          <rect>
-          <x>178</x>
-          <y>12</y>
+          <x>188</x>
+          <y>10</y>
           <width>91</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2684,10 +2831,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="FltBwHzLabel">
         <property name="geometry">
          <rect>
-          <x>276</x>
-          <y>12</y>
+          <x>284</x>
+          <y>10</y>
           <width>31</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2705,7 +2852,7 @@ p, li { white-space: pre-wrap; }
           <x>8</x>
           <y>10</y>
           <width>165</width>
-          <height>22</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2721,9 +2868,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>70</y>
-          <width>155</width>
-          <height>22</height>
+          <y>100</y>
+          <width>197</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="font">
@@ -2732,7 +2879,52 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="text">
-         <string>Степень усиления:</string>
+         <string>Коэффициент усиления:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="TransparencyLabel">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>40</y>
+          <width>179</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Прозрачность полосы:</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="TransparencySB">
+        <property name="geometry">
+         <rect>
+          <x>188</x>
+          <y>40</y>
+          <width>62</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.500000000000000</double>
         </property>
        </widget>
       </widget>
@@ -2807,7 +2999,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>WindowCB</tabstop>
   <tabstop>WindowAlphaSB</tabstop>
   <tabstop>ShiftFreqSB</tabstop>
-  <tabstop>FftShiftStepCB</tabstop>
   <tabstop>NullBinCircleCB</tabstop>
   <tabstop>AMDemodRB</tabstop>
   <tabstop>USBDemodRB</tabstop>

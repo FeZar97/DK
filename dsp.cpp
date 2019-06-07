@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "dsp.h"
 
 DSP::DSP(SDR *new_sdr)
@@ -80,9 +97,10 @@ void DSP::bind_objects()
 
     fft->moveToThread(&fft_thread);
     connect(&fft_thread, &QThread::finished, fft, &QObject::deleteLater);
-    connect(reader, &READER::get_fft_step, fft, &FFT_CALCER::get_fft_step);
-    connect(flt, &FILTER::get_fft_step, fft, &FFT_CALCER::get_fft_step);
-    connect(shifter, &SHIFTER::get_fft_step, fft, &FFT_CALCER::get_fft_step);
+    connect(reader, &READER::get_fft_step, fft, &FFT_CALCER::get_fft_step_fc);
+    connect(flt, &FILTER::get_fft_step, fft, &FFT_CALCER::get_fft_step_fc);
+    connect(shifter, &SHIFTER::get_fft_step, fft, &FFT_CALCER::get_fft_step_fc);
+    connect(demod, &DEMODULATOR::get_fft_step, fft, &FFT_CALCER::get_fft_step_f);
 
     demod->moveToThread(&demod_thread);
     connect(shifter, &SHIFTER::get_demod_step, demod, &DEMODULATOR::get_demod_step);

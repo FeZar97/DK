@@ -1,44 +1,58 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "stylehelper.h"
 
 QString StyleHelper::getWindowStyleSheet()
 {
     return
 /// QWidget
-            "QWidget{"
-            "    background-color: #454545;"
-            "    border: 1px solid black;"
-            "    border-radius: 3px;"
-            "}"
+           "QWidget{"
+           "    background-color: #454545;"
+           "    border: 1px solid black;"
+           "    border-radius: 3px;"
+           "}"
 /// QLabel
-            "QLabel{"
-            "    color: #DCDCDC;"
-            "    border: none;"
-            "}"
+           "QLabel{"
+           "    color: #DCDCDC;"
+           "    border: none;"
+           "}"
 /// QSpinBox
            "QSpinBox {"
-           "     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
-           "     border: 1px;"
-           "     color: #de8e37;"
+           "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
+           "    border: 1px solid rgb(95, 95, 95);"
+           "    color: #de8e37;"
            "}"
 /// QDoubleSpinBox
            "QDoubleSpinBox{"
-           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
-           "border: 1px;"
-           "color: #de8e37;"
+           "    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
+           "    border: 1px solid rgb(95, 95, 95);"
+           "    color: #de8e37;"
            "}"
 /// QProgressBar
-           "QProgressBar:horizontal{"
-           "    border: 1px solid gray;"
-           "    border-radius: 3px;"
-           "    background: #454545;"
-           "    padding: 1px;"
-           "    margin-right: 4ex;"
-           "}"
-           "QProgressBar::chunk:horizontal{"
-           "    background: #de8e37;"
-           "    margin-right: 2px;"
-           "    width: 10px;"
-           "}"
+            //"QProgressBar:horizontal{"
+            //"    border: 1px solid gray;"
+            //"    border-radius: 3px;"
+            //"    background: #454545;"
+            //"    color: #C3C3C3;"
+            //"}"
+            //"QProgressBar::chunk:horizontal{"
+            //"    background: #de8e37;"
+            //"}"
 /// QSlider
            "QSlider:vertical{"
            "    border: none;"
@@ -50,6 +64,10 @@ QString StyleHelper::getWindowStyleSheet()
             "   border: 1px solid rgb(95, 95, 95);"
             "   color: #de8e37;"
             "   background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
+            "}"
+            "QComboBox QAbstractItemView {"
+            "   background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(51, 51, 51), stop: 0.4 rgb(39, 39, 39), stop: 0.5 rgb(32,32,32), stop: 1.0 rgb(38,38,38));"
+            "   color: #de8e37;"
             "}"
 /// QPushButton
             "QPushButton{"
@@ -66,6 +84,16 @@ QString StyleHelper::getWindowStyleSheet()
             "   color: #de8e37;"
             "   border: 0px;"
             "   background: #454545;"
+            "}"
+/// QTextBrowser
+            "QTextBrowser{"
+            "   border: 1px solid black;"
+            "   color: #DCDCDC;"
+            "}"
+/// QPlainTextEdit
+            "QPlainTextEdit{"
+            "   border: 1px solid black;"
+            "   color: #DCDCDC;"
             "}"
             ;
 }

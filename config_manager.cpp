@@ -1,3 +1,20 @@
+/*
+    This file is part of DigitalKalmar(Кальмар-SDR)
+
+    DigitalKalmar is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DigitalKalmar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "config_manager.h"
 #include "ui_config_manager.h"
 
@@ -96,6 +113,7 @@ void config_manager::update_sdr_tab()
     }
     ui->CurrentDevSpinBox->setValue(sdr->sdr_params->index);
 
+    // частота дискретизации
     int idx;
     switch(sdr->sdr_params->sample_rate){
         case 240000:
@@ -105,14 +123,17 @@ void config_manager::update_sdr_tab()
             idx = 1;
             break;
     }
+    // частота дискретизации
     ui->SdrSampleRateCB->blockSignals(true);
     ui->SdrSampleRateCB->setCurrentIndex(idx);
     ui->SdrSampleRateCB->blockSignals(false);
 
+    // усиление
     ui->GainValBox->setCurrentIndex(sdr->sdr_params->gain_idx);
     ui->RtlAgcCB->setChecked(sdr->sdr_params->rtl_agc);
     ui->DirectSamplingCB->setCurrentIndex(sdr->sdr_params->direct_sampling_idx);
 
+    // строка выбора приемника по номеру
     // если приемник еще не добавлен, но есть доступные приемники
     ui->CurrentDevNumLabel->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
     ui->CurrentDevSpinBox->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
@@ -121,6 +142,9 @@ void config_manager::update_sdr_tab()
     // и есть свободные приемники
     ui->ConnectButton->setEnabled(!sdr->sdr_params->is_open && sdr->get_sdr_count());
     ui->DisconnectButton->setEnabled(sdr->sdr_params->is_open);
+
+    // обновление инфы о приемниках допускается только при отключенном приемнике
+    ui->ReloadButton->setEnabled(!sdr->sdr_params->is_open);
 
     // частота дискретизации может меняться только при условии подключенного приемника и пока не идет запись
     ui->SampleRateLabel->setEnabled(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving);
@@ -147,9 +171,9 @@ void config_manager::update_dsp_tab()
 
     ui->FltBwSB->setMaximum(sdr->sdr_params->sample_rate);
     ui->FltBwSB->setValue(dsp->dsp_params->flt_params.fltBw);
+    ui->TransparencySB->setValue(dsp->dsp_params->fft_params.fft_fltBwAlpha);
 
     ui->ShiftFreqSB->setValue(dsp->dsp_params->shift_params.r_frec);
-    ui->FftShiftStepCB->setChecked(dsp->dsp_params->shift_params.step);
     ui->ShiftFreqSB->setMaximum(sdr->sdr_params->sample_rate / 2);
     ui->ShiftFreqSB->setMinimum((-1) * double(sdr->sdr_params->sample_rate / 2));
 
@@ -167,6 +191,10 @@ void config_manager::update_dsp_tab()
     ui->WindowAlphaLabel->setEnabled(alpha_enabled);
     ui->WindowAlphaSB->setEnabled(alpha_enabled);
 
+    ui->FreqGridCB->setCurrentIndex(dsp->dsp_params->fft_params.fft_frqGrdIdx);
+    ui->FftStyleCB->setCurrentIndex(dsp->dsp_params->fft_params.fft_stlIdx);
+    ui->FftSonoPaletteCB->setCurrentIndex(dsp->dsp_params->fft_params.fft_sonoPltIdx);
+
     // доступность изменения частоты дискретизации
     ui->ReadOutPerSecLabel->setEnabled(enabled_flag);
     ui->ReadOutPerSecSB->setEnabled(enabled_flag);
@@ -178,13 +206,13 @@ void config_manager::update_dsp_tab()
     ui->SoundSignalCB->setChecked(dsp->dsp_params->sound_params.write_to_file);
 
     if(dsp->dsp_params->read_params.write_to_file)
-        ui->ReaderKbLabel->setText(QString::number(dsp->reader_rec->params->file.pos() / 1024) + " kB");
+        ui->ReaderKbLabel->setText(QString::number(dsp->reader_rec->params->file.pos() / 1024) + " кБ");
     if(dsp->dsp_params->flt_params.write_to_file)
-        ui->FltKbLabel->setText(QString::number(dsp->flt_rec->params->file.pos() / 1024) + " kB");
+        ui->FltKbLabel->setText(QString::number(dsp->flt_rec->params->file.pos() / 1024) + " кБ");
     if(dsp->dsp_params->shift_params.write_to_file)
-        ui->ShiftKbLabel->setText(QString::number(dsp->shift_rec->params->file.pos() / 1024) + " kB");
+        ui->ShiftKbLabel->setText(QString::number(dsp->shift_rec->params->file.pos() / 1024) + " кБ");
     if(dsp->dsp_params->sound_params.write_to_file)
-        ui->SoundKbLabel->setText(QString::number(dsp->sound_rec->params->file.pos() / 1024) + " kB");
+        ui->SoundKbLabel->setText(QString::number(dsp->sound_rec->params->file.pos() / 1024) + " кБ");
 
     // если флаг кратности == true, то шаг = (частота дискретизации) / (DSP_FFT_SIZE)
     // если флаг кратности == false, то шаг = 1
@@ -212,6 +240,9 @@ void config_manager::update_dsp_tab()
         case QPSK:
             break;
     }
+
+    // звуковая карта
+    ui->ScaleFactorSB->setValue(dsp->dsp_params->sound_params.scale_facor);
 }
 
 // применение стиля
@@ -235,15 +266,22 @@ void config_manager::set_ui_style()
     ui->LSBDemodRB->setStyleSheet(StyleHelper::getDemodRBStyleSheet());
     ui->FMDemodRB->setStyleSheet(StyleHelper::getDemodRBStyleSheet());
 
-    // SDR
-    //ui->RefreshButton->setStyleSheet(StyleHelper::getRefreshStyleSheet());
-    //ui->ConfirmButton->setStyleSheet(StyleHelper::getConfirmStyleSheet(true));
-
     // запись
     ui->AdcPathButton->setStyleSheet(StyleHelper::getPathButtonStyleSheet());
     ui->FltPathButton->setStyleSheet(StyleHelper::getPathButtonStyleSheet());
     ui->ShiftPathButton->setStyleSheet(StyleHelper::getPathButtonStyleSheet());
     ui->SoundPathButton->setStyleSheet(StyleHelper::getPathButtonStyleSheet());
+}
+
+void config_manager::appendAskrTextBrowser(QString additionalText)
+{
+    ui->AskrResTextBrowser->setPlainText(additionalText);
+    ui->AskrResTextBrowser->moveCursor(QTextCursor::End);
+}
+
+void config_manager::updateAskrProgressBar(int val)
+{
+    ui->AskrProgressBar->setValue(val);
 }
 
 /// --------------------------------РПУ----------------------------------------
@@ -295,14 +333,15 @@ void config_manager::on_KalibSignalTypeBox_currentIndexChanged(int new_signal_ty
 }
 
 // АСКР
-void config_manager::on_FirstValidatePB_clicked()
+void config_manager::on_AskrStartButton_clicked()
 {
-    emit first_rpu_test();
+    emit startAskr();
 }
 
 void config_manager::on_Tract1_CentralFreqSB_valueChanged(int new_central_freq)
 {
     rpu->first_tract.set_central_freq(new_central_freq * 1000);
+    emit repaintFftGraph();
 }
 
 void config_manager::on_Tract1_AttInBox_currentIndexChanged(int new_in_att_idx)
@@ -331,6 +370,7 @@ void config_manager::on_ReloadButton_clicked()
 {
     sdr->read_sdr_info();
     ui->FindedSdrTE->setText(sdr->sdr_params->sdrInfo);
+    update_sdr_tab();
 }
 
 // очистка информационного поля
@@ -361,15 +401,19 @@ void config_manager::on_ConnectButton_clicked()
 // отключение от приемника
 void config_manager::on_DisconnectButton_clicked()
 {
-    if(sdr->sdr_params->is_open && !dsp->dsp_params->read_params.is_receiving){
-        int result = rtlsdr_close(sdr->sdr_params->sdr_ptr);
+    if(sdr->sdr_params->is_open){
+        if(!dsp->dsp_params->read_params.is_receiving){
+            int result = rtlsdr_close(sdr->sdr_params->sdr_ptr);
 
-        if(!result){
-            sdr->sdr_params->is_open = false;
+            if(!result){
+                sdr->sdr_params->is_open = false;
+            }else{
+                sdr->sdr_params->is_open = true;
+            }
+            emit global_update_interface();
         }else{
-            sdr->sdr_params->is_open = true;
+            QMessageBox(QMessageBox::Information, "Ошибка", "Для отключения СПО от приемника необходимо остановить работу СПО.").exec();
         }
-        emit global_update_interface();
     }
 }
 
@@ -377,7 +421,13 @@ void config_manager::on_DisconnectButton_clicked()
 void config_manager::on_SdrSampleRateCB_currentIndexChanged(int new_sample_rate_idx)
 {
     sdr->set_sample_rate(sample_rates[new_sample_rate_idx]);
-    ui->FltBwSB->setMaximum(sample_rates[new_sample_rate_idx]);
+    ui->FltBwSB->setMaximum(sdr->sdr_params->sample_rate);
+
+    dsp->dsp_params->flt_params.fltRFrec = dsp->dsp_params->flt_params.fltBw / double(2 * sdr->sdr_params->sample_rate);
+    dsp->dsp_params->flt_params.recalc_flt_coeffs();
+
+    emit global_update_interface();
+    emit repaintFftGraph();
 }
 
 // смена КУ
@@ -429,6 +479,8 @@ void config_manager::on_FftModeCB_currentIndexChanged(int new_fft_mode)
 void config_manager::on_InversionCB_clicked(bool new_fft_inversion)
 {
     dsp->dsp_params->fft_params.fft_inversion = new_fft_inversion;
+    emit repaintFftGraph();
+    emit repaintSonoGraph();
 }
 
 void config_manager::on_ShiftFreqSB_valueChanged(double new_r_frec)
@@ -439,11 +491,6 @@ void config_manager::on_ShiftFreqSB_valueChanged(double new_r_frec)
 void config_manager::on_DCOffsetGain_valueChanged(double new_dc_gain)
 {
     dsp->dsp_params->fft_params.dc_offset_gain = float(new_dc_gain);
-}
-
-void config_manager::on_FftShiftStepCB_clicked(bool new_state)
-{
-    dsp->dsp_params->shift_params.step = new_state;
 }
 
 void config_manager::on_NullBinCircleCB_clicked(bool new_state)
@@ -593,6 +640,7 @@ void config_manager::on_FltBwSB_valueChanged(int _fltBw)
     dsp->dsp_params->flt_params.recalc_flt_coeffs();
 
     emit global_update_interface();
+    emit repaintFftGraph();
 }
 
 // изменение кол-ва усреднений в секунду
@@ -653,25 +701,21 @@ void config_manager::update_sound_rec_label()
 
 void config_manager::on_AMDemodRB_clicked()
 {
-    dsp->dsp_params->sound_params.scale_facor = -4;
     dsp->dsp_params->demod_params.demod_mode = AM;
 }
 
 void config_manager::on_USBDemodRB_clicked()
 {
-    dsp->dsp_params->sound_params.scale_facor = -4;
     dsp->dsp_params->demod_params.demod_mode = USB;
 }
 
 void config_manager::on_LSBDemodRB_clicked()
 {
-    dsp->dsp_params->sound_params.scale_facor = -4;
     dsp->dsp_params->demod_params.demod_mode = LSB;
 }
 
 void config_manager::on_FMDemodRB_clicked()
 {
-    dsp->dsp_params->sound_params.scale_facor = 1;
     dsp->dsp_params->demod_params.demod_mode = FM;
 }
 
@@ -680,12 +724,26 @@ void config_manager::on_ScaleFactorSB_valueChanged(int _scFct)
     dsp->dsp_params->sound_params.scale_facor = _scFct;
 }
 
-void config_manager::on_spinBox_valueChanged(int _presNb)
+void config_manager::on_FreqGridCB_currentIndexChanged(int _freq_grid)
 {
-    rpu->first_tract.send_tract_settings_to_RPU(_presNb, preselectors_central_freqs[ui->FreqPresNbSB->value()]);
+    dsp->dsp_params->fft_params.fft_frqGrdIdx = _freq_grid;
+    emit repaintFftGraph();
 }
 
-void config_manager::on_FreqPresNbSB_valueChanged(int _freqPresNb)
+void config_manager::on_FftStyleCB_currentIndexChanged(int _style_idx)
 {
-    rpu->first_tract.send_tract_settings_to_RPU(ui->spinBox->value(), preselectors_central_freqs[_freqPresNb]);
+    dsp->dsp_params->fft_params.fft_stlIdx = _style_idx;
+    emit repaintFftGraph();
+}
+
+void config_manager::on_FftSonoPaletteCB_currentIndexChanged(int _palette_idx)
+{
+    dsp->dsp_params->fft_params.fft_sonoPltIdx = _palette_idx;
+    emit repaintSonoGraph();
+}
+
+void config_manager::on_TransparencySB_valueChanged(double _fltBwAlpha)
+{
+    dsp->dsp_params->fft_params.fft_fltBwAlpha = _fltBwAlpha;
+    emit repaintFftGraph();
 }
