@@ -56,7 +56,8 @@ SOURCES += main.cpp\
            SonoGraph.cpp \
            iqcompensator.cpp \
     askr.cpp \
-    splashscreen.cpp
+    splashscreen.cpp \
+    ConstellationDiagram.cpp
 
 HEADERS  += definitions.h \
             widget.h \
@@ -80,11 +81,13 @@ HEADERS  += definitions.h \
             SonoGraph.h \
             iqcompensator.h \
     askr.h \
-    splashscreen.h
+    splashscreen.h \
+    ConstellationDiagram.h
 
 FORMS    += widget.ui \
             config_manager.ui \
-            splashscreen.ui
+            splashscreen.ui \
+    ConstellationDiagram.ui
 
 INCLUDEPATH += ../RTL/include
 LIBS += ../RTL/lib/rtlsdr.lib

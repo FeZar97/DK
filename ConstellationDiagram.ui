@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConstellationDiagram</class>
+ <widget class="QWidget" name="ConstellationDiagram">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>278</width>
+    <height>301</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="Diagram" native="true">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>26</y>
+     <width>271</width>
+     <height>271</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="SymbolRateSB">
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>4</y>
+     <width>63</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="frame">
+    <bool>false</bool>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9999999</number>
+   </property>
+   <property name="value">
+    <number>100</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="SymbolRateLabel">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>4</y>
+     <width>31</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Бод</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ModulationLabel">
+   <property name="geometry">
+    <rect>
+     <x>2</x>
+     <y>4</y>
+     <width>89</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Модуляция:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="DemodAlgoCB">
+   <property name="geometry">
+    <rect>
+     <x>92</x>
+     <y>2</y>
+     <width>63</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <item>
+    <property name="text">
+     <string>ФМ-2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ФМ-4</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ФМ-8</string>
+    </property>
+   </item>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
