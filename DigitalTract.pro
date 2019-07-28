@@ -14,19 +14,19 @@
 #  along with DigitalKalmar.  If not, see <https://www.gnu.org/licenses/>.
 
 #-------------------------------------------------
-# Project created by FeZaR97
+# Project created by FeZar97
 #-------------------------------------------------
 
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-VERSION = 2.19.5.27
+VERSION = 1.19.6.11
 
-QMAKE_TARGET_COMPANY     = FeZaR97
+QMAKE_TARGET_COMPANY     = FeZar97
 QMAKE_TARGET_PRODUCT     = Kalmar-SDR
 QMAKE_TARGET_DESCRIPTION = Kalmar-SDR
-QMAKE_TARGET_COPYRIGHT   = FeZaR97
+QMAKE_TARGET_COPYRIGHT   = FeZar97
 
 QT += multimedia
 qtHaveModule(multimedia): QT += multimedia
@@ -55,9 +55,9 @@ SOURCES += main.cpp\
            FftGraph.cpp \
            SonoGraph.cpp \
            iqcompensator.cpp \
-    askr.cpp \
-    splashscreen.cpp \
-    ConstellationDiagram.cpp
+           askr.cpp \
+           splashscreen.cpp \
+           ConstellationDiagram.cpp
 
 HEADERS  += definitions.h \
             widget.h \
@@ -80,23 +80,23 @@ HEADERS  += definitions.h \
             FftGraph.h \
             SonoGraph.h \
             iqcompensator.h \
-    askr.h \
-    splashscreen.h \
-    ConstellationDiagram.h
+            askr.h \
+            splashscreen.h \
+            ConstellationDiagram.h
 
 FORMS    += widget.ui \
             config_manager.ui \
             splashscreen.ui \
-    ConstellationDiagram.ui
+            ConstellationDiagram.ui
 
 INCLUDEPATH += ../RTL/include
 LIBS += ../RTL/lib/rtlsdr.lib
 LIBS += ../RTL/lib/convenience_static.lib
 LIBS += ../RPU/inpoutx64.lib
 
-include(../Qt IPP/LIBS/ipp.pri)
+include($$PWD/../Qt IPP/LIBS/ipp.pri)
 
-RESOURCES +=  images.qrc
+RESOURCES += images.qrc
 
 win32: RC_ICONS = $$PWD/buttons/SquidLow.ico
 
